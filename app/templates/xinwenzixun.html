@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+<meta>
+<title>article_list</title>
+<meta name="keywords" content=""/>
+<meta name="description" content=""/>
+<link href="/static/main/css/main.css" rel="stylesheet" type="text/css">
+<script src="/static/main/js/jquery.min.1.8.2.js"></script>
+
+</head>
+<body>
+{%include 'main/top.html'%}
+
+<div id="banner_inner">
+	<div style="background-image:url(/static/main/images/banner_inner.jpg);">　</div>
+	<div class="warp">
+		<h2><a href="/gongsijianjie">{{one.title}}<br></a></h2>
+	</div>
+</div>
+<div class="warp clearfix">
+	<div class="c_l">
+	<dl class="left_nav">					
+				{%for i in one_top.category%}
+					<dt><a href="/n/{{i.url}}" title="{{i.title}}">{{i.title}}</a></dt>
+				{%endfor%}
+				
+					
+				
+		</dl>
+		<ul class="list_left_btn">
+			<li><a href="/chanpinzonghui"><img src="/static/main/images/btn_products.jpg"></a></li>
+		</ul>
+		<div class="list_left">
+			<p class="title">推荐信息</p>
+			<ul>
+
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="c_r">
+		<div class="pos2">
+			<p><a href='/'>首页</a>
+			 > <a href='/nav_top/{{one.id}}'>{{one.title}}</a>
+			 </p>
+		</div>
+		<div class="list_news">
+			{%for i in articles%}
+			<dl class="clearfix">
+				<dt>{{i.timestamp|dateformat('d')}}<span>{{i.timestamp|dateformat('Y')}}-{{i.timestamp|dateformat('M')}}</span></dt>
+				<dd>
+					<h2><a href="/article/{{i.id}}">{{i.title}}</a></h2>
+					<!-- striptags去除HTML标签 -->
+					<p class="intro">{{i.body|striptags|truncate(200,False,end='...')}} </p> 
+					<p class="btn_more"><a href="/article/{{i.id}}"><img src="/static/main/images/btn_right_more.jpg"></a></p>
+				</dd>
+			</dl>
+			{%endfor%}
+		</div>
+
+		<div class="pages"> 
+			<span class="current">1</span>
+			<a href='list_3_2.html'>2</a>
+			<a href='list_3_3.html'>3</a>
+			<a href='list_3_2.html'>>></a>
+		</div>
+	</div>
+</div>
+
+{%include 'main/footer.html' %}
+
+</body>
+</html>
+

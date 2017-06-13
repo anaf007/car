@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+<head>
+<meta>
+<title>{{one.title}}</title>
+<meta name="keywords" content=""/>
+<meta name="description" content=""/>
+<link href="/static/main/css/main.css" rel="stylesheet" type="text/css">
+<script src="/static/main/js/jquery.min.1.8.2.js"></script>
+<!--[if IE 6]>
+<script src="js/DD_belatedPNG_0.0.8a.js"></script>
+<script type="text/javascript">DD_belatedPNG.fix('*');</script>
+<![endif]-->
+</head>
+<body>
+
+<script language=javascript type="text/javascript">
+(function(){
+    if(!Function.prototype.bind){
+        Function.prototype.bind = function(obj){
+            var owner = this,args = Array.prototype.slice.call(arguments),callobj = Array.prototype.shift.call(args);
+            return function(e){e=e||top.window.event||window.event;owner.apply(callobj,args.concat([e]));};
+        };
+    }
+})();
+var glume = function(id){
+    this.ctn = document.getElementById(id);
+    this.adLis = null;
+    this.btns = null;
+    this.animStep = 0.1;//动画速度0.1～0.9
+    this.switchSpeed = 3;//自动播放间隔(s)
+    this.defOpacity = 1;
+    this.tmpOpacity = 1;
+    this.crtIndex = 0;
+    this.crtLi = null;
+    this.adLength = 0;
+    this.timerAnim = null;
+    this.timerSwitch = null;
+    this.init();
+};
+glume.prototype = {
+    fnAnim:function(toIndex){
+        if(this.timerAnim){window.clearTimeout(this.timerAnim);}
+        if(this.tmpOpacity <= 0){
+            this.crtLi.style.opacity = this.tmpOpacity = this.defOpacity;
+            this.crtLi.style.filter = 'Alpha(Opacity=' + this.defOpacity*100 + ')';
+            this.crtLi.style.zIndex = 0;
+            this.crtIndex = toIndex;
+            return;
+        }
+        this.crtLi.style.opacity = this.tmpOpacity = this.tmpOpacity - this.animStep;
+        this.crtLi.style.filter = 'Alpha(Opacity=' + this.tmpOpacity*100 + ')';
+        this.timerAnim = window.setTimeout(this.fnAnim.bind(this,toIndex),50);
+    },
+    fnNextIndex:function(){
+        return (this.crtIndex >= this.adLength-1)?0:this.crtIndex+1;
+    },
+    fnSwitch:function(toIndex){
+        if(this.crtIndex==toIndex){return;}
+        this.crtLi = this.adLis[this.crtIndex];
+        for(var i=0;i<this.adLength;i++){
+            this.adLis[i].style.zIndex = 0;
+        }
+        this.crtLi.style.zIndex = 2;
+        this.adLis[toIndex].style.zIndex = 1;
+        for(var i=0;i<this.adLength;i++){
+            this.btns[i].className = '';
+        }
+        this.btns[toIndex].className = 'on'
+        this.fnAnim(toIndex);
+    },
+    fnAutoPlay:function(){
+        this.fnSwitch(this.fnNextIndex());
+    },
+    fnPlay:function(){
+        this.timerSwitch = window.setInterval(this.fnAutoPlay.bind(this),this.switchSpeed*1000);
+    },
+    fnStopPlay:function(){
+        window.clearTimeout(this.timerSwitch);
+    },
+    init:function(){
+        this.adLis = this.ctn.getElementsByTagName('li');
+        this.btns = this.ctn.getElementsByTagName('cite')[0].getElementsByTagName('span');
+        this.adLength = this.adLis.length;
+        for(var i=0,l=this.btns.length;i<l;i++){
+            with({i:i}){
+                this.btns[i].index = i;
+                this.btns[i].onclick = this.fnSwitch.bind(this,i);
+                this.btns[i].onclick = this.fnSwitch.bind(this,i);
+            }
+        }
+        this.adLis[this.crtIndex].style.zIndex = 2;
+        this.fnPlay();
+        this.ctn.onmouseover = this.fnStopPlay.bind(this);
+        this.ctn.onmouseout = this.fnPlay.bind(this);
+    }
+};
+var player1 = new glume('glume');
+
+//Tabs结合jquery的标签切换，showTabs(标签id名称前缀, 切换内容id前缀, 切换组id, 总切换标题数, 当前标签id);当前标签className为cur
+function showTabs(prefixTitle, prefixContent, id, total, curid){
+	for(var i=1;i<=total;i++){
+		$('#'+prefixContent+'_'+id+'_'+i).css('display', 'none');
+		$('#'+prefixTitle+'_'+id+'_'+i).removeClass('cur');	
+	}
+	$('#'+prefixContent+'_'+id+'_'+curid).css('display', 'block');
+	$('#'+prefixTitle+'_'+id+'_'+curid).addClass('cur');
+}
+</script>
+
+<div id="top">
+	<div class="warp clearfix">
+		<div class="logo"><a href="/"><img src="{{url_for('static',filename='main/images/logo.png')}}"></a></div>
+
+
+
+<ul class="nav clearfix">
+ <li class="shouye">
+		<a href="/" title="首页"><span>首页</span></a>
+</li>
+	{%for i in nav%}
+	<li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
+		<a href="/nav_top/{{i.id}}" title="{{i.title}}" class="bg1"><span>{{i.title}}</span></a>
+
+		<dl>
+		{%for x in i.category%}
+		<dd><a href="/nav/{{x.id}}" title="{{x.title}}">{{x.title}}</a></dd>
+		{%endfor%}
+
+		</dl> 
+	</li>
+
+	
+{%endfor%}
+{# if current_user.is_authenticated #}
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/user/usercenter" title="" class="bg1"><span>个人中心</span></a> -->
+	<!-- </li> -->
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/auth/login" title="" class="bg1"><span>发布信息</span></a> -->
+	<!-- </li> -->
+	{#else#}
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/auth/login" title="" class="bg1"><span>用户登录</span></a> -->
+	<!-- </li> -->
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/auth/register" title="" class="bg1"><span>快速注册</span></a> -->
+	<!-- </li> -->
+	{#endif#}
+</ul>
+
+
+
+
+	</div>
+	<div class="subnav">
+	</div>
+	<script>
+		$(document).ready(function(){
+			$("#top .subnav").hide();
+			$("#top .nav li dl").hide();
+		});
+		$("#top .nav").hover(
+			function(){
+				$("#top .nav li dl").slideDown(300);
+				$("#top .subnav").slideDown(300);
+			},
+			function(){
+				$("#top .nav li dl").slideUp(100);
+				$("#top .subnav").slideUp(100);
+			}
+		);
+	</script>
+</div>
+
+<div id="banner_inner">
+	<div style="background-image:url(/static/main/images/banner_inner.jpg);">　</div>
+	<div class="warp">
+		<h2><a href="/gongsijianjie">{{one.title}}<br></a></h2>
+	</div>
+</div>
+<div class="warp clearfix">
+	<div class="c_l">
+	<dl class="left_nav">					
+				 {%for i in one_top.category%}
+					<dt><a href="/nav/{{i.url}}" title="{{i.title}}">{{i.title}}</a></dt>
+				{%endfor%}
+				
+					
+				
+		</dl>
+		<ul class="list_left_btn">
+			<li><a href="/chanpinzonghui"><img src="/static/main/images/btn_products.jpg"></a></li>
+		</ul>
+		<div class="list_left">
+			<p class="title">推荐信息</p>
+			<ul>
+
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+<li><a href="/xinwendongtai/285.html">侧边文章</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="c_r">
+		<div class="pos2">
+			<p><a href='/'>首页</a>
+			> <a href='/nav_top/{{one_top.id}}'>{{one_top.title}}</a>
+			 > <a href='/nav/{{one.id}}'>{{one.title}}</a></p>
+		</div>
+		<h1 class="dis_title">{{one.title}}</h1>
+		<div class="dis_content2">
+			　　{{one.body|safe}}
+		</div>
+	</div>
+</div>
+
+{%include 'main/footer.html' %}
+
+</body>
+</html>

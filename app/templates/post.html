@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>post</title>
+</head>
+<body>
+	<h1>post</h1>   <br>
+
+	{%if current_user.can(Permission.WRITE_ARTICLES)%}
+		<form action="" method="post">
+			{{form.hidden_tag()}}
+			{{form.title.label}} : {{form.title}} <br>
+			{{form.body.label}} : {{form.body(class='ckeditor')}} <br>
+			{{form.submit()}}
+		</form>
+	{%endif%}
+
+	<br>
+
+	<ul>
+		{%for post in posts%}
+		<li>author:{{post.author.username}} <img src="{{post.author.gravatar(size=40)}}" alt="">  <br> <a href="{{url_for('.show_post',id=post.id)}}">{{post.title}}</a>: <br> {{post.body|safe}}</li>
+		{%endfor%}
+	</ul>
+
+	<ul>
+		{% if pagination.has_prev %}
+		<a href="{{ url_for('.post', page = pagination.prev_num) }}">上一页</a>{% else %}上一页 {% endif %} |
+		{% if pagination.has_next %}
+		<a href="{{ url_for('.post', page = pagination.next_num) }}">下一页</a>{% else %}下一页{% endif %}
+
+	</ul>
+
+</body>
+</html>
+<script src="{{url_for('static',filename='ckeditor/ckeditor.js')}}"></script>
+<script src="{{url_for('static',filename='ckeditor/config.js')}}"></script>
+<script src="{{url_for('static',filename='ckeditor/style.js')}}"></script>
+<script src="{{url_for('static',filename='ckeditor/plugin.js')}}"></script>

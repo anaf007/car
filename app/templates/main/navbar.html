@@ -1,0 +1,42 @@
+<ul class="nav clearfix">
+ <li class="shouye">
+		<a href="/" title="首页"><span>首页</span></a>
+</li>
+	{%for i in nav%}
+	<li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
+		<a href="/nav_top/{{i.id}}" title="{{i.title}}" class="bg1"><span>{{i.title}}</span></a>
+
+		<dl>
+		{%for x in i.category%}
+		<dd><a href="/nav/{{x.id}}" title="{{x.title}}">{{x.title}}</a></dd>
+		{%endfor%}
+
+		</dl> 
+	</li>
+
+	
+{%endfor%}
+<li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
+		<a href="/driver/index/" title="" class="bg1"><span>车源信息</span></a>
+</li>
+
+<li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
+		<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
+</li>
+
+{# if current_user.is_authenticated #}
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/user/usercenter" title="" class="bg1"><span>个人中心</span></a> -->
+	<!-- </li> -->
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/auth/login" title="" class="bg1"><span>发布信息</span></a> -->
+	<!-- </li> -->
+	{#else#}
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/auth/login" title="" class="bg1"><span>用户登录</span></a> -->
+	<!-- </li> -->
+	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
+		<!-- <a href="/auth/register" title="" class="bg1"><span>快速注册</span></a> -->
+	<!-- </li> -->
+	{#endif#}
+</ul>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>login</title>
+</head>
+<body>
+{%for message in get_flashed_messages()%}
+	{{message}} <br>
+	{%endfor%}
+
+
+{% if form.errors.verification_code %}
+{%for error in form.errors.verification_code%}
+{{error}}
+{%endfor%}
+{%endif%}
+
+
+{% if form.errors.password %}
+{%for error in form.errors.password%}
+{{error}}
+{%endfor%}
+{%endif%}
+
+
+{% if form.errors.username %}
+{%for error in form.errors.username%}
+{{error}}
+{%endfor%}
+{%endif%}
+
+	<form action="" method='post'>
+		{{form.hidden_tag()}}
+		{{form.username.label}}{{form.username(id='myname')}} <br>
+		{{form.password.label}}{{form.password}} <br>
+		{{ form.verification_code.label(class="control-label") | safe }}
+            
+            {{ form.verification_code(class="form-control", required=True) }}
+
+            <label class="control-label">
+            <img src="{# url_for('static', filename=code_img) #}">
+            <img src="{{get_verify()}}">
+            </label>
+
+          <br/>
+
+		{{form.remember_me.label}}{{form.remember_me}}  <br>
+		{{form.submit()}}
+
+	</form>
+</body>
+</html>
