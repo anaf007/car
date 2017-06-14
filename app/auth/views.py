@@ -124,15 +124,6 @@ def register_driver_post():
 		except Exception, e:
 			flash(u'数据错误')
 			db.session.rollback()
-			return "数据错误：%s"%str(e)
-		
-		
-		
-		
-		
-		# current_user.driver =  d
-
-		
 		
 
 		flash(u'申请司机完成。')

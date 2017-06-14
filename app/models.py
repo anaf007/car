@@ -23,8 +23,7 @@ class Permission:
 	MODERATE_COMMENTS = 0x04 #管理他人发表的评论
 	DRIVER = 0x05  #司机
 	CONSIGNOR =0x06 #货主
-	ADMINISTER = 0x99	#管理员
-
+	ADMINISTER = 0x80	#管理员
 
 
 """角色表 一对多，一个角色对应多个用户
@@ -75,6 +74,7 @@ class Role(db.Model):
 			role.default = roles[r][1]
 			db.session.add(role)
 		db.session.commit()
+
 
 #多对多关系
 #自引用关系
@@ -175,7 +175,7 @@ class User(UserMixin,db.Model):
 	#验证角色
 	def can(self,permissions):
 		return self.role is not None and \
-			(self.role.permissions & permissions) ==permissions
+			(self.role.permissions & permissions) == permissions
 
 	#验证角色
 	def is_administrator(self):
@@ -237,7 +237,6 @@ class User(UserMixin,db.Model):
 
 	def is_followed_by(self, user):
 		return self.followers.filter_by(follower_id=user.id).first() is not None
-
 
 
 #验证角色
@@ -358,7 +357,6 @@ class CategoryTop(db.Model):
 	
 
 
-
 #本来是想用多对多自引用关系 但是出现的错误太多，解决起来花很多时间，干脆用一对多关系解决父级栏目关系
 #栏目导航分类
 class Category(db.Model):
@@ -387,10 +385,6 @@ class Category(db.Model):
 		return self.title
 
 
-
-
-
-
 class Category_attribute(db.Model):
 	__tablename__ = 'category_attribute'
 	id = db.Column(db.Integer,primary_key=True)
@@ -411,7 +405,6 @@ class User_msg(db.Model):
 	timestamp = db.Column(db.DateTime(),default=datetime.utcnow)
 
 
-
 """
 使用者    负责人    车辆
 A		A			A
@@ -430,7 +423,6 @@ driver_user_reg = db.Table('driver_user_reg',
 						db.Column('user_id',db.Integer,db.ForeignKey('users.id')),
 						db.Column('driver_id',db.Integer,db.ForeignKey('drivers.id'))
 					)
-
 
 
 #车辆表

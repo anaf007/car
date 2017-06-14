@@ -25,3 +25,7 @@ def admin_required(f):
 
 def driver_required(f):
 	return permission_required(Permission.DRIVER)(f)
+
+def goods_required(f):
+	return permission_required(Permission.CONSIGNOR)(f)
+

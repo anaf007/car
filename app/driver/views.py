@@ -6,10 +6,9 @@ Author: by anaf
 
 # from flask import current_app
 from  flask.ext.login import login_required,current_user
-from ..decorators import driver_required,permission_required
+from ..decorators import goods_required,permission_required
 from . import driver
 from ..models import Permission,Driver,User
-from ..decorators import driver_required,permission_required
 from flask import render_template,request
 from app import db
 
@@ -17,7 +16,7 @@ from app import db
 @driver.route('/')
 @driver.route('/index/')
 @login_required
-@driver_required
+@goods_required
 def index():
 	d = Driver.query.filter_by(user_id=current_user.id)
 	car = current_user.drivers.all()
@@ -26,7 +25,7 @@ def index():
 
 @driver.route('/reg_dirver_add',methods=['POST'])
 @login_required
-@driver_required
+@goods_required
 def reg_driver_add():
 	r_d = request.form.get('driver')
 	r_u = request.form.get('user')
