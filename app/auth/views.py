@@ -7,10 +7,11 @@ note:auth视图函数
 from flask import render_template,redirect,request,url_for,flash,make_response,current_app,session
 from . import auth
 from flask.ext.login import login_user,login_required,logout_user,current_user
-from ..models import User
-from .forms import LoginForm
+from ..models import User,Driver,Permission,Role
+from .forms import LoginForm,Register_driver
 from app import db
 import random
+
 
 
 # @auth.route('/verify')
@@ -43,7 +44,11 @@ def login_post():
 		user = User.query.filter_by(username=form.username.data).first()
 		if user is not None and user.verify_password(form.password.data):
 			login_user(user,form.remember_me.data)
-			return redirect(request.args.get('next') or url_for('main.main_login'))
+			
+			if user.role is None or user.role.name==u'普通用户':
+				return redirect(url_for('.register_driver'))
+			else:
+				return redirect(request.args.get('next') or url_for('main.main_login'))
 		flash(u'校验数据错误')
 	else:
 		flash(u'校验数据错误')
@@ -88,6 +93,55 @@ def before_request():
 	if current_user.is_authenticated:
 		current_user.ping()
 		#书本中还代码的  不知道方法有什么用  所以省去也没见有什么变化
+
+@auth.route('/register_driver',methods=['GET'])
+def register_driver():
+	form = Register_driver()
+	return render_template('auth/register_driver.html',form=form)
+
+@auth.route('/register_driver',methods=['POST'])
+def register_driver_post():
+	form = Register_driver()
+	if form.validate_on_submit():
+		d = Driver()
+		d.users = current_user
+		d.phone = form.phone.data
+		d.length = form.length.data
+		d.number = form.number.data
+		d.travel = form.travel.data
+		d.driver = form.driver.data
+		d.note = form.note.data
+		d.user = current_user
+		d.use.append(current_user)
+		r = Role.query.get_or_404(1)
+		try:
+			db.session.add(d)
+			db.session.commit()
+			current_user.role =  r
+			db.session.add(current_user)
+			db.session.commit()
+			flash(u'数据OK')
+		except Exception, e:
+			flash(u'数据错误')
+			db.session.rollback()
+			return "数据错误：%s"%str(e)
+		
+		
+		
+		
+		
+		# current_user.driver =  d
+
+		
+		
+
+		flash(u'申请司机完成。')
+		return redirect(url_for('driver.index'))
+	else:
+		flash(u'校验数据错误')
+	return redirect(url_for('.register_driver'))
+
+
 
 
 

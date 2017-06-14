@@ -112,10 +112,10 @@ class User(UserMixin,db.Model):
 	phone  = db.Column(db.String(100),index=True,unique=True)
 	#货主表
 	goods_owner_id  = db.Column(db.Integer()) 
-	#司机表
-	driver_id  = db.Column(db.Integer, db.ForeignKey('driver.id'))
-	#创建者
-	driver = db.relationship('Driver', backref='users')
+	#创建者负责人  多对一  relationship  不会在表中显示行
+	driver  = db.relationship('Driver', backref='user')
+	
+	# drivers = db.relationship('Driver', backref='siji')
 	#车队
 	fleet_id  = db.Column(db.Integer())
 	#账户保障金
@@ -412,21 +412,45 @@ class User_msg(db.Model):
 
 
 
+"""
+使用者    负责人    车辆
+A		A			A
+B		A			A
+C		A			A	
+A		B			B
+B		A			C
+
+1.一辆车只有一个负责人
+2.一辆车可以有多个使用者
+3.一个负责人可以有多台车
+
+"""
+
+driver_user_reg = db.Table('driver_user_reg',
+						db.Column('user_id',db.Integer,db.ForeignKey('users.id')),
+						db.Column('driver_id',db.Integer,db.ForeignKey('drivers.id'))
+					)
+
+
 
 #车辆表
 class Driver(db.Model):
-	__tablename__ = 'driver'
+	__tablename__ = 'drivers'
 	id = db.Column(db.Integer(),primary_key=True)
-	# 创建者主人#多，    一个用户可以创建多个车
-	master = db.Column(db.Integer,db.ForeignKey('users.id'))  
-	#用户帐户  一，     一辆车 多个人用
-	user_id = db.relationship('User', backref='driver') 
-	#手机号
-	phone = db.Column(db.String(20))
+	# 创建者主人# 多对一    会在表中创建user_id
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	
+	#创建者  多，     一辆车 多个人用
+	use = db.relationship('User',
+								secondary=driver_user_reg,
+								backref=db.backref('drivers', lazy='dynamic'),
+								lazy='dynamic')
+	
+	# users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	#车长
 	length = db.Column(db.String(255))
 	#品牌
-	brand =  db.Column(db.String(255))
+	# brand =  db.Column(db.String(255))
 	#车牌号
 	number = db.Column(db.String(255))
 	#车架号码
@@ -434,7 +458,9 @@ class Driver(db.Model):
 	#发动机号码
 	engine_number  = db.Column(db.String(255))
 	#行驶证
-	driver_number   = db.Column(db.String(255))
+	driver   = db.Column(db.String(255))
+	#驾驶证
+	travel   = db.Column(db.String(255))
 	#违约次数
 	break_number = db.Column(db.Integer(),default=0) 
 	#申请时间
@@ -443,8 +469,10 @@ class Driver(db.Model):
 	start_time = db.Column(db.DateTime,default=datetime.utcnow) 
 	#状态
 	state = db.Column(db.Integer(),default=0)
+	#车辆描述
+	note = db.Column(db.Text)
 	#车辆证件照片   一
-	driver_images_id = db.relationship('Driver_images', backref='driver_images')
+	driver_images = db.relationship('Driver_images', backref='driver',lazy='dynamic')
 
 
 #车辆照片
@@ -454,7 +482,8 @@ class Driver_images(db.Model):
 	name = db.Column(db.String(64)) #
 	url = db.Column(db.String(100))
 	#多
-	driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'))
+	driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
+
 
 
 

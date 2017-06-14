@@ -14,3 +14,14 @@ class LoginForm(Form):
 	verification_code = StringField(u'验证码', validators=[Required(), Length(4, 4, message=u'填写4位验证码')])
 	remember_me = BooleanField('Keep me logged in ')
 	submit = SubmitField('Log In')
+
+
+class Register_driver(Form):
+	phone = StringField(u'车辆联系电话',validators=[Required(),Length(11)])
+	length = StringField(u'车身长度',validators=[Required(),Length(1,10)])
+	number = StringField(u'车牌号',validators=[Required(),Length(1,10)])
+	travel = StringField(u'行驶证号',validators=[Required(),Length(1,10)])
+	driver = StringField(u'驾驶证号',validators=[Required(),Length(1,10)])
+	note = StringField(u'车辆描述')
+	submit = SubmitField(u'注册')
+

@@ -6,6 +6,9 @@
 	<title>register</title>
 </head>
 <body>
+{%for message in get_flashed_messages()%}
+	{{message}} <br>
+	{%endfor%}
 	<form action="" method="post">
 		username: <input type="text" name="username" id=""> <br>
 		password <input type="password" name="password" id=""> <br>

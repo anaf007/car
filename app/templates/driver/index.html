@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>driver</title>
+</head>
+<body>
+<h1>driver</h1>
+<h3><a href="/auth/register_driver">添加车辆</a> </h3>
+<br/>
+<hr/>
+<span style='font-size:24px;color:red'>可使用的所有车辆信息：</span> <br/>
+{%for i in car %}
+
+ID:{{i.id}},车牌号{{i.number}}，车长：{{i.length}},车辆负责人：{{i.user.username}},负责人电话：{{i.user.phone}}<hr/>
+{%endfor%}
+
+
+
+<!-- <br>添加车辆使用人：
+<form method="post" action="{{url_for('driver.reg_driver_add')}}">
+	<select name='driver'>
+		<option selected="selected" >请选择车辆</option>
+		{%for i in car%}
+	<option value="{{i.id}}">车牌号{{i.number}}，车长：{{i.length}},</option>
+		{%endfor%}
+
+	</select>
+	用户名称：
+	<input type="text" name="user">
+		<input type="submit" value="添加">
+</form>
+ -->
+
+</body>
+</html>

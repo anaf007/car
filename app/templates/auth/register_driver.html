@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>register_driver</title>
+</head>
+<body>
+<h1>如需注册货主，请点击 <a href="/auth/register_huozhu">这里</a></h1>
+{%for message in get_flashed_messages()%}
+	{{message}} <br>
+	{%endfor%}
+<form method="post">
+	{{form.hidden_tag()}}
+	{{form.phone.label}}{{form.phone(id='myname')}} <br>
+	{{form.length.label}}{{form.length(id='myname')}} <br>
+	{{form.number.label}}{{form.number(id='myname')}} <br>
+	{{form.travel.label}}{{form.travel(id='myname')}} <br>
+	{{form.driver.label}}{{form.driver(id='myname')}} <br>
+	{{form.note.label}}{{form.note(id='myname')}} <br>
+	{{form.submit()}}<br>
+</form>
+</body>
+</html>
