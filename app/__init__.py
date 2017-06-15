@@ -24,12 +24,6 @@ login_manager = LoginManager()
 babel = Babel()
 
 
-
-
-
-# admin2 = Admin(url='/admin99', endpoint='admin2',name='chahua3287')
-
-
 #session_protection属性可以设置None，basic，strong提供不同的安全等级防止用户会话遭篡改
 login_manager.session_protection ='strong'
 #这个login_view  多了一个s，变成了login_views导致错误401  花了好几个钟头查找原因
@@ -65,6 +59,7 @@ def create_app(config_name):
 	
 
 	return app
+
 
 """
 python manage.py shell 

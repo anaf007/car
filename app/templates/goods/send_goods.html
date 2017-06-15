@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>发布货物</title>
+</head>
+<body>
+<h1>发布货物</h1>
+{%for message in get_flashed_messages()%}
+	{{message}} <br>
+	{%endfor%}
+<form method="post">
+	{{form.hidden_tag()}}
+	{{form.name.label}}{{form.name}} <br>
+	{{form.unit.label}}{{form.unit}} <br>
+	{{form.count.label}}{{form.count}} <br>
+	{{form.start_address.label}}{{form.start_address}} <br>
+	{{form.end_address.label}}{{form.end_address(id='myname')}} <br>
+	{{form.start_car_time.label}}{{form.start_car_time(id='myname')}} <br>
+	{{form.start_price.label}}{{form.start_price(id='myname')}} <br>
+	{{form.note.label}}{{form.note(id='myname')}} <br>
+	{{form.submit()}}<br>
+</form>
+</body>
+</html>

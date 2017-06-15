@@ -1,0 +1,23 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>register_goods</title>
+</head>
+<body>
+<h1>如需注册货主，请点击 <a href="/auth/register_huozhu">这里</a></h1>
+{%for message in get_flashed_messages()%}
+	<h1>{{message}} </h1><br>
+	{%endfor%}
+<form method="post">
+	{{form.hidden_tag()}}
+	{{form.name.label}}{{form.name}} <br>
+	{{form.company_size.label}}{{form.company_size}} <br>
+	{{form.company_industry.label}}{{form.company_industry}} <br>
+	{{form.address.label}}{{form.address}} <br>
+	{{form.note.label}}{{form.note(id='myname')}} <br>
+	{{form.submit()}}<br>
+</form>
+</body>
+</html>

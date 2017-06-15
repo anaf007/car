@@ -25,3 +25,15 @@ class Register_driver(Form):
 	note = StringField(u'车辆描述')
 	submit = SubmitField(u'注册')
 
+class Register_goods(Form):
+	name = StringField(u'公司名称',validators=[Required(),Length(2,50)])
+	company_size = StringField(u'公司规模',validators=[Required(),Length(1,10)])
+	company_industry = StringField(u'所属行业',validators=[Required(),Length(1,10)])
+	address = StringField(u'公司地址',validators=[Required(),Length(1,10)])
+	note = StringField(u'公司简介')
+	submit = SubmitField(u'注册')
+ 
+
+
+
+

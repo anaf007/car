@@ -110,12 +110,10 @@ class User(UserMixin,db.Model):
 	mail = db.Column(db.String(100),unique=True) 
 	#手机号，也可以用于登陆
 	phone  = db.Column(db.String(100),index=True,unique=True)
-	#货主表
-	goods_owner_id  = db.Column(db.Integer()) 
+	#货主表 一对一
+	consignors  = db.relationship('Consignor', backref='user',uselist=False)
 	#创建者负责人  多对一  relationship  不会在表中显示行
 	driver  = db.relationship('Driver', backref='user')
-	
-	# drivers = db.relationship('Driver', backref='siji')
 	#车队
 	fleet_id  = db.Column(db.Integer())
 	#账户保障金
@@ -138,6 +136,10 @@ class User(UserMixin,db.Model):
 								cascade='all, delete-orphan')
 	#评论
 	comments = db.relationship('Comment', backref='author', lazy='dynamic')
+	#货物发布者
+	goods_id = db.relationship('Goods',backref='user_goods',primaryjoin='Goods.user_id == User.id')
+	#货物司机接单者
+	car_goods_id = db.relationship('Goods',backref='car_goods',primaryjoin='Goods.car_user_id == User.id')
 
 	def __init__(self,**kwargs):
 		super(User,self).__init__(**kwargs)
@@ -476,6 +478,79 @@ class Driver_images(db.Model):
 	#多
 	driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
 
+
+
+#发货人，货主表不是goods
+class Consignor(db.Model):
+	__tablename__ = 'consignors'
+	id = db.Column(db.Integer(),primary_key=True)
+	# 创建者主人# 多对一    会在表中创建user_id
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	#公司名称
+	name = db.Column(db.String(64))
+	#公司大小规模 人数  20人  50人100人200人 500人1000人 2000人10000人
+	company_size = db.Column(db.String(50)) 
+	#公司行业，水产，销售 木材。。等等
+	company_industry = db.Column(db.String(50)) 
+	#证件表  ，公司营业执照等证件。
+	# company_cer = db.Column(db.Integer()) 
+	#公司地址
+	address  = db.Column(db.String(255)) 
+	#违约次数
+	break_number = db.Column(db.Integer(),default=0) 
+	#申请时间
+	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	#开通时间
+	start_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	#状态 0未开通 1正常
+	state = db.Column(db.Integer(),default=0)
+	#公司简介
+	note = db.Column(db.Text)
+
+
+#货主发布的货物信息表
+class Goods(db.Model):
+	__tablename__ = 'goods'
+	id = db.Column(db.Integer(),primary_key=True)
+	#名称
+	name = db.Column(db.String(255)) 
+	#单位  （吨，千克，次[趟]）
+	unit = db.Column(db.String(16)) 
+	#数量
+	count = db.Column(db.Integer(),default=1)
+	#发货地
+	start_address = db.Column(db.String(255)) 
+	#运送地
+	end_address = db.Column(db.String(255)) 
+	#描述
+	note = db.Column(db.Text) 
+	#发车时间
+	start_car_time =  db.Column(db.DateTime) 
+	#发布时间
+	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	#发布者
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	#开始报价运费
+	start_price = db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None))
+	#实际运费   接单结算运费 系统抽取比例  系统调节
+	end_price =  db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None))
+	#接单者
+	car_user_id =  db.Column(db.Integer, db.ForeignKey('users.id'))
+	#接单时间
+	receive_time = db.Column(db.DateTime) 
+	#状态 -1管理员关闭 0未付款到系统 1已付款到系统 2已经接单 3已经ok  其他状态等待 4初期未付款状态
+	state = db.Column(db.Integer())
+
+
+
+#货源留言表
+class Goods_comment(db.Model):
+	__tablename__ = 'goods_comments'
+	id = db.Column(db.Integer(),primary_key=True)
+	send_goods_id  = db.Column(db.Integer())
+  
 
 
 
