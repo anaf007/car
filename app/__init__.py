@@ -101,8 +101,8 @@ def configure_blueprint(app):
 	app.register_blueprint(auth_blueprint,url_prefix='/auth')
 	from .driver import driver as driver_blueprint
 	app.register_blueprint(driver_blueprint,url_prefix='/driver')
-	# from .consignor import consignor as consignor_blueprint
-	# app.register_blueprint(consignor_blueprint,url_prefix='/consignor')
+	from .goods import goods as goods_blueprint
+	app.register_blueprint(goods_blueprint,url_prefix='/consignor')
 
 
 def configure_config(app):

@@ -69,7 +69,7 @@ def for_admin_only():
 #需要登陆，且定义权限的函数
 @main.route('/moderator')
 @login_required
-@permission_required(Permission.MODERATE_COMMENTS)
+@permission_required(Permission.WRITE_ARTICLES)
 def for_moderators_only():
 	return "for coment moderators"
 

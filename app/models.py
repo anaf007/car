@@ -15,14 +15,14 @@ from flask import request,current_app
 
 
 
-#权限
+#权限,必须进二阶乘 *2  0x10,0x20,0x40,0x80
 class Permission:
 	FOLLOW = 0x01   #关注
 	COMMIT = 0x02	#在他人的文章中发表评论
 	WRITE_ARTICLES = 0x03	#写文章
 	MODERATE_COMMENTS = 0x04 #管理他人发表的评论
-	DRIVER = 0x05  #司机
-	CONSIGNOR =0x06 #货主
+	DRIVER = 0x08  #司机栏目
+	CONSIGNOR =0x10 #货主栏目
 	ADMINISTER = 0x80	#管理员
 
 

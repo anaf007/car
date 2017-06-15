@@ -16,10 +16,10 @@
 
 	
 {%endfor%}
+{%if not current_user.is_authenticated %}
 <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
 		<a href="/driver/index/" title="" class="bg1"><span>车源信息</span></a>
 </li>
-
 <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
 		<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
 </li>
@@ -29,6 +29,17 @@
 <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
 		<a href="#" title="" class="bg1"><span>{{current_user.username}}</span></a>
 	</li>
+{%endif%}
+{%if current_user.role.name == '司机'%}
+<li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
+		<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
+</li>
+{%endif%}
+{%if current_user.role.name =='货主'%}
+<li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
+		<a href="/driver/index/" title="" class="bg1"><span>车源信息</span></a>
+</li>
+{%endif%}
 {# if current_user.is_authenticated #}
 	<!-- <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');"> -->
 		<!-- <a href="/user/usercenter" title="" class="bg1"><span>个人中心</span></a> -->

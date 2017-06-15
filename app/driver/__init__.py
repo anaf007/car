@@ -1,8 +1,8 @@
 #coding=utf-8
-"""filename:app/main/__init__.py
+"""filename:app/driver/__init__.py
 Created 2017-06-12
 Author: by anaf
-note:main/__init__.py  Blueprint蓝图
+note:driver/__init__.py  Blueprint蓝图
 """ 
 
 from flask import Blueprint
