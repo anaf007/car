@@ -37,11 +37,9 @@
 		{{ form.verification_code.label(class="control-label") | safe }}
             
             {{ form.verification_code(class="form-control", required=True) }}
-
-            <label class="control-label">
-            <img src="{# url_for('static', filename=code_img) #}">
-            <img src="{{get_verify()}}">
-            </label>
+             <label class="control-label">
+			<img src="{{url_for('auth.generate_verification_code')}}">
+			</label>
 
           <br/>
 

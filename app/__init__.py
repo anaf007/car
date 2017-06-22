@@ -13,6 +13,8 @@ from config import config
 from flask.ext.login import LoginManager
 from flask.ext.admin import Admin
 from flask_babelex import Babel
+from flask_redis import FlaskRedis
+from flask_debugtoolbar import DebugToolbarExtension
 
 
 DEFAULT_APP_NAME = 'car'
@@ -22,12 +24,15 @@ moment = Moment()
 db = SQLAlchemy()
 login_manager = LoginManager()
 babel = Babel()
+redis_store = FlaskRedis()
+toolbar = DebugToolbarExtension()
 
 
 #session_protection属性可以设置None，basic，strong提供不同的安全等级防止用户会话遭篡改
 login_manager.session_protection ='strong'
 #这个login_view  多了一个s，变成了login_views导致错误401  花了好几个钟头查找原因
 login_manager.login_view = 'auth.login'
+login_manager.login_views = 'auth.login'
 login_manager.login_message = u"请登录后访问该页面."
 login_manager.refresh_view = 'auth.login'
 
@@ -42,14 +47,10 @@ def create_app(config_name):
 	#蓝图
 	configure_blueprint(app)
 	#创建flask-admin后台
-	# configure_create_admin(app)
+	configure_create_admin(app)
 
 	
 
-
-	
-	# from .users import users as user_blueprint
-	# app.register_blueprint(user_blueprint,url_prefix='/user')
 
 	# from .admins import admin_b as admins_blueprint
 	# app.register_blueprint(admins_blueprint)
@@ -84,8 +85,10 @@ def configure_extensions(app):
 	mail.init_app(app)
 	moment.init_app(app)
 	db.init_app(app)
+	redis_store.init_app(app)
 	
 	babel.init_app(app)
+	# toolbar.init_app(app)
 	login_manager.init_app(app)
 
 
@@ -98,6 +101,10 @@ def configure_blueprint(app):
 	app.register_blueprint(driver_blueprint,url_prefix='/driver')
 	from .goods import goods as goods_blueprint
 	app.register_blueprint(goods_blueprint,url_prefix='/consignor')
+	from .test import codetest as codetest_blueprint
+	app.register_blueprint(codetest_blueprint,url_prefix='/codetest')
+	from .usercenter import usercenter as user_blueprint
+	app.register_blueprint(user_blueprint,url_prefix='/usercenter')
 
 
 def configure_config(app):

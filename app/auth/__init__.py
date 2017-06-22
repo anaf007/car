@@ -5,14 +5,14 @@ Author: by anaf
 note:auth初始化函数
 """
 
-from flask import Blueprint,current_app,session
+from flask import Blueprint,current_app,session,make_response
 
 auth = Blueprint('auth',__name__)
 
 from . import views 
 
 
-import random,string
+import random,string,StringIO
 from datetime import datetime
 try:
 	from PIL import Image,ImageDraw,ImageFont,ImageFilter
@@ -35,8 +35,9 @@ def rndColor():
 def rndColor2():
     return (random.randint(32, 127), random.randint(32, 127), random.randint(32, 127))
 
-
+@auth.route('/genverify')
 def generate_verification_code():
+	output = StringIO.StringIO()
 	width = 70
 	height = 30
 	image = Image.new('RGB',(width,height),(255,255,255))
@@ -59,10 +60,14 @@ def generate_verification_code():
 		li.append(c)
 	filename = "".join(li)
 	
-
-	image.save(current_app.static_folder+'/code/'+filename+'.jpg', 'jpeg');
+	image.save(output,"JPEG")
+	img_data = output.getvalue()
+	# image.save(current_app.static_folder+'/code/'+filename+'.jpg', 'jpeg');
 	session['verify'] = verify_str
-	return '/static/code/'+filename+'.jpg'
+	response = make_response(img_data)
+	response.headers['Content-Type'] = 'image/jpeg'
+	# return '/static/code/'+filename+'.jpg'
+	return response
 
 
 #请求上下文 ，获取验证码

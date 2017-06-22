@@ -113,7 +113,7 @@ class User(UserMixin,db.Model):
 	#货主表 一对一
 	consignors  = db.relationship('Consignor', backref='user',uselist=False)
 	#创建者负责人  多对一  relationship  不会在表中显示行
-	driver  = db.relationship('Driver', backref='user')
+	drivers  = db.relationship('Driver', backref='driver_user',primaryjoin='Driver.user_id == User.id',lazy='dynamic')
 	#车队
 	fleet_id  = db.Column(db.Integer())
 	#账户保障金
@@ -140,6 +140,8 @@ class User(UserMixin,db.Model):
 	goods_id = db.relationship('Goods',backref='user_goods',primaryjoin='Goods.user_id == User.id')
 	#货物司机接单者
 	car_goods_id = db.relationship('Goods',backref='car_goods',primaryjoin='Goods.car_user_id == User.id')
+	#付款者
+	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
 
 	def __init__(self,**kwargs):
 		super(User,self).__init__(**kwargs)
@@ -160,8 +162,8 @@ class User(UserMixin,db.Model):
 			# db.session.add(self)
 			# db.session.commit()
 
-	def __repr__(self):
-		return self.username
+	# def __repr__(self):
+	# 	return self.username
 
 	@property
 	def password(self):
@@ -221,24 +223,24 @@ class User(UserMixin,db.Model):
 			 	db.session.rollback()
 
 	#多对多关注关系辅助方法
-	def follow(self, user):
-		if not self.is_following(user):
-			f = Follow(follower=self,followed=user)
-			db.session.add(f)
-			db.session.commit()
+	# def follow(self, user):
+	# 	if not self.is_following(user):
+	# 		f = Follow(follower=self,followed=user)
+	# 		db.session.add(f)
+	# 		db.session.commit()
 
-	def unfollow(self, user):
-		f = self.followed.filter_by(followed_id=user.id).first()
-		if f:
-			db.session.delete(f)
-			db.session.commit()
+	# def unfollow(self, user):
+	# 	f = self.followed.filter_by(followed_id=user.id).first()
+	# 	if f:
+	# 		db.session.delete(f)
+			# db.session.commit()
 
-	def is_following(self, user):
-		return self.followed.filter_by(followed_id=user.id).first() is not None
-		return fo is not None
+	# def is_following(self, user):
+	# 	return self.followed.filter_by(followed_id=user.id).first() is not None
+	# 	return fo is not None
 
-	def is_followed_by(self, user):
-		return self.followers.filter_by(follower_id=user.id).first() is not None
+	# def is_followed_by(self, user):
+	# 	return self.followers.filter_by(follower_id=user.id).first() is not None
 
 
 #验证角色
@@ -257,6 +259,7 @@ def load_user(user_id):
 	return User.query.get(int(user_id))
 
 
+#文章
 class Article(db.Model):
 	__tablename__ = 'articles'
 	id = db.Column(db.Integer,primary_key=True)
@@ -358,8 +361,8 @@ class CategoryTop(db.Model):
 		return self.title
 	
 
-
-#本来是想用多对多自引用关系 但是出现的错误太多，解决起来花很多时间，干脆用一对多关系解决父级栏目关系
+#本来是想用多对多自引用关系 但是出现的错误太多，解决起来花很多时间，
+#干脆用一对多关系解决父级栏目关系
 #栏目导航分类
 class Category(db.Model):
 	__tablename__ = 'categorys'
@@ -405,6 +408,8 @@ class User_msg(db.Model):
 	phone = db.Column(db.String(11))
 	body = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime(),default=datetime.utcnow)
+	show = db.Column(db.Integer,default=0)
+	state = db.Column(db.Integer())
 
 
 """
@@ -423,7 +428,7 @@ B		A			C
 
 driver_user_reg = db.Table('driver_user_reg',
 						db.Column('user_id',db.Integer,db.ForeignKey('users.id')),
-						db.Column('driver_id',db.Integer,db.ForeignKey('drivers.id'))
+						db.Column('use_driver_id',db.Integer,db.ForeignKey('drivers.id'))
 					)
 
 
@@ -437,7 +442,7 @@ class Driver(db.Model):
 	#创建者  多，     一辆车 多个人用
 	use = db.relationship('User',
 								secondary=driver_user_reg,
-								backref=db.backref('drivers', lazy='dynamic'),
+								backref=db.backref('use_drivers', lazy='dynamic'),
 								lazy='dynamic')
 	
 	# users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -467,6 +472,13 @@ class Driver(db.Model):
 	note = db.Column(db.Text)
 	#车辆证件照片   一
 	driver_images = db.relationship('Driver_images', backref='driver',lazy='dynamic')
+	order_pay = db.relationship('Order_pay', backref='order_pays',lazy='dynamic',primaryjoin='Order_pay.drivers_id == Driver.id')
+	post = db.relationship('Driver_post', backref='posts',lazy='dynamic',primaryjoin='Driver_post.driver_id == Driver.id')
+
+
+
+	# def __repr__(self):
+	# 	return self.number
 
 
 #车辆照片
@@ -479,8 +491,7 @@ class Driver_images(db.Model):
 	driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
 
 
-
-#发货人，货主表不是goods
+#发货人，货主表。不是goods 货源表
 class Consignor(db.Model):
 	__tablename__ = 'consignors'
 	id = db.Column(db.Integer(),primary_key=True)
@@ -506,6 +517,8 @@ class Consignor(db.Model):
 	state = db.Column(db.Integer(),default=0)
 	#公司简介
 	note = db.Column(db.Text)
+	driver_post = db.relationship('Driver_post', backref='driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Consignor.id')
+
 
 
 #货主发布的货物信息表
@@ -540,9 +553,9 @@ class Goods(db.Model):
 	car_user_id =  db.Column(db.Integer, db.ForeignKey('users.id'))
 	#接单时间
 	receive_time = db.Column(db.DateTime) 
-	#状态 -1管理员关闭 0未付款到系统 1已付款到系统 2已经接单 3已经ok  其他状态等待 4初期未付款状态
-	state = db.Column(db.Integer())
-
+	#状态 -2失效订单被抢付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  其他状态等待 ?4初期未付款状态?
+	state = db.Column(db.Integer(),default=0)
+	order_pay = db.relationship('Order_pay', backref='order_pay',lazy='dynamic',primaryjoin='Order_pay.goods_id == Goods.id')
 
 
 #货源留言表
@@ -550,6 +563,59 @@ class Goods_comment(db.Model):
 	__tablename__ = 'goods_comments'
 	id = db.Column(db.Integer(),primary_key=True)
 	send_goods_id  = db.Column(db.Integer())
+
+
+#支付订单
+class Order_pay(db.Model):
+	__tablename__ = 'order_pays'
+	id = db.Column(db.Integer,primary_key=True)
+	order  = db.Column(db.String(20),unique=True)
+	goods_id =  db.Column(db.Integer, db.ForeignKey('goods.id'))
+	drivers_id =  db.Column(db.Integer, db.ForeignKey('drivers.id'))
+	driver_post_id =  db.Column(db.Integer, db.ForeignKey('driver_posts.id'))
+	create_time = db.Column(db.DateTime,default=datetime.utcnow)
+	pay_time = db.Column(db.DateTime)
+	state = db.Column(db.Integer,default=0)
+	pay_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	pay_price = db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None))
+
+
+
+#车源信息
+class Driver_post(db.Model):
+	__tablename__ = 'driver_posts'
+	id = db.Column(db.Integer,primary_key=True)
+	#名称
+	title = db.Column(db.String(100))
+	#发车地点
+	start_address = db.Column(db.String(255)) 
+	#到达地点
+	end_address = db.Column(db.String(255)) 
+	#描述
+	note = db.Column(db.Text) 
+	#发车时间
+	start_car_time =  db.Column(db.DateTime) 
+	#发布时间
+	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	#发布者
+	driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
+	#开始报价运费
+	start_price = db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None))
+	#实际运费   接单结算运费 系统抽取比例  系统调节
+	end_price =  db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None))
+	#接单者
+	consignor_user_id =  db.Column(db.Integer, db.ForeignKey('consignors.id'))
+	#接单时间
+	receive_time = db.Column(db.DateTime) 
+	#状态 -2失效订单被抢付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  其他状态等待 ?4初期未付款状态?
+	state = db.Column(db.Integer(),default=0)
+	#外键
+	order_pay = db.relationship('Order_pay', backref='d_posts',uselist='False')
+
+
   
 
 

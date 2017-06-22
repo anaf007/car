@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>show_goods</title>
+</head>
+<body>	 
+货品标题：{{gd.name}} <br>
+发货地：{{gd.start_address}}<br>
+到达地：{{gd.end_address}}<br>
+运费：{{gd.start_price}}<br>
+发货时间{{gd.start_car_time}}<br>
+用户：{{gd.user_goods.username}}<br>
+公司名称：{{gd.user_goods.consignors.name}}<br>
+公司地址：{{gd.user_goods.consignors.address}}
+ <br/>
+ <br/>
+<form method="post" action="{{url_for('goods.send_order')}}">
+	 <input type="hidden" value="{{gd.id}}" name="id">
+	<input type="submit" value="[接货下单]">
+</form>
+
+<!-- <h1><a href="{{url_for('goods.send_order')}}">[下单]</a></h1> -->
+</body>
+</html>

@@ -7,7 +7,7 @@ note:user/__init__.py  Blueprint蓝图
 
 from flask import Blueprint
 
-users = Blueprint('user',__name__)
+usercenter = Blueprint('usercenter',__name__)
 
 from . import views 
 

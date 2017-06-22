@@ -4,7 +4,7 @@ Created 2017-05-29
 Author: by anaf
 """
 
-from flask import render_template,redirect,url_for,request,flash,current_app,make_response
+from flask import render_template,redirect,url_for,request,flash,current_app,make_response,Response
 from . import main
 from .. import db
 from ..models import Article,Comment,Permission,CategoryTop,Category
@@ -12,6 +12,7 @@ from  flask.ext.login import login_required,current_user
 from ..decorators import admin_required,permission_required
 from .forms import PostForm,CommentForm
 import os,random,datetime
+from app.online_user import get_online_users
 
 
 #顶级栏目
@@ -163,3 +164,10 @@ def Get_Nav():
         return Navcat.query.filter_by(pid=pid).order_by('sort').all()
         
     return dict(Get_Nav=get)
+
+
+@main.route('/online')
+def online():
+    return Response('Online: %s' % ', '.join(get_online_users()),mimetype='text/plain')
+
+

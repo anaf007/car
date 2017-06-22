@@ -4,6 +4,9 @@
 	<title>goods</title>
 </head>
 <body>
-goods -index
+<h1>货源信息</h1><br>
+{%for i in goods%}
+标题：{{i.name}} <a href="{{url_for('goods.show_goods',id=i.id, _external=True )}}">查看</a><br>
+{%endfor%}
 </body>
 </html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>send-order</title>
+</head>
+<body>
+<h1>send-order</h1>
+货物名称：  {{gd.name}} <br>
+[{{gd.start_address}}-{{gd.end_address}}] <br>
+发货时间：{{gd.start_car_time}} <br>
+确认之后需要交纳{{gd.start_price|float*0.3}}元定金，运费的30%  <br>
+<form method="post" action="{{url_for('goods.confirm_order')}}">
+<input type="hidden" value="{{gd.id}}" name="id" >
+车辆：
+<select name="car">
+ {%for i in current_user.driver%}
+	<option value="{{i.id}}">车牌号：{{i.number}}</option>
+ {%endfor%}
+</select>
+<input type="submit" value="确认下单并支付定金">
+	
+</form>
+</body>
+</html>

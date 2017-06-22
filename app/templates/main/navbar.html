@@ -30,6 +30,9 @@
 <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
 		<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
 </li>
+<li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
+		<a href="{{url_for('driver.add_post')}}" title="" class="bg1"><span>发布车辆信息</span></a>
+</li>
 {%endif%}
 {%if current_user.role.name =='货主'%}
 <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
@@ -45,7 +48,7 @@
 		<a href="/auth/logout" title="" class="bg1"><span>退出</span></a>
 	</li>
 <li onMouseOver="$('.nav .bg1 span').addClass('cur');" onMouseOut="$('.nav .bg1 span').removeClass('cur');">
-		<a href="#" title="" class="bg1"><span>{{current_user.username}}</span></a>
+		<a href="{{url_for('usercenter.index')}}" title="" class="bg1"><span>{{current_user.username}}</span></a>
 	</li>
 {%endif%}
 

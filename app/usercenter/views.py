@@ -5,27 +5,24 @@ Author: by anaf
 """
 
 from flask import render_template,abort,request,current_app,url_for,make_response,flash,redirect
-from . import users
+from . import usercenter
 from .. import db
 import random,os,datetime
 from  flask.ext.login import login_required,current_user
 from  ..models import Permission,User
 from app.decorators import permission_required
 
-@users.route('/index')
-@users.route('/')
-@users.route('/<username>')
+@usercenter.route('/index')
+@usercenter.route('/')
+@usercenter.route('/<username>')
 def index(username=''):
-	users = User.query.filter_by(username=username).first()
-	if users is None:
-		abort(404)
-	return render_template('user/index.html',user=users)
+    return render_template('user/index.html',user=current_user)
 
-@users.route('/edit_profile')
+@usercenter.route('/edit_profile')
 def edit_profile():
 	return render_template('user/edit_profile.html',form=current_user)
 
-@users.route('/edit_profile',methods=['POST'])
+@usercenter.route('/edit_profile',methods=['POST'])
 def edit_profile_post():
 	users = User.query.get_or_404(current_user.id)
 	users.about_me = request.form.get('about_me')
@@ -41,7 +38,7 @@ def gen_rnd_filename():
     filename_prefix = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     return '%s%s' % (filename_prefix, str(random.randrange(1000, 10000)))
 
-@users.route('/upload', methods=['GET', 'POST'])
+@usercenter.route('/upload', methods=['GET', 'POST'])
 @login_required
 def UploadFileImage():
     """CKEditor file upload"""
@@ -73,15 +70,14 @@ def UploadFileImage():
           window.parent.CKEDITOR.tools.callFunction(%s, '%s', '%s');
         </script>
 
-        """ 
-    % (callback, url, error)
+        """% (callback, url, error)
     response = make_response(res)
     response.headers["Content-Type"] = "text/html"
     return response
 
 
 #用户关注
-@users.route('/follow/<username>')
+@usercenter.route('/follow/<username>')
 @login_required
 @permission_required(Permission.FOLLOW)
 def follow(username):
@@ -96,7 +92,8 @@ def follow(username):
     return redirect(url_for('.index',username=username))
 
 
-@users.route('/followers/<username>')
+#关注
+@usercenter.route('/followers/<username>')
 def followers(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
@@ -110,7 +107,7 @@ def followers(username):
 
 
 #取消关注
-@users.route('/unfollow/<username>')
+@usercenter.route('/unfollow/<username>')
 @login_required
 @permission_required(Permission.FOLLOW)
 def unfollow(username):
@@ -123,3 +120,10 @@ def unfollow(username):
         return redirect(url_for('.index', username=username))
     
     return redirect(url_for('.index',username=username))
+
+
+
+
+
+
+

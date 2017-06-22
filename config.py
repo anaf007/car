@@ -14,6 +14,13 @@ class Config:
 	SQLALCHEMY_COMMIT_ONTRARDOWN = True
 	#####
 	SQLALCHEMY_TRACK_MODIFICATIONS  = False
+	#redis
+	REDIS_URL = "redis://:@localhost:6379/car"
+	# REDIS_URL  =  "unix://[:password]@/path/to/socket.sock?db=0"
+	#redis缓存
+	ONLINE_LAST_MINUTES = 5
+
+	DEBUG = False
 
 	@staticmethod
 	def init_app(app):
