@@ -2,160 +2,67 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>title</title>
-	<link href="{{url_for('static',filename='main/css/main.css')}}" rel="stylesheet" type="text/css">
-<script src="{{url_for('static',filename='main/js/jquery.min.1.8.2.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static',filename='main/js/ping.js')}}"></script>
-<script type="text/javascript">
-  if(typeof(pgvMain) == 'function')
-  pgvMain("", {senseParam: "p"});
-</script>
-<script type="text/javascript" src="{{url_for('static',filename='main/js/microajax.js')}}"></script>
-<script type="text/javascript">function cdcAjax(url, callbackFunction){return microAjax(url, callbackFunction);}</script>
-<script type="text/javascript" src="{{url_for('static',filename='main/js/album.js')}}"></script>
+	<title>index</title>
+	<style>
+	li{font-size: 30px;line-height: 50px;}
+	</style>
 </head>
 
-<body class="bg_index">
-{%include 'main/top.html'%}
+<body>
+	<ul class="nav clearfix">
+		 <li class="shouye">
+				<a href="/" title="首页"><span>首页</span></a>
+		</li>
+		{%for i in nav%}
+		<li>
+			<a href="/nav_top/{{i.id}}" title="{{i.title}}" class="bg1"><span>{{i.title}}</span></a>
 
-<div id="container">
-<!--跑马banner-->
-  <div id="glume">
-	<ul class="Limg">
-		<li class="bg_1"><a href="javascript:;" target="_blank">&nbsp;</a></li>
-		<li class="bg_2"><a href="javascript:;" target="_blank">&nbsp;</a></li>
-		<li class="bg_3"><a href="javascript:;" target="_blank">&nbsp;</a></li>
-    </ul>
-    <cite class="Nubbt">
-		<span class="on">1</span>
-		<span >2</span>
-		<span >3</span>
-    </cite>
-  </div>
+			<dl>
+			{%for x in i.category%}
+			<dd><a href="/nav/{{x.id}}" title="{{x.title}}">{{x.title}}</a></dd>
+			{%endfor%}
 
+			</dl> 
+			</li>
+		{%endfor%}
 
-</div>
-<div class="warp clearfix">
-	<div class="bg_index01 clearfix">
-		<dl class="clearfix">
-		<h2><a href="/chaoshilenggui/" title="超市冷柜">超市冷柜</a><span>CHAOSHILENGGUI</span></h2>
-			<dt><a href="/chaoshilenggui/"><img src="images/p_01.jpg"></a></dt>
-			<dd class="classlist">
-			  
-				<a href="/fengmugui/">风幕柜</a>
-			  
-				<a href="/daogui/">岛柜</a>
-			  
-				<a href="/xianrougui/">鲜肉柜</a>
-			  
-				<a href="/shushigui/">熟食柜</a>
-			  
-			</dd>
-			<dd class="intro">
-				制冷系统元件及控制件均采用进口名牌产品，确保产品运行稳定、可靠。超市冷柜设备主要适合于大型卖场、超市等食品的保鲜、冷藏。
-			</dd>
-		</dl>
-		<dl class="clearfix">
-		<h2><a href="/dangaogui/" title="蛋糕柜">蛋糕柜</a><span>DANGAOGUI</span></h2>
-			<dt><a href="/dangaogui/"><img src="images/p_02.jpg"></a></dt>
-			<dd class="classlist">
-				<a href="/dangaogui/">直角柜</a>
-				<a href="/dangaogui/">圆弧柜</a><br>
-				<a href="/dangaogui/">立式蛋糕柜</a>
-				<a href="/dangaogui/">面包柜</a><br>
-				<a href="/dangaogui/">组合蛋糕柜</a>
-			</dd>
-			<dd class="intro">
-				蛋糕柜主要用途为蛋糕店蛋糕巧克力、面包的冷藏展示柜作用，产品元件均采用进口名牌产品。
-			</dd>
-		</dl>
-		<dl class="clearfix">
-		<h2><a href="/shucaishuiguogui/" title="蔬菜水果柜">蔬菜水果柜</a><span>SHUCAISHUIGUOGUI</span></h2>
-			<dt><a href="/shucaishuiguogui/"><img src="images/p_03.jpg"></a></dt>
-			<dd class="classlist">
-				<a href="/shucaishuiguogui/">水果冷藏柜</a>
-				<a href="/shucaishuiguogui/">蔬菜冷藏柜</a>
-			</dd>
-			<dd class="intro">
-				蔬菜水果柜主要用途为水果、蔬菜冷藏保鲜，防止蔬菜水果的腐烂，产品元件均采用进口名牌产品。
-			</dd>
-		</dl>
-		<dl class="clearfix" style="border-right-color:#FFF;">
-		<h2><a href="/bianlidianlenggui/" title="便利店冷柜">便利店冷柜</a><span>BIANLIDIANLENGGUI</span></h2>
-			<dt><a href="/bianlidianlenggui/"><img src="images/p_04.jpg"></a></dt>
-			<dd class="classlist">
-				<a href="/bianlidianlenggui/">玻璃门陈列柜</a><br>
-				<a href="/bianlidianlenggui/">敞开式冷柜</a><br>
-				<a href="/bianlidianlenggui/">直冷陈列柜</a>
-			</dd>
-			<dd class="intro">
-				便利店冷柜适用于便利店展示饮料及冷藏保鲜，大玻璃门设计，增加了商品的展示性。产品美观大方，对使用场合起到一定的装饰作用...
-			</dd>
-		</dl>
-	</div>
-</div>
-<div class="warp clearfix">
-	<div class="c_index_l">
-	<p align=center>
-	<!-- <embed height=163 type=application/x-shockwave-flash align=middle width=218 src="#" allowScriptAccess="sameDomain" quality="high"> -->
-	</p>
-	</div>
-	<div class="c_index_c">
-		<ul class="title">
-			<li id="tabT_1_1" onClick="showTabs('tabT', 'tabC', 1, 2, 1);">行业资讯</li>
-			<li id="tabT_1_2" onClick="showTabs('tabT', 'tabC', 1, 2, 2);" class="cur">新闻动态</li>
-		</ul>
-		<ul id="tabC_1_1" class="list">
-		<li><span>2013-04-02</span><a href="/hangyezixun/284.html">·超市冷柜直冷式和风冷式独具一格</a></li>
-<li><span>2013-04-02</span><a href="/hangyezixun/282.html">·使用熟食柜的时候应该有哪些讲究呢？</a></li>
-<li><span>2013-04-01</span><a href="/hangyezixun/281.html">·佛山保鲜柜价格/东莞展示柜要多少钱</a></li>
-<li><span>2013-04-01</span><a href="/hangyezixun/279.html">·展示冷柜温度如何管理？</a></li>
-<li><span>2013-03-30</span><a href="/hangyezixun/277.html">·深圳水果保鲜柜/蛋糕柜的维护及保养</a></li>
+		{%if not current_user.is_authenticated %}
+		<li>
+				<a href="/driver/index/" title="" class="bg1"><span>车源信息</span></a>
+		</li>
+		<li>
+				<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
+		</li>
 
-		</ul>
-		<ul id="tabC_1_2" class="list" style="display:none;">
-		<li><span>2013-04-02</span><a href="/xinwendongtai/285.html">·临汾水果柜/不同食品的最佳存放温度</a></li>
-<li><span>2013-04-02</span><a href="/xinwendongtai/280.html">·宝尼尔电器冷藏展示柜卖点在哪里？</a></li>
-<li><span>2013-04-02</span><a href="/xinwendongtai/283.html">·日常蛋糕展示柜的使用须知：</a></li>
-<li><span>2013-04-01</span><a href="/xinwendongtai/278.html">·丹佛斯压缩机最新价格是多少</a></li>
-<li><span>2013-03-29</span><a href="/xinwendongtai/276.html">·南昌风幕柜/如何巧妙运用超市冷冻展示柜</a></li>
+		{%endif%}
 
-		</ul>
-	</div>
-	<div class="c_index_r">
-		<p style="height:131px;"><img src="images/pic_index_contact.jpg"></p>
-		<p style="height:34px;"><img src="images/pic_index_jobs.jpg"></p>
-	</div>
-</div>
-<div class="warp bg_index_about clearfix">
-	<dl class="clearfix">
-		<dt><img src="images/pic_index_about.jpg"></dt>
-		<dd>
-			<p>    合肥宝尼尔电器有限公司是专业从事超市冷柜、保鲜柜、冷藏柜、风幕柜、蔬菜水果柜、蛋糕展示柜、熟食柜、鲜肉柜、厨房冷柜、饮料展示柜等冷藏冷冻设备的研究、设计、开 发、销售和服务的现代化冷链企业，公司拥有国际顶尖的技术力量、专业化的设计、先进的生产设备、成熟的生产工艺和完善的质量保证体系以及 完善的售后服务团队，为国内外客户提供优质的产品和满意的服务。</p>
-			<p>    主要产品有：超市冷柜、保鲜柜、冷藏柜、展示柜、蔬菜水果柜、蛋糕展示柜、熟食柜、鲜肉柜、厨房冷柜、饮料展示柜等一系列保鲜冷藏展示设备。本公司与国内 外众多贸易经销商、代理商、超市卖场、便利店、企事业单位等建立良好的客户关系，一直以来以优质的产品和热情周到的服务赢得了国内外客户的信赖和一致好评。<a href="/qiyejianjie">[详细...]</a></p>
-		</dd>
-	</dl>
-</div>
-<div class="flink">
-	<div class="warp clearfix">
-		<p class="title"><img src="images/title_index_link.jpg"></p>
-		<ul class="links">
-		   
-			<li><a href='http://sc.chinaz.com' target='_blank'>保鲜柜</a> </li>
-	       
-			<li><a href='http://sc.chinaz.com' target='_blank'>冷藏柜</a> </li>
-	       
-			<li><a href='http://sc.chinaz.com' target='_blank'>蛋糕柜</a> </li>
-	       
-			<li><a href='http://sc.chinaz.com' target='_blank'>冷柜</a> </li>
-	       	      
-		</ul>
-	</div>
-</div>
+	{%if current_user.is_authenticated %}
+{%if current_user.role.name == '司机'%}
+<li>
+		<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
+</li>
+<li>
+		<a href="{{url_for('driver.add_post')}}" title="" class="bg1"><span>发布车辆信息</span></a>
+</li>
+{%endif%}
+{%if current_user.role.name =='货主'%}
+<li>
+		<a href="/driver/index/" title="" class="bg1"><span>车源信息</span></a>
+</li>
+<li>
+		<a href="/consignor/send_goods" title="" class="bg1"><span>发布货物信息</span></a>
+</li>
 
-{%include 'main/footer.html'%}
+	{%endif%}
 
+	<li>
+		<a href="/auth/logout" title="" class="bg1"><span>退出</span></a>
+	</li>
+<li>
+		<a href="{{url_for('usercenter.index')}}" title="" class="bg1"><span>{{current_user.username}}，[{{current_user.role.name}}]</span></a>
+	</li>
 
-
+	{%endif%}
+	</ul>
 </body>
 </html>

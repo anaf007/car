@@ -142,6 +142,8 @@ class User(UserMixin,db.Model):
 	car_goods_id = db.relationship('Goods',backref='car_goods',primaryjoin='Goods.car_user_id == User.id')
 	#付款者
 	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
+	#用户邮件
+	user_msgs = db.relationship('User_msg', backref='user_msg')
 
 	def __init__(self,**kwargs):
 		super(User,self).__init__(**kwargs)
@@ -400,16 +402,17 @@ class Category_attribute(db.Model):
 		return self.name
 
 
-#留言表
+#用户信息表
 class User_msg(db.Model):
 	__tablename__ = 'user_msgs'
 	id = db.Column(db.Integer,primary_key=True)
-	name = db.Column(db.String(64))
+	title = db.Column(db.String(64))
 	phone = db.Column(db.String(11))
 	body = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime(),default=datetime.utcnow)
 	show = db.Column(db.Integer,default=0)
 	state = db.Column(db.Integer())
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 """
@@ -616,7 +619,26 @@ class Driver_post(db.Model):
 	order_pay = db.relationship('Order_pay', backref='d_posts',uselist='False')
 
 
-  
+
+
+class Redis_Task(db.Model):
+	__tablename__ = 'redis_tasks'
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(80))
+	redis_key = db.Column(db.String(128), unique=True)
+	start_time = db.Column(db.DateTime)
+	create_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+	def __init__(self, name, redis_key, start_time):
+		self.name = name
+		self.redis_key = redis_key
+		start_time = ':'.join(start_time.split(':')[:2])
+		self.start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")
+		# self.seconds as key expire seconds
+		self.seconds = int((self.start_time - datetime.utcnow).total_seconds())
+
+	def __repr__(self):
+		return '<Task name:%r, key:%r>' % (self.name, self.redis_key)
 
 
 

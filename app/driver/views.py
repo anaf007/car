@@ -11,17 +11,18 @@ from . import driver
 from ..models import Permission,Driver,User,Driver_post
 from flask import render_template,request,redirect,url_for,flash
 from app import db
+from datetime import datetime
 
 
-#需要登陆，且需要司机员权限
+#需要登陆，且需要货主权限
 @driver.route('/')
 @driver.route('/index/')
 @login_required
 @goods_required
 def index():
-	d = Driver.query.filter_by(user_id=current_user.id)
-	car = current_user.drivers.all()
-	return render_template('driver/index.html',car = car)
+	#查询时间大于今天，并且状态=0，  这个 filter时间查询花了1个多小时
+	dp = Driver_post.query.filter(Driver_post.state==0).filter(Driver_post.start_car_time>datetime.utcnow()).order_by('create_time').all()
+	return render_template('driver/index.html',dp=dp)
 
 
 #注册车辆信息？
@@ -92,6 +93,11 @@ def add_posts():
 
 
 
+@driver.route('/show_post/<int:id>')
+@goods_required
+def show_post(id=0):
+	dp = Driver_post.query.get_or_404(id)
+	return render_template('driver/show_post.html',dp = dp)
 
 
 

@@ -128,7 +128,7 @@ def register_driver_post():
 		
 
 		flash(u'申请司机完成。')
-		return redirect(url_for('driver.index'))
+		return redirect(url_for('usercenter.index'))
 	else:
 		flash(u'校验数据错误')
 	return redirect(url_for('.register_driver'))
@@ -159,7 +159,7 @@ def register_goods_post():
 			db.session.add(current_user)
 			db.session.commit()
 			flash(u'货主添加完毕')
-			return redirect(url_for('goods.index'))
+			return redirect(url_for('usercenter.index'))
 		except Exception, e:
 			flash(u'数据错误，添加失败：%s'%str(e))
 			db.session.rollback()
