@@ -8,7 +8,7 @@ from flask import render_template,redirect,request,url_for,flash,make_response,c
 from . import auth
 from flask.ext.login import login_user,login_required,logout_user,current_user
 from ..models import User,Driver,Permission,Role,Consignor
-from .forms import LoginForm,Register_driver,Register_goods
+from .forms import LoginForm,Register_goods
 from app import db
 import random
 
@@ -94,44 +94,7 @@ def before_request():
 		current_user.ping()
 		#书本中还代码的  不知道方法有什么用  所以省去也没见有什么变化
 
-#注册司机
-@auth.route('/register_driver',methods=['GET'])
-def register_driver():
-	form = Register_driver()
-	return render_template('auth/register_driver.html',form=form)
 
-#注册司机
-@auth.route('/register_driver',methods=['POST'])
-def register_driver_post():
-	form = Register_driver()
-	if form.validate_on_submit():
-		d = Driver()
-		d.users = current_user
-		d.phone = form.phone.data
-		d.length = form.length.data
-		d.number = form.number.data
-		d.travel = form.travel.data
-		d.driver = form.driver.data
-		d.note = form.note.data
-		d.user = current_user
-		d.use.append(current_user)
-		r = Role.query.filter_by(name=u'司机').first()
-		try:
-			db.session.add(d)
-			current_user.role =  r
-			db.session.add(current_user)
-			db.session.commit()
-			flash(u'车主添加完毕')
-		except Exception, e:
-			flash(u'数据错误，添加失败：%s'%str(e))
-			db.session.rollback()
-		
-
-		flash(u'申请司机完成。')
-		return redirect(url_for('usercenter.index'))
-	else:
-		flash(u'校验数据错误')
-	return redirect(url_for('.register_driver'))
 
 #注册货主
 @auth.route('/register_goods',methods=['GET'])

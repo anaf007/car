@@ -1,31 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
 	<meta charset="UTF-8">
 	<title>userindex</title>
 </head>
 <body>
-	<h1>{{user.username}}</h1> <br>
+ <a href="/">主页</a>
+	<h1>{{user.id}}:{{user.username}}</h1> <br>
 	<img src="{{user.gravatar(size=128)}}" alt=""> <br>
 	{%if current_user.is_authenticated %}
 		<!-- <a href="/user/edit_profile">编辑资料</a> -->
 	{%endif%} <br>
 	
-	{% if current_user.can(Permission.FOLLOW) and user != current_user %}
- {% if not current_user.is_following(user) %}
- <a href="{{ url_for('.follow', username=user.username) }}"
- class="btn btn-primary">Follow</a>
- {% else %}
- <a href="{{ url_for('.unfollow', username=user.username) }}"
- class="btn btn-default">Unfollow</a>
- {% endif %}
-{% endif %}
-
-
-{% if current_user.is_authenticated and user != current_user and
- user.is_following(current_user) %}
-| <span class="label label-default">Follows you</span>
-{% endif %}
+	
+{%if current_user.role.name=='司机'%}
+车辆信息： <br>
+{%for i in current_user.drivers%}
+{{i.number}}<br>
+{%endfor%}
+<a href="{{url_for('driver.register_driver_post')}}">添加车辆信息</a>
+{%endif%}
 
 <br>已接订单：<br>
 {%for i in current_user.order_pay%}

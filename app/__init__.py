@@ -15,7 +15,14 @@ from flask.ext.admin import Admin
 from flask_babelex import Babel
 from flask_redis import FlaskRedis
 from flask_debugtoolbar import DebugToolbarExtension
+from flask.ext.bootstrap import Bootstrap
+from rq import Queue
+from rq.job import Job
 
+from redis import Redis
+redis = Redis()
+
+# from app.redis_worker import conn
 
 DEFAULT_APP_NAME = 'car'
 
@@ -26,19 +33,27 @@ login_manager = LoginManager()
 babel = Babel()
 redis_store = FlaskRedis()
 toolbar = DebugToolbarExtension()
+bootstrap = Bootstrap()
+
+# q = Queue(connection=conn)
+# import queue_daemon
+
 
 
 #session_protection属性可以设置None，basic，strong提供不同的安全等级防止用户会话遭篡改
 login_manager.session_protection ='strong'
 #这个login_view  多了一个s，变成了login_views导致错误401  花了好几个钟头查找原因
 login_manager.login_view = 'auth.login'
-login_manager.login_views = 'auth.login'
+# login_manager.login_views = 'auth.login'
 login_manager.login_message = u"请登录后访问该页面."
 login_manager.refresh_view = 'auth.login'
 
 def create_app(config_name):
 	app = Flask(__name__)
 	app.config.from_object(config[config_name])
+	app.config['REDIS_QUEUE_KEY'] = 'my_queue'
+
+	# queue_daemon(app)
 
 	#配置文件
 	configure_config(app)
@@ -90,6 +105,7 @@ def configure_extensions(app):
 	babel.init_app(app)
 	# toolbar.init_app(app)
 	login_manager.init_app(app)
+	bootstrap.init_app(app)
 
 
 def configure_blueprint(app):
@@ -133,6 +149,16 @@ def configure_create_admin(app):
 
 
 
-
+def queue_daemon(app, rv_ttl=500):
+	while 1:
+		msg = redis.blpop(app.config['REDIS_QUEUE_KEY'])
+		func, key, args, kwargs = loads(msg[1])
+		try:
+			rv = func(*args, **kwargs)
+		except Exception, e:
+			rv = e
+		if rv is not None:
+			redis.set(key, dumps(rv))
+			redis.expire(key, rv_ttl)
 
 

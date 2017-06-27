@@ -22,6 +22,11 @@ class Config:
 
 	DEBUG = False
 
+	SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+	SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+	REDIS_QUEUE_KEY = 'my_queue'
+
 	@staticmethod
 	def init_app(app):
 		pass

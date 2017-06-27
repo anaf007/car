@@ -18,7 +18,7 @@
 车辆：
 <select name="car">
 
-{%for i in current_user.driver%}
+{%for i in current_user.drivers%}
 	<option value="{{i.id}}">{{i.number}} </option>
 
 {%endfor%}

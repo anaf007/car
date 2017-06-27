@@ -12,6 +12,7 @@ from .import login_manager
 from datetime import datetime
 import hashlib,random
 from flask import request,current_app
+import datetime as datetime2
 
 
 
@@ -633,9 +634,9 @@ class Redis_Task(db.Model):
 		self.name = name
 		self.redis_key = redis_key
 		start_time = ':'.join(start_time.split(':')[:2])
-		self.start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")
+		self.start_time = datetime2.datetime.strptime(start_time, "%Y-%m-%d %H:%M")
 		# self.seconds as key expire seconds
-		self.seconds = int((self.start_time - datetime.utcnow).total_seconds())
+		self.seconds = int((self.start_time - datetime.utcnow()).total_seconds())
 
 	def __repr__(self):
 		return '<Task name:%r, key:%r>' % (self.name, self.redis_key)

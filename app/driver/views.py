@@ -8,10 +8,11 @@ Author: by anaf
 from  flask.ext.login import login_required,current_user
 from ..decorators import goods_required,permission_required,driver_required
 from . import driver
-from ..models import Permission,Driver,User,Driver_post
+from ..models import Permission,Driver,User,Driver_post,Role
 from flask import render_template,request,redirect,url_for,flash
 from app import db
 from datetime import datetime
+from forms import Register_driver
 
 
 #需要登陆，且需要货主权限
@@ -45,7 +46,7 @@ def reg_driver_add():
 	return "ok"
 
 
-#添加车辆信息
+#添加源信息
 @driver.route('/add_post')
 @login_required
 @driver_required
@@ -98,6 +99,46 @@ def add_posts():
 def show_post(id=0):
 	dp = Driver_post.query.get_or_404(id)
 	return render_template('driver/show_post.html',dp = dp)
+
+
+#注册司机
+@driver.route('/register_driver',methods=['GET'])
+def register_driver():
+	form = Register_driver()
+	return render_template('driver/register_driver.html',form=form)
+
+#注册司机
+@driver.route('/register_driver',methods=['POST'])
+def register_driver_post():
+	form = Register_driver()
+	if form.validate_on_submit():
+		d = Driver()
+		d.users = current_user
+		d.phone = form.phone.data
+		d.length = form.length.data
+		d.number = form.number.data
+		d.travel = form.travel.data
+		d.driver = form.driver.data
+		d.note = form.note.data
+		d.driver_user = current_user
+		d.use.append(current_user)
+		r = Role.query.filter_by(name=u'司机').first()
+		try:
+			db.session.add(d)
+			current_user.role =  r
+			db.session.add(current_user)
+			db.session.commit()
+			flash(u'车主添加完毕')
+		except Exception, e:
+			flash(u'数据错误，添加失败：%s'%str(e))
+			db.session.rollback()
+		
+
+		flash(u'申请司机完成。')
+		return redirect(url_for('usercenter.index'))
+	else:
+		flash(u'校验数据错误')
+	return redirect(url_for('.register_driver'))
 
 
 
