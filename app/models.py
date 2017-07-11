@@ -141,6 +141,7 @@ class User(UserMixin,db.Model):
 	goods_id = db.relationship('Goods',backref='user_goods',primaryjoin='Goods.user_id == User.id')
 	#货物司机接单者
 	car_goods_id = db.relationship('Goods',backref='car_goods',primaryjoin='Goods.car_user_id == User.id')
+	# car_goods_id = db.relationship('Goods',backref='car_goods',primaryjoin='Goods.car_user_id == User.id')
 	#付款者
 	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
 	#用户邮件
@@ -557,7 +558,7 @@ class Goods(db.Model):
 	car_user_id =  db.Column(db.Integer, db.ForeignKey('users.id'))
 	#接单时间
 	receive_time = db.Column(db.DateTime) 
-	#状态 -2失效订单被抢付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  其他状态等待 ?4初期未付款状态?
+	#状态 -2失效订单超时未支付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  其他状态等待 ?4初期未付款状态?
 	state = db.Column(db.Integer(),default=0)
 	order_pay = db.relationship('Order_pay', backref='order_pay',lazy='dynamic',primaryjoin='Order_pay.goods_id == Goods.id')
 
@@ -573,14 +574,23 @@ class Goods_comment(db.Model):
 class Order_pay(db.Model):
 	__tablename__ = 'order_pays'
 	id = db.Column(db.Integer,primary_key=True)
+	#订单
 	order  = db.Column(db.String(20),unique=True)
+	#货物
 	goods_id =  db.Column(db.Integer, db.ForeignKey('goods.id'))
+	#车辆
 	drivers_id =  db.Column(db.Integer, db.ForeignKey('drivers.id'))
+	#车辆信息
 	driver_post_id =  db.Column(db.Integer, db.ForeignKey('driver_posts.id'))
+	#创建时间
 	create_time = db.Column(db.DateTime,default=datetime.utcnow)
+	#支付时间
 	pay_time = db.Column(db.DateTime)
+	#-1失效 0创建未支付 1完成
 	state = db.Column(db.Integer,default=0)
+	#支付者
 	pay_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	#支付金额
 	pay_price = db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
 
@@ -618,6 +628,17 @@ class Driver_post(db.Model):
 	state = db.Column(db.Integer(),default=0)
 	#外键
 	order_pay = db.relationship('Order_pay', backref='d_posts',uselist='False')
+
+
+class Order_Task(db.Model):
+	__tablename__ = 'order_tasks'
+	id = db.Column(db.Integer,primary_key=True)
+	#订单号
+	order_str = db.Column(db.String(20))
+	#创建时间
+	create_time = db.Column(db.DateTime,default=datetime.utcnow)
+	#运行时间
+	run_time = db.Column(db.DateTime,default=datetime.utcnow)
 
 
 

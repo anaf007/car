@@ -2,7 +2,11 @@
 """filename:app/__init__.py
 Created 2017-05-29
 Author: by anaf
-note:初始化函数
+note:初始化函数，书本教程确实坑
+把“app = Flask(__name__)”放到create_app里面 
+后面需要到app不知道怎么取
+不能from app import app
+def create_app(config_name):
 """
 
 from flask import Flask,render_template
@@ -18,6 +22,10 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.bootstrap import Bootstrap
 from rq import Queue
 from rq.job import Job
+
+from flask_apscheduler import APScheduler
+
+scheduler = APScheduler()
 
 from redis import Redis
 redis = Redis()
@@ -47,9 +55,9 @@ login_manager.login_view = 'auth.login'
 # login_manager.login_views = 'auth.login'
 login_manager.login_message = u"请登录后访问该页面."
 login_manager.refresh_view = 'auth.login'
-
+app = Flask(__name__)
 def create_app(config_name):
-	app = Flask(__name__)
+	
 	app.config.from_object(config[config_name])
 	app.config['REDIS_QUEUE_KEY'] = 'my_queue'
 
@@ -81,12 +89,7 @@ def create_app(config_name):
 python manage.py shell 
 from app import db 
 db.create_all()
-from app.models import Role,User
-admin_role = Role(name = 'admin')
-mod_role = Role(name = 'Moderator')
-user_role = Role(name = 'User')
-user_admin = User(username='admins',password='admins',role=admin_role)
-user_mod = User(username='moderator',password='moderator',role=mod_role)
+xuser_mod = User(username='moderator',password='moderator',role=mod_role)
 user_user = User(username='use',password='use',role=user_role)
 db.session.add(admin_role)
 db.session.add(mod_role)
@@ -106,6 +109,9 @@ def configure_extensions(app):
 	# toolbar.init_app(app)
 	login_manager.init_app(app)
 	bootstrap.init_app(app)
+
+	scheduler.init_app(app)
+	scheduler.start()
 
 
 def configure_blueprint(app):

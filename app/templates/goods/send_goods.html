@@ -13,12 +13,93 @@
 	{{form.name.label}}{{form.name}} <br>
 	{{form.unit.label}}{{form.unit}} <br>
 	{{form.count.label}}{{form.count}} <br>
-	{{form.start_address.label}}{{form.start_address}} <br>
-	{{form.end_address.label}}{{form.end_address(id='myname')}} <br>
-	{{form.start_car_time.label}}{{form.start_car_time(id='myname')}} <br>
-	{{form.start_price.label}}{{form.start_price(id='myname')}} <br>
-	{{form.note.label}}{{form.note(id='myname')}} <br>
+	{{form.start_address.label}}<div id="area"></div><br>
+	
+	{{form.end_address.label}}<div id="end_area"></div><br>
+	
+	{{form.start_car_time.label}}{{form.start_car_time()}} <br>
+	{{form.start_price.label}}{{form.start_price()}} <br>
+	{{form.note.label}}{{form.note()}} <br>
 	{{form.submit()}}<br>
 </form>
 </body>
 </html>
+
+<script src="{{url_for('static',filename='city.js')}}"></script>
+<script type="text/javascript">
+var sheng = document.createElement("select");
+var shi = document.createElement("select");
+var qu = document.createElement("select");
+var area = document.getElementById("area");
+
+sheng.setAttribute('name', 'start_sheng');
+shi.setAttribute('name', 'start_shi');
+qu.setAttribute('name', 'start_qu');
+area.appendChild(sheng);
+area.appendChild(shi);
+area.appendChild(qu);
+
+
+var endarea = document.getElementById("end_area");
+var end_sheng = document.createElement("select");
+var end_shi = document.createElement("select");
+var end_qu = document.createElement("select");
+end_sheng.setAttribute('name', 'end_sheng');
+end_shi.setAttribute('name', 'end_shi');
+end_qu.setAttribute('name', 'end_qu');
+endarea.appendChild(end_sheng);
+endarea.appendChild(end_shi);
+endarea.appendChild(end_qu);
+
+
+end_sheng.options[0] = new Option("请输入省",'');
+end_shi.options[0] = new Option("请输入市",'');
+end_qu.options[0] = new Option("请输入区/县",'');
+
+
+
+sheng.options[0] = new Option("请输入省",'');
+shi.options[0] = new Option("请输入市",'');
+qu.options[0] = new Option("请输入区/县",'');
+
+// 循环第一步,把省循环进select
+for (var i = 0; i < city.length; i++) {
+	sheng.options[sheng.length] = new Option(city[i].name,city[i].name);
+	end_sheng.options[end_sheng.length] = new Option(city[i].name,city[i].name);
+	// 循环第二步,把所有的市都循环进select
+	sheng.onchange = function(){
+		shi.options.length = 0;
+		shi.options[shi.length] = new Option("请输入市",'');
+		for (var j = 0; j < city[sheng.selectedIndex-1].city.length; j++) {
+			shi.options[shi.length] = new Option(city[sheng.selectedIndex-1].city[j].name,city[sheng.selectedIndex-1].city[j].name)
+		}
+		
+	}
+
+	end_sheng.onchange = function(){
+		end_shi.options.length = 0;
+		end_shi.options[end_shi.length] = new Option("请输入市",'');
+		for (var j = 0; j < city[end_sheng.selectedIndex-1].city.length; j++) {
+			end_shi.options[end_shi.length] = new Option(city[end_sheng.selectedIndex-1].city[j].name,city[end_sheng.selectedIndex-1].city[j].name)
+		}
+		
+	}
+
+	shi.onchange = function(){
+		qu.options.length = 0;
+		qu.options[qu.length] = new Option("请输入区/县",'');
+		for (var k = 0; k < city[sheng.selectedIndex-1].city[shi.selectedIndex-1].area.length; k++) {
+			qu.options[qu.length] = new Option(city[sheng.selectedIndex-1].city[shi.selectedIndex-1].area[k],city[sheng.selectedIndex-1].city[shi.selectedIndex-1].area[k]);	
+		};
+	}
+	end_shi.onchange = function(){
+		end_qu.options.length = 0;
+		end_qu.options[end_qu.length] = new Option("请输入区/县",'');
+		for (var k = 0; k < city[end_sheng.selectedIndex-1].city[end_shi.selectedIndex-1].area.length; k++) {
+			end_qu.options[end_qu.length] = new Option(city[end_sheng.selectedIndex-1].city[end_shi.selectedIndex-1].area[k],city[end_sheng.selectedIndex-1].city[end_shi.selectedIndex-1].area[k]);	
+		};
+	}
+};
+
+
+</script>

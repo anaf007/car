@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>send_order</title>
+</head>
+<body>
+	车辆详细信息： <br>
+	 {#dp.title#} <br>
+	发车地点 {{dp.start_address}}	 <br>
+	抵达地点 {{dp.end_address}}	<br>
+	发车时间 {{dp.start_car_time}}<br>
+	车牌：{{dp.posts.number}}	<br>
+	车长：{{dp.posts.length}}	<br>
+	运费：{{dp.start_price}}	<br>
+	备注： {{dp.note}}<br>
+	确认之后需要交纳{{dp.start_price|float*1.0}}元定金,作为司机的运费！如果司机违约，定金将返还进您的余额.并可随时提现<br>
+	<form method="post" action="{{url_for('.confirm_order')}}">
+<input type="hidden" value="{{dp.id}}" name="id" >
+<select name="goods">
+ {%for i in current_user.goods_id%}
+	<option value="{{i.id}}">货物信息：{{i.name}}</option>
+ {%endfor%}
+</select>
+<input type="submit" value="确认下单并支付定金">
+	
+</form>
+</body>
+</html>

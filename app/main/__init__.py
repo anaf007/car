@@ -25,3 +25,9 @@ def inject_permissions():
 @main.before_request
 def mark_current_user_online():
 	mark_online(request.remote_addr)
+
+
+
+
+
+	

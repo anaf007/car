@@ -13,7 +13,7 @@
 <input type="hidden" value="{{gd.id}}" name="id" >
 车辆：
 <select name="car">
- {%for i in current_user.driver%}
+ {%for i in current_user.drivers%}
 	<option value="{{i.id}}">车牌号：{{i.number}}</option>
  {%endfor%}
 </select>

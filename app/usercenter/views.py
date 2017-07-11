@@ -9,13 +9,14 @@ from . import usercenter
 from .. import db
 import random,os,datetime
 from  flask.ext.login import login_required,current_user
-from  ..models import Permission,User
+from  ..models import Permission,User,Driver
 from app.decorators import permission_required
 
 @usercenter.route('/index')
 @usercenter.route('/')
 @usercenter.route('/<username>')
 def index(username=''):
+    d = Driver.query.filter_by(driver_user=current_user).first()
     return render_template('user/index.html',user=current_user)
 
 @usercenter.route('/edit_profile')

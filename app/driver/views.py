@@ -8,12 +8,15 @@ Author: by anaf
 from  flask.ext.login import login_required,current_user
 from ..decorators import goods_required,permission_required,driver_required
 from . import driver
-from ..models import Permission,Driver,User,Driver_post,Role
-from flask import render_template,request,redirect,url_for,flash
-from app import db
+from ..models import Permission,Driver,User,Driver_post,Role,Goods,Order_pay,Order_Task
+from flask import render_template,request,redirect,url_for,flash,abort
+from app import db,scheduler
 from datetime import datetime
 from forms import Register_driver
-
+from app import redis_store,app
+import logging,time,random
+from decimal import Decimal
+import datetime as datime
 
 #需要登陆，且需要货主权限
 @driver.route('/')
@@ -84,6 +87,7 @@ def add_posts():
 		db.session.add(gp)
 		db.session.commit()
 		flash(u'添加成功')
+		#添加定时操作
 
 	except Exception, e:
 		db.session.rollback()
@@ -140,6 +144,103 @@ def register_driver_post():
 		flash(u'校验数据错误')
 	return redirect(url_for('.register_driver'))
 
+#接车下单货主访问
+@driver.route('/send_order',methods=['POST'])
+@login_required
+@goods_required
+def send_order():
+	id = request.form.get('id')
+	try:
+		dp = Driver_post.query.get_or_404(int(id))
+	except Exception, e:
+		abort(403)
+	return render_template('driver/send_order.html',dp=dp)
 
+
+#确认接车下单货主访问
+#这里是货主下单过程  需要限时支付，需要到缓存机制
+@driver.route('/confirm_order',methods=['POST'])
+@login_required
+@goods_required
+def confirm_order():
+
+	#车源id
+	req_id = request.form.get('id')
+	goods_id = request.form.get('goods')
+	choice_str = 'ABCDEFGHJKLNMPQRSTUVWSXYZ'
+	order_str = ''
+	str_time =  time.time()
+	order_str = str(int(int(str_time)*1.347))+order_str
+	
+	
+	for i in range(9):
+		order_str += random.choice(choice_str)
+	try:
+		dp = Driver_post.query.get_or_404(int(req_id))
+		goodsid = Goods.query.get_or_404(int(goods_id))
+	except Exception, e:
+		abort(403)
+	order_str = 'C'+order_str
+
+	op = Order_pay()
+	op.order = order_str
+	#货物信息
+	op.order_pay = goodsid 
+	#车源信息
+	op.d_posts = dp 
+	#付款者
+	op.order_pay_user = current_user 
+	# dp.car_goods = current_user
+	#创建时间
+	dp.receive_time = datetime.utcnow()
+	dp.state = 1  #1货主已下单
+	#支付金额
+	op.pay_price = Decimal(float(dp.start_price) * 1)
+	
+	
+	try:
+		db.session.add(op)
+		db.session.add(dp)
+		db.session.commit()
+
+		#限时支付
+		from apscheduler.triggers.interval import IntervalTrigger
+		now = datetime.now()
+		#年year月mom日day 时hour分min秒seconds
+		delta = datime.timedelta(seconds=30)
+		n_days = now + delta
+		runtime = n_days.strftime('%Y-%m-%d %H:%M:%S')
+		db.session.add(Order_Task(order_str=order_str,create_time=datetime.utcnow(),run_time=runtime))
+		db.session.commit()
+
+		#添加定时任务
+		scheduler.add_job(func=limit_confirm_pay,id=order_str,args=[order_str,],trigger=IntervalTrigger(seconds=30),replace_existing=True)
+		
+		#此处应该是跳转到支付页面url_for
+	except Exception, e:
+		return 'error:%s'%str(e)
+	return redirect(url_for('driver.index'))
+
+
+
+#司机接单限时支付
+def limit_confirm_pay(order_str):
+	#不添加日志会提示错误
+	logging.basicConfig()
+	#数据库操作
+	with app.app_context():
+		#获取任务信息
+		ot = Order_Task.query.filter_by(order_str=order_str).first()
+		op = Order_pay.query.filter_by(order=ot.order_str).first()
+		if op.state==0:
+			#订单
+			op.state = -1
+			#车源信息
+			op.d_posts.state = 0
+			db.session.add(op)
+		db.session.delete(ot)
+		db.session.commit()
+	#删除队列任务
+	scheduler.delete_job(id=order_str)
 
 

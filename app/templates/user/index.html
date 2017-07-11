@@ -14,11 +14,23 @@
 	
 	
 {%if current_user.role.name=='司机'%}
-车辆信息： <br>
+已发布的车源信息： <br>
 {%for i in current_user.drivers%}
-{{i.number}}<br>
+{{i.id}}<br>
+
+{%endfor%}xinxi
+{%for i in current_user.drivers.post%}
+{{i.id}}<br>
 {%endfor%}
 <a href="{{url_for('driver.register_driver_post')}}">添加车辆信息</a>
+{%endif%}
+
+{%if current_user.role.name=='货主'%}
+货物信息： <br>
+{%for i in current_user.goods_id%}
+货物名称：{{i.name}}<br>
+{%endfor%}
+<a href="{{url_for('driver.register_driver_post')}}">发布货物信息</a>
 {%endif%}
 
 <br>已接订单：<br>

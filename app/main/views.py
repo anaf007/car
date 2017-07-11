@@ -12,7 +12,7 @@ from  flask.ext.login import login_required,current_user
 from ..decorators import admin_required,permission_required
 from .forms import PostForm,CommentForm
 import os,random,datetime
-from app.online_user import get_online_users
+from app.online_user import get_online_users,mark_online
 
 
 #顶级栏目
@@ -169,5 +169,11 @@ def Get_Nav():
 @main.route('/online')
 def online():
     return Response('Online: %s' % ', '.join(get_online_users()),mimetype='text/plain')
+
+@main.route('/mark_online')
+def mark_online():
+    return Response('Online: %s' % ', '.join(mark_online()))
+
+
 
 

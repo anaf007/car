@@ -1,19 +1,32 @@
 #coding=utf-8
 
 from . import codetest
+from flask import current_app
 from app import redis_store
+from app import scheduler
 import random,time
 from forms import AddTaskForm
-from app.models import Redis_Task
-from flask import request,render_template,redirect,abort,session,jsonify
+from app.models import Redis_Task,Order_Task,Order_pay
+from flask import request,render_template,redirect,abort,session,jsonify,url_for
 from app import db
 from rq import Worker, Queue, Connection
 from rq.job import Job
 from app.redis_worker import conn
 import uuid
-
 from redis import Redis
+import logging
 redis = Redis()
+from app import app
+# app = app._get_current_object()
+
+
+@codetest.route('/2')
+def index2():
+	ot = Order_Task.query.filter_by(order_str='a2').first()
+	op = Order_pay.query.filter_by(order=ot.order_str).first()
+	print op
+	return 'op'
+
 
 @codetest.route('/')
 def index():
@@ -48,6 +61,7 @@ def add_task():
     task_id = request.args.get('tid')
     ori_task = Redis_Task.query.filter(Redis_Task.id == task_id).first()
     form = AddTaskForm()
+    print ori_task
     if ori_task:
         form = AddTaskForm(name=ori_task.name, key=ori_task.redis_key, ctime=ori_task.start_time)
 
@@ -66,38 +80,45 @@ def add_task():
             db.session.commit()
         else:
             db.session.add(task)
+        print 'seconds'
+        print task.seconds
 
-        redis_store.setex(str_key, 1, task.seconds)
+        redis_store.setex(str_key,task.seconds,add(1,2))
         return redirect('/')
     return render_template('codetest/add.html', form=form)
 
 
 
 def count_and_save_words(url):
-	errors = []
-	try:
-		r = requests.get(url)
-	except:
-		errors.append("Unable to get URL. Please make sure it's valid and try again.")
-		return {"error": errors}
-	# text processing
-	raw = BeautifulSoup(r.text).get_text()
-	nltk.data.path.append('./nltk_data/')  # set the path
-	tokens = nltk.word_tokenize(raw)
-	text = nltk.Text(tokens)
+	# errors = []
+	# try:
+	# 	r = requests.get(url)
+	# except:
+	# 	errors.append("Unable to get URL. Please make sure it's valid and try again.")
+	# 	return {"error": errors}
+	# # text processing
+	# raw = BeautifulSoup(r.text).get_text()
+	# nltk.data.path.append('./nltk_data/')  # set the path
+	# tokens = nltk.word_tokenize(raw)
+	# text = nltk.Text(tokens)
 
-	# remove punctuation, count raw words
-	nonPunct = re.compile('.*[A-Za-z].*')
-	raw_words = [w for w in text if nonPunct.match(w)]
-	raw_word_count = Counter(raw_words)
+	# # remove punctuation, count raw words
+	# nonPunct = re.compile('.*[A-Za-z].*')
+	# raw_words = [w for w in text if nonPunct.match(w)]
+	# raw_word_count = Counter(raw_words)
 
-	# stop words
-	no_stop_words = [w for w in raw_words if w.lower() not in stops]
-	no_stop_words_count = Counter(no_stop_words)
+	# # stop words
+	# no_stop_words = [w for w in raw_words if w.lower() not in stops]
+	# no_stop_words_count = Counter(no_stop_words)
 
 	# save the results
+	from app.models import Redis_Task
+	rt = Redis_Task(name='name',redis_key='7',start_time='2017-07-12 1:12')
+	db.session.add(rt)
+	db.session.commit()
 	try:
-		return '111'
+		print 'ok'
+	
 	# 	result = Result(
 	# 		url=url,
 	# 		result_all=raw_word_count,
@@ -108,23 +129,26 @@ def count_and_save_words(url):
 	# 	return result.id
 	except:
 		errors.append("Unable to add item to database.")
-		return {"error": errors}
+		# return {"error": errors}
+	return 'ok'
 
 
 @codetest.route('/codetestindex', methods=['GET', 'POST'])
 def codetestindex():
 	results = {}
-	from app.redis_worker import conn
+	# from app.redis_worker import conn
 	q = Queue(connection=conn)
-	if request.method == "POST":
+	
 		# get url that the person has entered
-		url = request.form['url']
-		if 'http://' not in url[:7]:
-			url = 'http://' + url
-		job = q.enqueue_call(
-			func=count_and_save_words, args=(url,), result_ttl=30
-		)
-		print(job.get_id())
+	# url = request.form['url']
+	url = 'url.com'
+	if 'http://' not in url[:7]:
+		url = 'http://' + url
+	#这里好像是指 运行的函数执行多少秒  而不是多少秒后执行  不是要的结果
+	job = q.enqueue_call(
+		func=count_and_save_words(url), args=(url,), result_ttl=10
+	)
+	print(job.get_id())
 	return render_template('codetest/index.html', results=results)
 
 @codetest.route("/results/<job_key>", methods=['GET'])
@@ -136,7 +160,6 @@ def get_results(job_key):
 		return "Nay!", 202
 
 
-from flask import current_app
 from pickle import loads, dumps
 
 
@@ -202,8 +225,8 @@ class DelayedResult(object):
 			if rv is not None:
 				a,b,[c,e],d = loads(rv)
 				self._rv = a(c,e)
-		# return self._rv[0](self._rv[2][0],self._rv[2][1])
 		return self._rv
+
 
 def queuefunc(f):
 	def delay(*args, **kwargs):
@@ -220,4 +243,63 @@ def queuefunc(f):
 def add(a=0, b=0):
 	print a+b
 	return a+b
+
+"""
+end
+http://flask.pocoo.org/snippets/73/, 2011年的例子。
+例子始终跑步起来 没办法get，只好使用hget。
+发现setex定时功能在shell下定时function，
+redis_store.setex(str_key,add(), task.seconds)
+例子中都是以字符串数字作为传参对象。实际开发多以function作为传参
+"""
+
+from app.models import User
+def job1(a):
+	#不添加日志会提示错误
+	logging.basicConfig()
+	#数据库操作
+	with app.app_context():
+		u = User.query.get(1)
+		# u.phone = '99999999999'
+		# db.session.add(u)
+		# db.session.commit()
+	print a
+	#删除队列任务
+	scheduler.delete_job(id='job1')
+
+
+
+def jobfromparm(**jobargs):
+	id = jobargs['id']
+	func = jobargs['func']
+	# args = eval_r(jobargs['args'])
+	trigger = jobargs['trigger']
+	seconds = jobargs['seconds']
+	from apscheduler.triggers.interval import IntervalTrigger
+	job = scheduler.add_job(func=job1,id='job1',args=[7,],trigger=IntervalTrigger(seconds=5),replace_existing=True)
+	return 'sucess'
+@codetest.route('/pause')
+def pausejob():
+	scheduler.pause_job('job1')
+	return "Success!"
+
+@codetest.route('/remove')
+def removejob():
+	scheduler.delete_job(id='job1')
+	return "Success!"
+
+	
+@codetest.route('/resume')
+def resumejob():
+	scheduler.resume_job('job1')
+	return "Success!"
+@codetest.route('/addjob', methods=['GET', 'POST'])
+def addjob():
+	# data = request.get_json(force=True)
+	data = {"id":"job1","func": "job1","args":"(1, 8)","trigger":"interval","seconds":10}
+	job = jobfromparm(**data)
+	return '12'
+
+
+
 
