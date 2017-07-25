@@ -51,7 +51,9 @@ bootstrap = Bootstrap()
 #session_protection属性可以设置None，basic，strong提供不同的安全等级防止用户会话遭篡改
 login_manager.session_protection ='strong'
 #这个login_view  多了一个s，变成了login_views导致错误401  花了好几个钟头查找原因
-login_manager.login_view = 'auth.login'
+# login_manager.login_view = 'auth.login'
+#自动注册
+login_manager.login_view = 'auth.autoregister'
 # login_manager.login_views = 'auth.login'
 login_manager.login_message = u"请登录后访问该页面."
 login_manager.refresh_view = 'auth.login'
@@ -127,6 +129,9 @@ def configure_blueprint(app):
 	app.register_blueprint(codetest_blueprint,url_prefix='/codetest')
 	from .usercenter import usercenter as user_blueprint
 	app.register_blueprint(user_blueprint,url_prefix='/usercenter')
+
+	from .superadmin import superadmin as superadmin_blueprint
+	app.register_blueprint(superadmin_blueprint,url_prefix='/superadmin')
 
 
 def configure_config(app):

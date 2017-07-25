@@ -36,7 +36,7 @@ def rndColor2():
     return (random.randint(32, 127), random.randint(32, 127), random.randint(32, 127))
 
 @auth.route('/genverify')
-def generate_verification_code():
+def generate_verification_code(nowtime =''):
 	output = StringIO.StringIO()
 	width = 70
 	height = 30
@@ -53,20 +53,17 @@ def generate_verification_code():
 
 	#模糊
 	# image = image.filter(ImageFilter.BLUR)
-	li = []
-	for i in range(10):
-		temp = random.randrange(65,90)
-		c = chr(temp)
-		li.append(c)
-	filename = "".join(li)
+	# li = []
+	# for i in range(10):
+	# 	temp = random.randrange(65,90)
+	# 	c = chr(temp)
+	# 	li.append(c)
 	
 	image.save(output,"JPEG")
 	img_data = output.getvalue()
-	# image.save(current_app.static_folder+'/code/'+filename+'.jpg', 'jpeg');
 	session['verify'] = verify_str
 	response = make_response(img_data)
 	response.headers['Content-Type'] = 'image/jpeg'
-	# return '/static/code/'+filename+'.jpg'
 	return response
 
 

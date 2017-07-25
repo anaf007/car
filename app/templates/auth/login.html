@@ -1,52 +1,159 @@
-<!doctype html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>login</title>
-</head>
-<body>
-{%for message in get_flashed_messages()%}
-	{{message}} <br>
-	{%endfor%}
+{% extends "base.html" %}
+{% block title %}用户登录{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<header class="ui-header ui-header-positive ui-border-b">
+<i class="ui-icon-return" onclick="history.back()"></i>
+<h1>用户登录</h1>
+</header>
+
+
+<section class="ui-container">
+	<selection class="slider">
+		<div class="ui-slider" id="slider1">
+			<ul class="ui-slider-content" style="width: 300%">
+				<li><span style="background-image:url(http://placeholder.qiniudn.com/640x200)"></span></li>
+				<li><span style="background-image:url(http://placeholder.qiniudn.com/640x200)"></span></li>
+				<li><span style="background-image:url(http://placeholder.qiniudn.com/640x200)"></span></li>
+			</ul>
+		</div>
+	</selection>
+
+    	<div class="ui-form ui-border-t">
+
+    	{%for message in get_flashed_messages(category_filter=['error'])%}
+		
+		<div class="ui-tooltips ui-tooltips-guide">
+            <div class="ui-tooltips-cnt ui-border-b">
+                <i></i>
+                {{message}}
+            </div>
+        </div>
+		{%endfor%}
+
+		{%for message in get_flashed_messages(category_filter=['login'])%}
+		
+		<div class="ui-tooltips ui-tooltips-guide">
+            <div class="ui-tooltips-cnt ui-border-b">
+                <i></i>
+                {{message}}
+            </div>
+        </div>
+		{%endfor%}
+
 
 
 {% if form.errors.verification_code %}
 {%for error in form.errors.verification_code%}
-{{error}}
+<div class="ui-tooltips ui-tooltips-warn">
+    <div class="ui-tooltips-cnt ui-border-b">
+        <i></i>{{error}} <a class="ui-icon-close"></a>
+    </div>
+</div>
 {%endfor%}
 {%endif%}
 
 
 {% if form.errors.password %}
 {%for error in form.errors.password%}
-{{error}}
+<div class="ui-tooltips ui-tooltips-warn">
+    <div class="ui-tooltips-cnt ui-border-b">
+        <i></i>{{error}} <a class="ui-icon-close"></a>
+    </div>
+</div>
 {%endfor%}
 {%endif%}
 
 
 {% if form.errors.username %}
 {%for error in form.errors.username%}
-{{error}}
+<div class="ui-tooltips ui-tooltips-warn">
+    <div class="ui-tooltips-cnt ui-border-b">
+        <i></i>{{error}} <a class="ui-icon-close"></a>
+    </div>
+</div>
 {%endfor%}
 {%endif%}
+            <form action="" method="post">
+            	{{form.hidden_tag()}}
+                <div class="ui-form-item ui-form-item-pure ui-border-b">
+                    
+                    {{form.username(placeholder="用户名/手机号")}} 
+                    
+                </div>
+                <div class="ui-form-item ui-form-item-pure ui-border-b">
+                    
+                    {{form.password(placeholder="密码")}} <br>
+                    
+                </div>
 
-	<form action="" method='post'>
-		{{form.hidden_tag()}}
-		{{form.username.label}}{{form.username(id='myname')}} <br>
-		{{form.password.label}}{{form.password}} <br>
-		{{ form.verification_code.label(class="control-label") | safe }}
-            
-            {{ form.verification_code(class="form-control", required=True) }}
-             <label class="control-label">
-			<img src="{{url_for('auth.generate_verification_code')}}">
-			</label>
+                <div class="ui-form-item ui-form-item-r ui-border-b">
+                    
+                     {{ form.verification_code(placeholder="验证码", required=True) }}
+                    <!-- 若按钮不可点击则添加 disabled 类 -->
+                    <!-- <button type="button" class="ui-border-l">重新发送</button> -->
+                    <img src="{{url_for('auth.generate_verification_code')}}" style="width: 110px;
+				    height: 40px;
+				    position: absolute;
+				    top:1px;
+				    right:1px;margin:3px;" onclick="javascript:newgdcode(this,this.src);">
+                    
+                </div> 
+                <div class="ui-btn-wrap">
+	                 <input type="submit" value="登录" class="ui-btn-lg ui-btn-danger"> <p>&nbsp;</p>
+	                 <button class="ui-btn-lg active" onclick="javascript:window.location.href='{{url_for('auth.register')}}'">快速注册</button>	
+	            </div>
+                
+            </form>
+    </div>
+        	<script class="demo-script">
+		        (function (){
+		            var slider = new fz.Scroll('#slider1', {
+		                role: 'slider',
+		                indicator: true,
+		                autoplay: true,
+		                interval: 3000
+		            });
+		            var slider2 = new fz.Scroll('#slider2', {
+		                role: 'slider',
+		                indicator: true,
+		                autoplay: true,
+		                interval: 3000
+		            });
 
-          <br/>
+		            slider.on('beforeScrollStart', function(fromIndex, toIndex) {
+		                console.log(fromIndex,toIndex)
+		            });
 
-		{{form.remember_me.label}}{{form.remember_me}}  <br>
-		{{form.submit()}} 
-		 <br/>  <a href="{{url_for('auth.register')}}">注册</a>
+		            slider.on('scrollEnd', function(cruPage) {
+		                console.log(cruPage)
+		            });
+		        })();
+        	</script>
+        </section>
+<script language="javascript"> 
+function newgdcode(obj,url) { 
+obj.src = url+ '?nowtime=' + new Date().getTime(); 
+//后面传递一个随机参数，否则在IE7和火狐下，不刷新图片 
+} 
+</script> 
+<footer class="ui-footer ui-footer-btn" style='height:40px;padding-top:10px;'>
+<div class="ui-flex ui-flex-pack-center">
+    <div> <a href="">联系客服&nbsp;</a></div>|
+    <div><a href="">&nbsp;忘记密码</a> </div>
+</div>
+          
+</footer>
 
-	</form>
-</body>
-</html>
+
+{% endblock %}
+
+
+	
+
+
+

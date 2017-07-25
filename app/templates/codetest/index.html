@@ -1,56 +1,23 @@
-{% extends "bootstrap/base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+<!DOCTYPE html >
+<html >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>请使用支持HTML5的现代浏览器。使用chrome可以体验语音搜索效果。</title>
+<style type="text/css">
+    .search_form{position:relative; height:31px; margin:60px;display:inline-block;} 
+    .search_form:hover{-webkit-box-shadow:0 0 3px #999;-moz-box-shadow:0 0 3px #999}
+    .sinput{float:left; width:200px; height:21px; line-height:21px; padding:4px 7px; color:b3b3b3;  border:1px solid #999; border-radius:2px 0 0 2px; background-color:#fbfbfb;} 
+    .sbtn{
+        float:left; 
+        width:50px; 
+        height:31px;
+        padding:0 12px;
+        margin-left:-1px; border-radius:0 2px 2px 0; border:1px solid #4d90fe; background-color:#4d90fe; cursor:pointer;  display:inline-block; font-size:12px; vertical-align:middle; color:#f3f7fc;position:absolute;} 
+    .sbtn:hover{background:#4084f2} 
+</style>
+</head>
 
-{% block title %}控制面板{% endblock %}
-
-{% block content %}
-    <div class="container">
-        <h1 class="page-header">任务列表
-            <a class="btn btn-info" href="{{ url_for('codetest.add_task') }}">添加新任务</a></h1>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-                <th>#</th>
-                <th>任务名</th>
-                <th>redis键</th>
-                <th>状态</th>
-                <th>开始时间</th>
-                <th>创建时间</th>
-                <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for obj in tasks %}
-                <tr>
-                  <th scope="row">{{loop.index}}</th>
-                    <td>{{ obj.name }}</td>
-                    <td>{{ obj.redis_key }}</td>
-                    <td>{% if obj.expired == 1 %}
-                            <span class="label label-default">已过期</span>&nbsp;
-                            <span class="label label-success">成功</span>
-                        {% else %}
-                            <span class="label label-info">未过期</span>
-                    {% endif %}</td>
-                    <td>{{ obj.start_time }}</td>
-                    <td>{{ obj.create_date }}</td>
-                    <td>
-                        <a class="btn btn-success btn-sm" href="{{ url_for('codetest.add_task', tid=obj.id) }}">修改</a>&nbsp;
-                        
-                    </td>
-                </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <form action="" method="post">
-            <input type="text" name="url" id=""> <br>
-            <input type="submit" value="submit">
-        </form>
-    </div>
-{% endblock %}
-
-{% block scripts %}
-    {{ super() }}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/task.js', _external=True) }}"></script>
-
-{% endblock %}
-
+<body>
+<form action="#" method="get" class="search_form">     <input type="text" name="s" class="sinput" placeholder="输入 回车搜索" autofocus x-webkit-speech>      <input type="submit" value="搜索" class="sbtn"> </form> 
+</body>
+</html>

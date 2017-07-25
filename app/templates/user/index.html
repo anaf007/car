@@ -1,41 +1,84 @@
-<!doctype html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>userindex</title>
-</head>
-<body>
- <a href="/">主页</a>
-	<h1>{{user.id}}:{{user.username}}</h1> <br>
-	<img src="{{user.gravatar(size=128)}}" alt=""> <br>
-	{%if current_user.is_authenticated %}
-		<!-- <a href="/user/edit_profile">编辑资料</a> -->
-	{%endif%} <br>
-	
-	
-{%if current_user.role.name=='司机'%}
-已发布的车源信息： <br>
-{%for i in current_user.drivers%}
-{{i.id}}<br>
+{% extends "base.html" %}
+{% block title %}用户登录{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
 
-{%endfor%}xinxi
-{%for i in current_user.drivers.post%}
-{{i.id}}<br>
-{%endfor%}
-<a href="{{url_for('driver.register_driver_post')}}">添加车辆信息</a>
+
+{% block body %}
+
+	
+
+<section class="ui-container" style='border-bottom:60px solid transparent;'>
+<div style="background-color:#00CD66;color:white;padding-top:10px;">
+<div style="float:left;width:100%;">
+	
+	<p style="float:right;padding-right:5px">联系客服</p>	
+</div>
+	
+	<div class="ui-avatar-one" style="margin:0px auto;">
+		<span style="background-image:url('{{user.gravatar(size=120)}}');"></span>
+		
+	</div>
+	<div style="margin:0px auto;padding-top:10px;text-align:center">
+		<p class="ui-tag-wrap"><i class="ui-tag-vip"></i>{{current_user.phone}}[{{current_user.role}}]</p>
+		<p style="text-align:center">
+			下单信息
+            {%if current_user.role.name=='司机'%}
+{{getSend_Driver_post_Count(current_user.drivers)}}次&nbsp;接单0次&nbsp;违约0次
 {%endif%}
-
 {%if current_user.role.name=='货主'%}
-货物信息： <br>
-{%for i in current_user.goods_id%}
-货物名称：{{i.name}}<br>
-{%endfor%}
-<a href="{{url_for('driver.register_driver_post')}}">发布货物信息</a>
+{{current_user.consignors.goods_id.count()}}次&nbsp;接单0次&nbsp;违约0次
 {%endif%}
+		</p>
+	</div>
+	
 
-<br>已接订单：<br>
-{%for i in current_user.order_pay%}
-{{i.order}} <br>
-{%endfor%}
-</body>
-</html>
+	
+</div>
+
+
+
+<ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
+    <li><div><i class='ui-icon-order'></i></div><i>信息认证</i></li>
+    <li><div><i class='ui-icon-personal'></i></div><i>我的钱包</i></li>
+    <!-- <li><div><i class='ui-icon-cart'></i></div><i></i>已完成</li> -->
+    {%if current_user.role.name=='司机'%}
+    <li><div><i class='ui-icon-dressup'></i></div><i>车辆信息</i></li>
+    {%endif%}
+    {%if current_user.role.name=='货主'%}
+    <li><div><i class='ui-icon-dressup'></i></div><i>企业信息</i></li>
+    {%endif%}
+   
+</ul>
+<ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
+    <li><div><i class='ui-icon-dressup'></i></div><i>推荐有奖</i></li>
+    <li><div><i class='ui-icon-dressup'></i></div><i>我的名片</i></li>
+    <li><div><i class='ui-icon-dressup'></i></div><i>设置</i></li>
+</ul>
+<ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
+    <li data-href='{{url_for(".show_order")}}'><div><i class='ui-icon-dressup'></i></div><i>下单信息</i></li>
+    <li><div><i class='ui-icon-dressup'></i></div><i>接单信息</i></li>
+    <li><div><i class='ui-icon-dressup'></i></div><i>违约信息</i></li>
+</ul>
+
+<p>&nbsp;</p>
+</section>
+
+<style>
+
+
+.avatar{
+    width: 100%; 
+    height: 100%;
+    display: block;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    -webkit-background-size: cover;
+    -webkit-border-radius: 200px;
+}
+
+</style>
+
+{% endblock %}
+

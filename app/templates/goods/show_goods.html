@@ -1,24 +1,147 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>show_goods</title>
-</head>
-<body>	 
-货品标题：{{gd.name}} <br>
-发货地：{{gd.start_address}}<br>
-到达地：{{gd.end_address}}<br>
-运费：{{gd.start_price}}<br>
-发货时间{{gd.start_car_time}}<br>
-用户：{{gd.user_goods.username}}<br>
-公司名称：{{gd.user_goods.consignors.name}}<br>
-公司地址：{{gd.user_goods.consignors.address}}
- <br/>
- <br/>
-<form method="post" action="{{url_for('goods.send_order')}}">
-	 <input type="hidden" value="{{gd.id}}" name="id">
-	<input type="submit" value="[接货下单]">
-</form>
+{% extends "base.html" %}
+{% block title %}货物信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
 
-<!-- <h1><a href="{{url_for('goods.send_order')}}">[下单]</a></h1> -->
-</body>
-</html>
+
+{% block body %}
+
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>货物信息，编号：{{gd.id}}</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+
+
+<section id="ui-container" style=''>
+
+		<section id="form">
+			<div class="demo-item"></div>
+			<div class="ui-form ui-border-t">
+		        <form action="{{url_for('goods.send_order')}}" method="post">
+		        	<input type="hidden" name="goodsid" value="{{gd.id}}">
+
+		
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		                <i class='icon-home icon-large' style='color:#548B54'></i>[出发]
+		                {{gd.start_shi}}{{gd.start_qu}}{{gd.start_address}}
+		            </div>
+
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+	                    <i class='icon-truck icon-large' style='color:#1E90FF'></i>[目的]
+	                    {{gd.end_shi}}{{gd.end_qu}}{{gd.end_address}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-calendar icon-large' style='color:#FF6A6A'></i>[装货时间]
+	                    {{gd.start_car_time|dateformat("Y-M-d")}}&nbsp;{{gd.start_zone}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-suitcase icon-large' style='color:#EE6363'></i>[货物名称]
+	                    {{gd.name}}&nbsp;<span style='color:red;font-size:18px;'>{{gd.select_car_type}}</span>
+	                </div>                
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-list-alt icon-large' style='color:#8A2BE2'></i>[车辆]
+	                    {%if gd.car_length%}
+	                    {{gd.car_length}}
+	                    {%endif%}
+	                    {%if gd.tiji%}
+	                    {{gd.tiji}}方
+	                    {%endif%}
+	                    {%if gd.zhongliang%}
+	                    {{gd.zhongliang}}吨
+	                    {%endif%}
+	                    {{gd.car_type}}           
+	                    
+	                </div>
+
+	                {%if gd.note%}
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-align-left icon-large' style='color:#FFA500'></i>[备注]
+	                    &nbsp;{{gd.note}}&nbsp;
+	                </div>
+	                {%endif%}
+
+	                <!-- <div class="ui-form-item ui-border-b">
+	                    <i class='icon-hospital icon-large'></i>[企业]
+	                    &nbsp;{{gd.consignorsGoods.name}}&nbsp;
+
+	                    {%if gd.consignorsGoods.state==2%} 
+			            <i class='icon-thumbs-up'></i>诚信企业
+			            {%endif%}
+
+	                    {%if gd.consignorsGoods.state==1%} 
+			            <i class='icon-check'></i>认证企业
+			            {%endif%}
+			            {%if gd.consignorsGoods.state==0%} 
+			            <i class='icon-tag'></i>未认证
+			            
+			            {%endif%}
+	                </div> -->
+
+	                <div class="ui-form-item ui-border-b" style="color:red">
+	                    <label>运费(元)</label>
+	                    <input type="text" value="{{gd.start_price}}" name="price" style="color:red" disabled="disabled">
+	                </div>
+
+
+	                {%if not current_user.phone%}
+		            <div class="ui-form-item ui-border-b">
+	                    <label>联系电话</label>
+	                    <input type="text" value="" name="phone" placeholder='输入手机号码以便与您联系'>
+	                </div>
+	                {%else%}
+	                <div class="ui-form-item ui-border-b">
+	                    <label>装货车辆</label>
+	                    <div class="ui-select">
+	                        <select name="car">
+	                        {%for i in current_user.drivers%}
+							<option value="{{i.id}}">车牌{{i.number}}，车长{{i.length}} </option>
+							{%endfor%}
+	                        </select>
+	                    </div>
+	                </div>
+	                {%endif%}
+
+	                <div class="ui-btn-wrap">
+	                
+						<input type="submit" value="立即预约" class="ui-btn-lg ui-btn-danger"> <br>
+						<a class="ui-btn-lg ui-btn-primary" href="tel:07713103126"><i class='icon-phone icon-1x' ></i>&nbsp;电话沟通马上接单</a>
+	                </div>
+				
+		        </form>
+		    </div>
+		</section>
+	
+	
+
+</section>
+
+
+
+
+
+
+
+<script>
+$('.ui-actionsheet button').click(function(){
+    if($(this).data('href')){
+        location.href= $(this).data('href');
+    }
+});
+</script>
+<style>
+	#ui-container{
+		border-top:45px solid transparent;
+		border-bottom:60px solid transparent;
+	}
+</style>
+{% endblock %}
+
+
+
+
+

@@ -27,6 +27,8 @@ class Config:
 
 	REDIS_QUEUE_KEY = 'my_queue'
 
+	# PERMANENT_SESSION_LIFETIME = 31
+
 	@staticmethod
 	def init_app(app):
 		pass

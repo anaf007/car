@@ -10,7 +10,7 @@ from flask.ext.login import login_user,login_required,logout_user,current_user
 from ..models import User,Driver,Permission,Role,Consignor
 from .forms import LoginForm,Register_goods
 from app import db
-import random
+import random,time
 
 
 
@@ -35,23 +35,27 @@ def login_post():
 	if form.validate_on_submit():
 		try:
 			if form.verification_code.data.upper() != session['verify']:
-				flash(u'验证码错误')
+				flash(u'验证码错误1','error')
 				return redirect(url_for('.login'))
 		except Exception, e:
-			flask(u'校验错误')
+			flash(u'校验错误2','error')
 			return redirect(url_for('.login'))
 
 		user = User.query.filter_by(username=form.username.data).first()
+		if not user:
+			user = User.query.filter_by(phone=form.username.data).first()
+
 		if user is not None and user.verify_password(form.password.data):
-			login_user(user,form.remember_me.data)
+			login_user(user,True)
 			
 			if user.role is None or user.role.name==u'普通用户':
-				return redirect(url_for('.register_driver'))
+				return redirect(request.args.get('next') or url_for('main.main_login'))
+				# return redirect(url_for('.register_goods'))
 			else:
 				return redirect(request.args.get('next') or url_for('main.main_login'))
-		flash(u'校验数据错误')
+		flash(u'校验数据错误3','error')
 	else:
-		flash(u'校验数据错误')
+		flash(u'校验数据错误4','error')
 
 	return redirect(url_for('.login'))
 
@@ -60,7 +64,7 @@ def login_post():
 def logout():
 	logout_user()
 	flash(u'您已成功退出')
-	return redirect(url_for('main.index'))
+	return redirect(url_for('main.index_main'))
 
 
 @auth.route('/register')
@@ -130,6 +134,33 @@ def register_goods_post():
 		flash(u'校验数据错误')
 	return redirect(url_for('.register_goods'))
 
+
+@auth.route('/autoregister')
+def autoregister():
+	choice_str = 'ABCDEFGHJKLNMPQRSTUVWSXYZ'
+	username_str = ''
+	password_str = ''
+	str_time =  time.time()
+	username_str = str(int(int(str_time)*1.301))+username_str
+	username_str += 'AU'
+	for i in range(2):
+		username_str += random.choice(choice_str)
+
+	for i in range(6):
+		password_str += random.choice(choice_str)
+
+	username = username_str
+	password = password_str
+
+	user = User.query.filter_by(username=username).first()
+	if user is None:
+		user = User(username=username,password=password)
+		db.session.add(user)
+		db.session.commit()
+		login_user(user,True)
+		return redirect(url_for('main.index'))
+	else:
+		return redirect(url_for('.autoregister'))
 
 
 

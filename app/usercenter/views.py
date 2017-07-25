@@ -124,7 +124,10 @@ def unfollow(username):
 
 
 
-
+@usercenter.route('/show_order')
+@login_required
+def show_order():
+    return render_template('user/show_order.html')
 
 
 

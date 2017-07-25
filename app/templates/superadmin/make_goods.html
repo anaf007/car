@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>make_index</title>
+</head>
+<body>
+	{%for i in goods%}
+	ID:{{i.id}},预约人数：{{i.make_count}}
+	<a href="{{url_for('superadmin.make_goods_show',id=i.id)}}">
+			[出发]{{i.start_sheng}}——{{i.start_shi}},
+			[目的]{{i.end_sheng}}——{{i.end_shi}}
+			
+			</p>
+			<p style='color:#cccccc'>
+				<i class='icon-suitcase icon-large' ></i>
+				{%if i.name%}{{i.name}}{%endif%}
+				{%if i.car_length%}{{i.car_length}}{%endif%}{%if i.tiji%}{{i.tiji}}{%endif%}{%if i.zhongliang%}{{i.zhongliang}}{%endif%}</p>
+	</a>
+	<hr>
+	{%endfor%}
+</body>
+</html>

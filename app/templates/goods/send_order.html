@@ -1,20 +1,97 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>send-order</title>
-</head>
-<body>
-<h1>send-order</h1>
+{% extends "base.html" %}
+{% block title %}预约完成{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <!-- <i class="ui-icon-return" onclick="{{url_for('main.index')}}"></i> -->
+    <h1>预约成功</h1>
+</header>
+
+<section class="ui-container">
+	<section id="notice">
+	    <div class="demo-item">
+	        <p class="demo-desc">运输货物详情</p>
+	        <div class="demo-block">
+	            <section id="form">
+			<div class="demo-item"></div>
+			<div class="ui-form ui-border-t">
+		        
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		                <i class='icon-home icon-large' style='color:#548B54'></i>[出发]
+		                {{gd.start_shi}}{{gd.start_qu}}{{gd.start_address}}
+		            </div>
+
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+	                    <i class='icon-truck icon-large' style='color:#1E90FF'></i>[目的]
+	                   {{gd.end_shi}}{{gd.end_qu}}{{gd.end_address}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-calendar icon-large' style='color:#FF6A6A'></i>[装货时间]
+	                    {{gd.start_car_time|dateformat("Y-M-d")}}&nbsp;{{gd.start_zone}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-suitcase icon-large' style='color:#8A2BE2'></i>[货物名称]
+	                    {{gd.name}}&nbsp;<span style='color:red;font-size:18px;'>{{gd.select_car_type}}</span>
+	                </div>                
+
+	               
+
+	                <div class="ui-form-item ui-border-b" style="color:red">
+	                    <label>运费(元)</label>
+	                    <input type="text" value="{{gd.start_price}}" name="price" style="color:red">
+	                </div>
+
+	               <div class="demo-block" style="color:red">
+	                    您的预约信息已成功提交，后台正在进行匹配，稍后会电话通知您。
+	                    <!-- 电话确认无误后，您需要加纳{{show_price}}元的定金。同时需要过来签订 -->
+	                    <span style='color:blue;'>如您（公司）是运输团队，可点击下方“申请运输专线”获得最新的货运信息。</span>
+	                </div>
+
+
+	                
+
+	                <div class="ui-btn-wrap">
+	                
+						<input type="submit" value="完成" class="ui-btn-lg ui-btn-danger" onclick="javascript:window.location='{{url_for('main.index')}}';"> 
+	                </div>
+
+	                <div class="ui-btn-wrap">
+	                
+						<input type="submit" value="申请运输专线" class="ui-btn-lg ui-btn-primary"> 
+	                </div>
+				
+		    </div>
+		</section>
+	
+	        </div>
+	    </div>
+	</section>
+<section>
+{% endblock %}
+
+
 货物名称：  {{gd.name}} <br>
-[{{gd.start_address}}-{{gd.end_address}}] <br>
+发货地点：[{{gd.start_address}}]，到达地点：[{{gd.end_address}}] <br>
 发货时间：{{gd.start_car_time}} <br>
-确认之后需要交纳{{gd.start_price|float*0.3}}元定金，运费的30%  <br>
+ <span style='color:red'>
+您的账户资金为：{{current_user.price}}元，
+确认之后需要交纳运费的{{gd.start_price|float*0.3}}(30%)作为保证金 <br>
+您还需要交纳
+{{gd.start_price|float*0.3 - current_user.price|float}}元定金. <br>交易结束后，连同运费将会结算到您的账户下，并可随时提现。</span>  <br>
 <form method="post" action="{{url_for('goods.confirm_order')}}">
 <input type="hidden" value="{{gd.id}}" name="id" >
-车辆：
+车源信息: <br>
 <select name="car">
  {%for i in current_user.drivers%}
-	<option value="{{i.id}}">车牌号：{{i.number}}</option>
+ 	{%for j in i.post%}
+	<option value="{{j.id}}">{{j.title}}</option>
+ 	{%endfor%}
  {%endfor%}
 </select>
 <input type="submit" value="确认下单并支付定金">

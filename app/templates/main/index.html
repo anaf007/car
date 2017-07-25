@@ -1,68 +1,301 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>index</title>
-	<style>
-	li{font-size: 30px;line-height: 50px;}
-	</style>
-</head>
+{% extends "base.html" %}
+{% block title %}主页{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
 
-<body>
-	<ul class="nav clearfix">
-		 <li class="shouye">
-				<a href="/" title="首页"><span>首页</span></a>
-		</li>
-		{%for i in nav%}
-		<li>
-			<a href="/nav_top/{{i.id}}" title="{{i.title}}" class="bg1"><span>{{i.title}}</span></a>
 
-			<dl>
-			{%for x in i.category%}
-			<dd><a href="/nav/{{x.id}}" title="{{x.title}}">{{x.title}}</a></dd>
-			{%endfor%}
+{% block body %}
+<header class="ui-header ui-header-positive ui-border-b">
+            
+            <div class="ui-searchbar-wrap ui-border-b focus" style="background-color:transparent;">
+                <div class="ui-searchbar ui-border-radius">
+                    <i class="ui-icon-search" style='color:black;'></i>
+                    <div class="ui-searchbar-text">输南宁到广州明天发车即可搜索</div>
+                    <div class="ui-searchbar-input">
+                    <input  type="text" placeholder="输南宁到广州明天发车即可搜索" autocapitalize="off" id='selecttext'>
+                    </div>
+                </div>
 
-			</dl> 
-			</li>
-		{%endfor%}
+                <i class="ui-icon-news" style='color:black;'></i>
+                <!-- <i class="ui-icon-news ui-reddot" style='color:black;'></i> -->
+            </div>
+           
+            <!-- <button class="ui-btn">回首页</button> -->
+</header>
+<section class="ui-container">
 
-		{%if not current_user.is_authenticated %}
-		<li>
-				<a href="/driver/index/" title="" class="bg1"><span>车源信息</span></a>
-		</li>
-		<li>
-				<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
-		</li>
+<section id="poptips" style='display:none;'>
+    <div class="ui-poptips ui-poptips-search">
+        <div class="ui-poptips-cnt"><i></i></div>
+    </div>
+</section>
 
-		{%endif%}
 
-	{%if current_user.is_authenticated %}
-{%if current_user.role.name == '司机'%}
-<li>
-		<a href="/consignor" title="" class="bg1"><span>货源信息</span></a>
-</li>
-<li>
-		<a href="{{url_for('driver.add_post')}}" title="" class="bg1"><span>发布车辆信息</span></a>
-</li>
+    <selection class="slider">
+        <div class="ui-slider" id="slider1" style="height:80px;">
+            <ul class="ui-slider-content" style="width: 300%;">
+                <li><span style="background-image:url({{url_for('static',filename='images/1.jpg',_external=True)}});"></span></li>
+                <li><span style="background-image:url({{url_for('static',filename='images/2.jpg',_external=True)}})"></span></li>
+                <li><span style="background-image:url({{url_for('static',filename='images/3.jpg',_external=True)}})"></span></li>
+            </ul>
+        </div>
+    </selection>
+    <div class="ui-tooltips ui-tooltips-warn">
+        <div class="ui-tooltips-cnt ui-border-b">
+        <marquee  direction="left" scrollamount="6" 
+          onmouseover="this.stop()" onmouseout="this.start()">
+            <a href="">系统已累计发布货物信息2178302条，累计货值78696672元。</a>&nbsp;&nbsp;&nbsp;
+            <a href="">目前南宁到广州的货物信息有528条，货值总价38902817元。</a>&nbsp;&nbsp;&nbsp;
+            <a href="">南宁到杭州货源充足已有719条货物信息，货主正着急寻找司机。</a>&nbsp;&nbsp;&nbsp;
+            <a href="">消息状态相关提示消息状态相关提示消息状态相关提示消息状态相关提示</a>&nbsp;&nbsp;&nbsp;  
+        </marquee>
+            
+        </div>
+    </div>
+
+    <div class="ui-form ui-border-t">
+
+        {%for message in get_flashed_messages(category_filter=['error'])%}
+        
+        <div class="ui-tooltips ui-tooltips-guide">
+            <div class="ui-tooltips-cnt ui-border-b">
+                <i></i>
+                {{message}}
+            </div>
+        </div>
+        {%endfor%}
+
+        {%for message in get_flashed_messages(category_filter=['success'])%}
+        
+        <div class="ui-tooltips ui-tooltips-guide">
+            <div class="ui-tooltips-cnt ui-border-b">
+                <i></i>
+                {{message}}
+            </div>
+        </div>
+        {%endfor%}
+            <script class="demo-script">
+                (function (){
+                    var slider = new fz.Scroll('#slider1', {
+                        role: 'slider',
+                        indicator: true,
+                        autoplay: true,
+                        interval: 3000
+                    });
+                    var slider2 = new fz.Scroll('#slider2', {
+                        role: 'slider',
+                        indicator: true,
+                        autoplay: true,
+                        interval: 3000
+                    });
+
+                    slider.on('beforeScrollStart', function(fromIndex, toIndex) {
+                        console.log(fromIndex,toIndex)
+                    });
+
+                    slider.on('scrollEnd', function(cruPage) {
+                        console.log(cruPage)
+                    });
+                })();
+            </script> 
+    </div>
+    <div>
+        <ul class="ui-tiled" style="padding:20px 0;">
+            <li><a href="{{url_for('driver.add_post')}}" style="color:#2E8B57"><i class='icon-edit icon-2x'></i><div>发布车源</div></a></li>
+            <li><a href="{{url_for('goods.index')}}" style="color:#2E8B57"><i class='icon-briefcase icon-2x'></i><div>找货</div></a></li>
+            {%if current_user.role.name=='普通用户'%}
+            <li><a href="{{url_for('goods.send_goods')}}" style="color:#2E8B57"><i class='icon-edit icon-2x'></i><div>发货货源</div></a></li>
+            {%else%}
+            <li><a href="{{url_for('usercenter.show_order')}}" style="color:#2E8B57"><i class='icon-user icon-2x'></i><div>我的发布</div></a></li>
+            {%endif%}
+        </ul>
+    </div>
+
+    <div class="ui-whitespace">
+        <p class="ui-txt-default">[南宁-广州]专线已发布29条货物信息</p>
+        <p class="ui-txt-default">[南宁-上海]专线已发布3条货物信息</p>
+        <p class="ui-txt-default">[南宁-杭州]专线已发布9条货物信息</p>
+        <p class="ui-txt-default">[南宁-北京]专线已发布24条货物信息</p>
+    </div>
+
+   <!--  <ul class="ui-list ui-list-pure ui-border-tb" style="margin-bottom:10%;">
+
+
+        <li class="ui-border-r" style="background-color:#EEE9E9;padding:0px;margin:0px;float:left;width:100%;border-bottom: 1px #cccccc solid;">
+
+            <a href="#" >
+
+            <p style="color:red;font-size: 18px;float:left;width:100%;">
+            <i class='icon-calendar icon-large' style='float:left;'></i>
+            <span style='float:left;'>长期用车</span><span class="date" style='float:left;'>[每天装车]</span>
+            27人预约
+            </p>
+
+            <p style="font-size: 18px;float:left;width:100%;color:#000000;">
+            <i class='icon-home icon-large' style='float:left;'></i>
+            <span style='float:left;color:#000000;'>南宁</span> 
+            <i class='icon-truck icon-large' style='float:left;'></i>
+            <span style='float:left;color:#000000;'>多条线路</span> 
+            <i class='icon-thumbs-up icon-large' style='float:left;'></i>
+
+            
+            <span class="ui-tag-wrap" style="float:left;color:#000000;">诚信企业<i class="ui-tag-svip"></i></span>
+            </p>
+
+            <p style="font-size: 18px;float:left;width:100%;color:#000000;">
+            
+            <i class='icon-suitcase icon-large' style="float:left;line-height:28px;"></i> 
+            <span style='float:left;color:#000000;'>
+            多种货物
+            &nbsp;<span style='color:red'>￥1000-5000元</span>
+            
+            </span> 
+
+            </p>
+
+
+            </a>
+        </li>
+
+        <li class="ui-border-r" style="background-color:#EEE9E9;padding:0px;margin:0px;float:left;width:100%;border-bottom: 1px #cccccc solid;">
+
+            <a href="#" >
+
+            <p style="color:red;font-size: 18px;float:left;width:100%;">
+            <i class='icon-calendar icon-large' style='float:left;'></i>
+            <span style='float:left;'>长期用车</span><span class="date" style='float:left;'>[每周装车]</span>5人预约
+            </p>
+
+            <p style="font-size: 18px;float:left;width:100%;color:#000000;">
+            <i class='icon-home icon-large' style='float:left;'></i>
+            <span style='float:left;'>南宁</span> 
+            <i class='icon-truck icon-large' style='float:left;'></i>
+            <span style='float:left;'>杭州</span> 
+            <i class='icon-thumbs-up icon-large' style='float:left;'></i>
+
+            
+            <span class="ui-tag-wrap" style="float:left">诚信企业<i class="ui-tag-svip"></i></span>
+            </p>
+
+            <p style="font-size: 18px;float:left;width:100%;color:#000000;">
+            
+            <i class='icon-suitcase icon-large' style="float:left;line-height:28px;"></i> 
+            <span style='float:left;'>
+            饮料
+            &nbsp;<span style='color:red'>￥8400.00元</span>
+            &nbsp;<span style='text-decoration:line-through;color:#cccccc'>￥11200.00元</span>
+            </span> 
+
+            </p>
+
+            </a>
+        </li>
+
+
+
+
+
+
+
+        {%for i in goods%}
+        {%if loop.index%2==1%}
+        <li class="ui-border-r" style="background-color:#FFFAFA;padding:0px;margin:0px;float:left;width:100%;border-bottom: 1px #cccccc solid;">
+        {%else%}
+        <li class="ui-border-r" style="background-color:#F5F5F5;padding:0px;margin:0px;float:left;width:100%;border-bottom: 1px #cccccc solid;">
+
+        {%endif%}
+            <a href="{{url_for('goods.show_goods',id=i.id)}}" >
+
+            <p style="color:#1E90FF;font-size: 18px;float:left;width:100%;">
+            <span style='float:left;'><i class='icon-calendar' style='float:left;line-height:28px;'></i></span><span class="date" style='float:left;color:#000000;'>[{{i.start_car_time|dateformat("Y-M-d")}}&nbsp;{{i.start_zone}}装车]
+            {%if i.select_car_type=='拼车'%}
+            <span style='color:red;font-size:18px;'>拼车</span>
+            {%endif%}
+            </span>
+            {%if i.select_car_type=='零担'%}
+            <span style='color:red;font-size:18px;'>零担</span>
+            {%endif%}
+            </span>
+            {%if i.make_count>1%}
+            <span style='color:#6495ED'>{{i.make_count}}人预约</span>
+            {%endif%}
+            </p>
+
+            <p style="font-size: 18px;float:left;width:100%;">
+            <i class='icon-home' style='float:left;line-height:28px;'></i>
+            <span style='float:left;color:#000000;'>{{i.start_shi}}</span> 
+            <i class='icon-truck' style='float:left;line-height:28px;'></i>
+            <span style='float:left;color:#000000;'>{{i.end_shi}}</span> 
+            
+
+            {%if i.consignorsGoods.state==1%} 
+            <i class='icon-check' style='float:left;line-height:28px;'></i>
+            <span class="ui-tag-wrap" style="float:left;color:#000000;">认证企业<i class="ui-tag-vip"></i></span>
+            {%endif%}
+            {%if i.consignorsGoods.state==0%} 
+            <i class='icon-tag' style='float:left;line-height:28px;'></i>
+            <span class="ui-tag-wrap" style="float:left;padding-right:0px;color:#000000;">未认证</span>
+            <i class="ui-icon-tag-vip" style='float:left;line-height:28px;'></i>
+            {%endif%}
+            <span style='float:left;'>
+
+            </p>
+
+            <p style="font-size: 18px;float:left;width:100%;">
+            
+            <i class='icon-suitcase' style="float:left;line-height:28px;"></i> 
+            <span style='float:left;color:#000000;'>
+            {%if i.name%}
+            {{i.name}}
+            {%endif%}
+            &nbsp;<span style='color:#FA8072'>￥{{i.start_price}}元</span>
+            &nbsp;<span style='text-decoration:line-through;color:#cccccc'>￥{{(i.start_price|int)*1.349}}元</span>
+            </span> 
+
+            </p>
+
+            </a>
+        </li>
+
+        {%endfor%}
+    </ul> -->
+
+
+    <div style="width:100%;height:50px;">
+    <br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br></div>
+</section> 
+<style>
+    p{padding-top: 5px;padding-left: 5px;font-size: 18px;}
+    h4{padding-left: 5px;font-size: 18px;padding-bottom: 5px;}
+    /*li{font-size: 18px;}*/
+    .ui-poptips{width: 100%;height: 50%;padding:0px;}
+    .ui-poptips-cnt{width: 100%;height: 100%;}
+    
+    .ui-tooltips-warn .ui-tooltips-cnt{background-color:#f8f8f8;}
+</style>
+{%if not current_user.phone%}
+<style>
+    .ui-footer{display: none;}
+</style>
 {%endif%}
-{%if current_user.role.name =='货主'%}
-<li>
-		<a href="/driver/index/" title="" class="bg1"><span>车源信息</span></a>
-</li>
-<li>
-		<a href="/consignor/send_goods" title="" class="bg1"><span>发布货物信息</span></a>
-</li>
+<script>
+    var el,el2,el3;
+    $("#selecttext").click(function(){
+        el=$.tips({
+            content:'',
+            stayTime:600000, //1000=1秒  600000=10分钟
+            type:"search"
+        })
+        el.on("tips:hide",function(){
+            console.log("tips hide");
+        })
 
-	{%endif%}
+    });
 
-	<li>
-		<a href="/auth/logout" title="" class="bg1"><span>退出</span></a>
-	</li>
-<li>
-		<a href="{{url_for('usercenter.index')}}" title="" class="bg1"><span>{{current_user.username}}，[{{current_user.role.name}}]</span></a>
-	</li>
+</script>
+{% endblock %}
 
-	{%endif%}
-	</ul>
-</body>
-</html>
+
+
+	

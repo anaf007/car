@@ -7,7 +7,7 @@ Author: by anaf
 from flask import render_template,redirect,url_for,request,flash,current_app,make_response,Response
 from . import main
 from .. import db
-from ..models import Article,Comment,Permission,CategoryTop,Category
+from ..models import Article,Comment,Permission,CategoryTop,Category,Goods
 from  flask.ext.login import login_required,current_user
 from ..decorators import admin_required,permission_required
 from .forms import PostForm,CommentForm
@@ -48,7 +48,14 @@ def article(id=0):
                         one=one,one_top=one_top)
  
 @main.route('/')
+@login_required
 def index():
+    # categorts = CategoryTop.query.all()
+    goods = Goods.query.order_by('id desc').all()
+    return render_template('main/index.html',goods=goods)
+
+@main.route('/index')
+def index_main():
     categorts = CategoryTop.query.all()
     return render_template('main/index.html',nav=categorts)
 

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}用户登录{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<header class="ui-header ui-header-positive ui-border-b">
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>下单列表</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+<section class="ui-container">
+
+
+<ul class="ui-list ui-list-pure ui-border-tb">
+
+{%if current_user.drivers%}
+{%for i in current_user.drivers%}
+{%for j in i.post.order_by('create_time desc')%}
+<li class="ui-border-t">
+    <p><span>发车时间：</span><span class="date">[{{j.start_car_time}}</span>]</p>
+    <h4>{{j.title}} </h4>
+</li>
+{%endfor%}
+{%endfor%}
+{%endif%}
+{%if current_user.consignors%}
+{%for j in current_user.consignors.goods_id.order_by('create_time desc')%}
+<li class="ui-border-t">
+    <p><span>装货时间：</span><span class="date">[{{j.start_car_time}}</span>]</p>
+    <h4>{{j.title}} </h4>
+</li>
+{%endfor%}
+{%endif%}
+</ul>
+</section>
+
+
+{% endblock %}
+

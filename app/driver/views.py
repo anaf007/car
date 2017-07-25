@@ -18,6 +18,7 @@ import logging,time,random
 from decimal import Decimal
 import datetime as datime
 
+
 #需要登陆，且需要货主权限
 @driver.route('/')
 @driver.route('/index/')
@@ -52,7 +53,6 @@ def reg_driver_add():
 #添加源信息
 @driver.route('/add_post')
 @login_required
-@driver_required
 def add_post():
 	return render_template('driver/add_post.html')
 
@@ -60,7 +60,6 @@ def add_post():
 #添加车源信息，此处应该进行系统匹配并发送邮件消息 短信等各种操作
 @driver.route('/add_post',methods=['POST'])
 @login_required
-@driver_required
 def add_posts():
 	start_sheng = request.form.get('start_sheng')
 	start_shi = request.form.get('start_shi')
@@ -70,28 +69,117 @@ def add_posts():
 	end_shi = request.form.get('end_shi')
 	end_qu = request.form.get('end_qu')
 
-	car = Driver.query.get_or_404(int(request.form.get('car')))
-	time = request.form.get('time')
+	mon = request.form.get('mon')
+	day = request.form.get('day')
+	zone = request.form.get('zone')
+
+	yesr = time.strftime('%Y',time.localtime(time.time()))
+	timestr = yesr+'/'+mon+'/'+day
+
+
+	if not start_sheng:
+		flash(u'数据校验失败,请选择发车地点','error')
+		return redirect(url_for('.add_post'))
+	if not end_sheng:
+		flash(u'数据校验失败,请选择到达地点','error')
+		return redirect(url_for('.add_post'))
+
+	if not start_shi:
+		flash(u'数据校验失败,请选择出发城市','error')
+		return redirect(url_for('.add_post'))
+
+	if not end_shi:
+		flash(u'数据校验失败,请选择目的城市','error')
+		return redirect(url_for('.add_post'))
+
+	if current_user.phone=='' or not current_user.phone:
+		if request.form.get('phone') =='' or request.form.get('phone') == None:
+			flash(u'数据校验失败,请输入手机号码','error')
+			return redirect(url_for('.add_post'))
+
+
+
+
+	if start_shi:
+		start_address = start_sheng+"-"+start_shi
+	if start_qu:
+		start_address = start_sheng+"-"+start_shi+"-"+start_qu
+
+	if end_shi:
+		end_address = end_sheng+"-"+end_shi
+	if end_qu:
+		end_address = end_sheng+"-"+end_shi+"-"+end_qu
+
+	carid = request.form.get('car')
+	#如果没有验证角色，获取手机号码  更改用户角色
+	d = Driver()
+	if not carid:
+		phone = request.form.get('phone')
+		if User.query.filter_by(phone=phone).first():
+			flash(u'该手机号码已经被注册，请登录后再发布。','login')
+			return redirect(url_for('auth.login'))
+		d.users = current_user
+		d.phone = phone
+		d.number = u'默认车辆'
+		d.car_length = u'未知'
+		
+		d.note = u'默认车辆信息，联系电话'+phone
+		d.driver_user = current_user
+		d.use.append(current_user)
+		r = Role.query.filter_by(name=u'司机').first()
+		try:
+			db.session.add(d)
+			current_user.role =  r
+			current_user.phone =  phone
+			db.session.add(current_user)
+			db.session.commit()
+		except Exception, e:
+			flash(u'数据错误，添加失败：%s'%str(e),'error')
+			db.session.rollback()
+			return redirect(url_for('.add_post'))
+	else:
+		d = Driver.query.get_or_404(int(request.form.get('car')))
+
+	car = d
+	starttime = timestr
 	price = request.form.get('price')
 	note = request.form.get('note')
 
 	gp = Driver_post()
-	gp.title = '['+start_shi+'-'+end_shi+']'+u'发车时间:'+time
-	gp.start_address = start_sheng+'-'+start_shi+'-'+start_qu
-	gp.end_address = end_sheng+'-'+end_shi+'-'+end_qu
+	#标题
+	gp.title = '['+start_shi+'-'+end_shi+']'+u'发车时间:'+yesr+'/'+mon+'/'+day+zone
+	#发车地址
+	gp.start_address = start_address
+	gp.start_sheng = start_sheng
+	gp.start_shi = start_shi
+	gp.start_qu = start_qu
+	#目的地址
+	gp.end_sheng = end_sheng
+	gp.end_shi = end_shi
+	gp.end_qu = end_qu
+	gp.end_address = end_address
+	#备注
 	gp.note = note
-	gp.start_car_time = time
-	gp.posts = car
+	#发车时间
+	gp.start_car_time = starttime
+	#车辆信息
+	gp.driverPosts = car
+	#报价价格
 	gp.start_price = price
+	#装车时段
+	gp.zone = request.form.get('zone')
 	try:
 		db.session.add(gp)
 		db.session.commit()
-		flash(u'添加成功')
+		
+		flash(u'您的车辆信息发布成功，系统自动进行信息匹配，匹配成功后会短信通知您，请稍后。','success')
 		#添加定时操作
+		return redirect(url_for('.add_post'))
 
 	except Exception, e:
 		db.session.rollback()
-		flash(u'添加失败%s'%str(e))
+		
+		flash(u'添加失败%s'%str(e),'error')
 
 	
 	return redirect(url_for('.add_post'))
@@ -172,7 +260,6 @@ def confirm_order():
 	str_time =  time.time()
 	order_str = str(int(int(str_time)*1.347))+order_str
 	
-	
 	for i in range(9):
 		order_str += random.choice(choice_str)
 	try:
@@ -185,17 +272,21 @@ def confirm_order():
 	op = Order_pay()
 	op.order = order_str
 	#货物信息
-	op.order_pay = goodsid 
+	op.goods_order_pay = goodsid 
 	#车源信息
-	op.d_posts = dp 
+	op.driver_posts_order_pays = dp 
 	#付款者
 	op.order_pay_user = current_user 
 	# dp.car_goods = current_user
 	#创建时间
 	dp.receive_time = datetime.utcnow()
-	dp.state = 1  #1货主已下单
+	#1货主已下单
+	dp.state = 1  
+	#具体字段意思是看models模型设计   4为货主自己寻找货源
+	goodsid.state = 4
+
 	#支付金额
-	op.pay_price = Decimal(float(dp.start_price) * 1)
+	op.pay_price = Decimal(float(dp.start_price) * 1-float(current_user.price))
 	
 	
 	try:
@@ -235,8 +326,11 @@ def limit_confirm_pay(order_str):
 		if op.state==0:
 			#订单
 			op.state = -1
-			#车源信息
-			op.d_posts.state = 0
+			#车源信息 状态更改
+			op.driver_posts_order_pays.state = 0
+			#货源信息 状态更改
+			op.goods_order_pay.state = 0
+			
 			db.session.add(op)
 		db.session.delete(ot)
 		db.session.commit()

@@ -111,15 +111,15 @@ class User(UserMixin,db.Model):
 	mail = db.Column(db.String(100),unique=True) 
 	#手机号，也可以用于登陆
 	phone  = db.Column(db.String(100),index=True,unique=True)
-	#货主表 一对一
-	consignors  = db.relationship('Consignor', backref='user',uselist=False)
+	#货主表 一对一   
+	consignors  = db.relationship('Consignor', backref='consignor_user',uselist=False)
 	#创建者负责人  多对一  relationship  不会在表中显示行
 	drivers  = db.relationship('Driver', backref='driver_user',primaryjoin='Driver.user_id == User.id',lazy='dynamic')
 	#车队
 	fleet_id  = db.Column(db.Integer())
 	#账户保障金
 	price = db.Column(db.Numeric(precision=10,scale=2,\
-		asdecimal=True, decimal_return_scale=None))
+		asdecimal=True, decimal_return_scale=None),default=0)
 	#状态  默认1
 	status = db.Column(db.Integer(),default=1)
 	#外键文章
@@ -137,15 +137,15 @@ class User(UserMixin,db.Model):
 								cascade='all, delete-orphan')
 	#评论
 	comments = db.relationship('Comment', backref='author', lazy='dynamic')
-	#货物发布者
-	goods_id = db.relationship('Goods',backref='user_goods',primaryjoin='Goods.user_id == User.id')
+	#货物发布者 这里不做货物发布了   货物发布应当链接到货主表
+	# goods_id = db.relationship('Goods',backref='user_goods',primaryjoin='Goods.user_id == User.id')
 	#货物司机接单者
-	car_goods_id = db.relationship('Goods',backref='car_goods',primaryjoin='Goods.car_user_id == User.id')
-	# car_goods_id = db.relationship('Goods',backref='car_goods',primaryjoin='Goods.car_user_id == User.id')
+	car_goods_id = db.relationship('Goods',backref='car_goods_user',primaryjoin='Goods.car_user_id == User.id')
 	#付款者
 	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
 	#用户邮件
 	user_msgs = db.relationship('User_msg', backref='user_msg')
+	
 
 	def __init__(self,**kwargs):
 		super(User,self).__init__(**kwargs)
@@ -476,9 +476,12 @@ class Driver(db.Model):
 	#车辆描述
 	note = db.Column(db.Text)
 	#车辆证件照片   一
-	driver_images = db.relationship('Driver_images', backref='driver',lazy='dynamic')
+	driver_images = db.relationship('Driver_images', backref='driverImages',lazy='dynamic')
+	#直接关联车辆信息表driver_posts 不关联这个表了,2017-07-21-司机自助下单  直接关联这个表不用发布信息所以不用关联下面这个了
 	order_pay = db.relationship('Order_pay', backref='order_pays',lazy='dynamic',primaryjoin='Order_pay.drivers_id == Driver.id')
-	post = db.relationship('Driver_post', backref='posts',lazy='dynamic',primaryjoin='Driver_post.driver_id == Driver.id')
+	post = db.relationship('Driver_post', backref='driverPosts',lazy='dynamic',primaryjoin='Driver_post.driver_id == Driver.id')
+	#司机自助下单货物用户
+	driver_self_post_id = db.relationship('Driver_self_order', backref='driver_self_order_driver',lazy='dynamic',primaryjoin='Driver_self_order.driver == Driver.id')
 
 
 
@@ -496,7 +499,7 @@ class Driver_images(db.Model):
 	driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
 
 
-#发货人，货主表。不是goods 货源表
+#货主表发货人。不是goods货源表
 class Consignor(db.Model):
 	__tablename__ = 'consignors'
 	id = db.Column(db.Integer(),primary_key=True)
@@ -522,8 +525,10 @@ class Consignor(db.Model):
 	state = db.Column(db.Integer(),default=0)
 	#公司简介
 	note = db.Column(db.Text)
-	driver_post = db.relationship('Driver_post', backref='driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Consignor.id')
-
+	#接单车辆？ 接的是  车辆信息表
+	# driver_post = db.relationship('Driver_post', backref='driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Consignor.id')
+	#货物表
+	goods_id = db.relationship('Goods', backref='consignorsGoods',lazy='dynamic',primaryjoin='Goods.consignors_id == Consignor.id')
 
 
 #货主发布的货物信息表
@@ -532,22 +537,42 @@ class Goods(db.Model):
 	id = db.Column(db.Integer(),primary_key=True)
 	#名称
 	name = db.Column(db.String(255)) 
+	#体积 方
+	tiji = db.Column(db.String(16)) 
+	#重量
+	zhongliang = db.Column(db.String(16)) 
+	#车型
+	car_type = db.Column(db.String(16)) 
+	#车长
+	car_length = db.Column(db.String(16)) 
 	#单位  （吨，千克，次[趟]）
 	unit = db.Column(db.String(16)) 
 	#数量
 	count = db.Column(db.Integer(),default=1)
 	#发货地
 	start_address = db.Column(db.String(255)) 
+	start_sheng = db.Column(db.String(255)) 
+	start_shi = db.Column(db.String(255)) 
+	start_qu = db.Column(db.String(255)) 
+	start_xiangxi_address = db.Column(db.String(255)) 
 	#运送地
 	end_address = db.Column(db.String(255)) 
+	end_sheng = db.Column(db.String(255)) 
+	end_shi = db.Column(db.String(255)) 
+	end_qu = db.Column(db.String(255)) 
+	end_xiangxi_address = db.Column(db.String(255)) 
 	#描述
 	note = db.Column(db.Text) 
+	#car_type 整车拼车零担
+	select_car_type = db.Column(db.String(255)) 
 	#发车时间
 	start_car_time =  db.Column(db.DateTime) 
+	start_zone = db.Column(db.String(10))
 	#发布时间
 	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
-	#发布者
-	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	#发布者 不是user表 应该是货主公司表 
+	consignors_id = db.Column(db.Integer, db.ForeignKey('consignors.id'))
+	# user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	#开始报价运费
 	start_price = db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
@@ -556,21 +581,30 @@ class Goods(db.Model):
 		asdecimal=True, decimal_return_scale=None))
 	#接单者
 	car_user_id =  db.Column(db.Integer, db.ForeignKey('users.id'))
+	#对应车辆信息表
+	driver_post_id = db.relationship('Driver_post', backref='goods_driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Goods.id')
+	# derver_posts_id =  db.Column(db.Integer, db.ForeignKey('driver_post.id'))
 	#接单时间
 	receive_time = db.Column(db.DateTime) 
-	#状态 -2失效订单超时未支付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  其他状态等待 ?4初期未付款状态?
+	#状态 -2失效订单超时未支付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok   其他状态等待 ?4初期未付款状态?
 	state = db.Column(db.Integer(),default=0)
-	order_pay = db.relationship('Order_pay', backref='order_pay',lazy='dynamic',primaryjoin='Order_pay.goods_id == Goods.id')
+	order_pay = db.relationship('Order_pay', backref='goods_order_pay',lazy='dynamic',primaryjoin='Order_pay.goods_id == Goods.id')
+	#预约数量
+	make_count = db.Column(db.Integer,default=0)
+	#紧急状态 置顶1
+	show_statie = db.Column(db.Integer,default=0)
+	#自助下单
+	driver_self_post_id = db.relationship('Driver_self_order', backref='driver_self_orders',lazy='dynamic',primaryjoin='Driver_self_order.goods == Goods.id')
 
 
-#货源留言表
+#货源留言表,目前还没有关系
 class Goods_comment(db.Model):
 	__tablename__ = 'goods_comments'
 	id = db.Column(db.Integer(),primary_key=True)
 	send_goods_id  = db.Column(db.Integer())
 
 
-#支付订单
+#支付订单,预约表
 class Order_pay(db.Model):
 	__tablename__ = 'order_pays'
 	id = db.Column(db.Integer,primary_key=True)
@@ -586,14 +620,13 @@ class Order_pay(db.Model):
 	create_time = db.Column(db.DateTime,default=datetime.utcnow)
 	#支付时间
 	pay_time = db.Column(db.DateTime)
-	#-1失效 0创建未支付 1完成
+	#-1失效 0创建未审核，自行预约 1审核通过未支付 2已支付 
 	state = db.Column(db.Integer,default=0)
-	#支付者
+	#支付者，不能直接关联货主或者车辆信息表  因为一个车可能是多个用户使用
 	pay_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	#支付金额
 	pay_price = db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
-
 
 
 #车源信息
@@ -603,13 +636,31 @@ class Driver_post(db.Model):
 	#名称
 	title = db.Column(db.String(100))
 	#发车地点
-	start_address = db.Column(db.String(255)) 
-	#到达地点
-	end_address = db.Column(db.String(255)) 
+	#出发省
+	start_sheng = db.Column(db.String(100))
+	#出发市
+	start_shi = db.Column(db.String(100))
+	#出发区
+	start_qu = db.Column(db.String(100))
+
+	#目的省
+	end_sheng = db.Column(db.String(100))
+	#目的省
+	end_shi = db.Column(db.String(100))
+	#目的省
+	end_qu = db.Column(db.String(100))
+
 	#描述
 	note = db.Column(db.Text) 
 	#发车时间
 	start_car_time =  db.Column(db.DateTime) 
+	#发车时段  全天 上午下午晚上
+	zone = db.Column(db.String(100))
+
+	start_address = db.Column(db.String(100))
+	#目的省
+	end_address = db.Column(db.String(100))
+
 	#发布时间
 	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
 	#发布者
@@ -620,14 +671,14 @@ class Driver_post(db.Model):
 	#实际运费   接单结算运费 系统抽取比例  系统调节
 	end_price =  db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
-	#接单者
-	consignor_user_id =  db.Column(db.Integer, db.ForeignKey('consignors.id'))
+	#接单者，关联到货物信息表
+	consignor_user_id =  db.Column(db.Integer, db.ForeignKey('goods.id'))
 	#接单时间
 	receive_time = db.Column(db.DateTime) 
-	#状态 -2失效订单被抢付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  其他状态等待 ?4初期未付款状态?
+	#状态 -2失效订单被抢付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  4司机自身去接单，所以该条信息自动冲掉 ！5！其他状态等待
 	state = db.Column(db.Integer(),default=0)
 	#外键
-	order_pay = db.relationship('Order_pay', backref='d_posts',uselist='False')
+	order_pay = db.relationship('Order_pay', backref='driver_posts_order_pays',uselist='False')
 
 
 class Order_Task(db.Model):
@@ -639,8 +690,6 @@ class Order_Task(db.Model):
 	create_time = db.Column(db.DateTime,default=datetime.utcnow)
 	#运行时间
 	run_time = db.Column(db.DateTime,default=datetime.utcnow)
-
-
 
 
 class Redis_Task(db.Model):
@@ -661,6 +710,33 @@ class Redis_Task(db.Model):
 
 	def __repr__(self):
 		return '<Task name:%r, key:%r>' % (self.name, self.redis_key)
+
+
+#车辆信息  车长  体积 方   重量 吨  不做外键。
+class Car_Info(db.Model):
+	__tablename__ = 'car_infos'
+	id = db.Column(db.Integer,primary_key=True)
+	length = db.Column(db.String(80))
+	tiji = db.Column(db.String(80))
+	zhongliang = db.Column(db.String(80))
+	sort = db.Column(db.Integer,default=10)
+
+#车型  低栏 平板 高栏 冷藏车 等   不做外键
+class Car_Type(db.Model):
+	__tablename__ = 'car_types'
+	id = db.Column(db.Integer,primary_key=True)
+	name = db.Column(db.String(80))
+
+#司机自助下单 货物预约表
+class Driver_self_order(db.Model):
+	__tablename__ = 'Driver_self_orders'
+	id = db.Column(db.Integer,primary_key=True)
+	driver = db.Column(db.Integer, db.ForeignKey('drivers.id'))
+	goods = db.Column(db.Integer, db.ForeignKey('goods.id'))
+	create_time = db.Column(db.DateTime,default=datetime.utcnow)
+	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
+	static = db.Column(db.Integer(),default=0)
+
 
 
 

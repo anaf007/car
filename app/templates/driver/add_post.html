@@ -1,77 +1,301 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>add_post</title>
-</head>
+{% extends "base.html" %}
+{% block title %}发布车辆信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
 
-<body>
-{%for message in get_flashed_messages()%}
-	<h1>{{message}}</h1> <br>
-	{%endfor%}
-发布车源信息： <br>
-<form method="post" action="">
 
-发车地点
-<div id="area"></div>
-抵达地点
-<div id="end_area"></div>
-车辆：
-<select name="car">
+{% block body %}
 
-{%for i in current_user.drivers%}
-	<option value="{{i.id}}">{{i.number}} </option>
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>发布车源信息</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
 
+
+
+<section class='ui-container'>
+{%for message in get_flashed_messages(category_filter=['error'])%}
+<div class="ui-tooltips ui-tooltips-warn">
+<div class="ui-tooltips-cnt ui-border-b">
+    <i></i>{{message}}
+</div>	
+</div>	
 {%endfor%}
-</select> <br>
-发车时间：
-<input type="text" name="time" value="2017-07-08 20:20">
-<br>
-运费：
-<input type="text" name="price" value="3000">
-<br>
-备注：
-<input type="text" name="note">
-<br>
-<input type="submit" value="发布">
-</form>
-<br>
+
+
+
+
+{%for message in get_flashed_messages(category_filter=['success'])%}
+<div class="ui-dialog">
+    <div class="ui-dialog-cnt">
+	    <header class="ui-dialog-hd ui-border-b">
+            <h3>发布成功</h3>
+            <!-- <i class="ui-dialog-close" data-role="button"></i> -->
+        </header>
+        <div class="ui-dialog-bd">
+            <div>{{message}}</div>
+        </div>
+        <div class="ui-dialog-ft">
+        	
+        	<button type="button" class="ui-btn-lg ui-btn-danger" style="border-color:#ccc;" data-href="{{url_for('driver.add_post')}}">取消</button>
+        	<button type="button" class="ui-btn-lg ui-btn-danger" style="border-color:#ccc;" data-href="{{url_for('driver.add_post')}}">确定</button>
+            <!-- <button type="button" data-role="button" data-href="{{url_for('driver.add_post')}}">取消</button> -->
+            <!-- <button type="button" data-role="button" onclick="">确定</button> -->
+        </div>
+    </div>        
+</div>
+<script class="demo-script">
+$(".ui-dialog").dialog("show");
+</script>
+{%endfor%}
+
+	<section id="form">
+		<div class="ui-form ui-border-t">
+	        <form action="" method="post">
+	            <div class="ui-form-item ui-border-b">
+	                <label style="width:75px;">出发地</label>
+	                <div class="ui-select-group">
+	                    <div id="area">    
+	                    </div>
+	                </div>
+	            </div>
+
+	            <div class="ui-form-item ui-border-b">
+	                <label style="width:75px;">目的地</label>
+	                <div class="ui-select-group">
+	                    <div id="end_area">    
+	                    </div>
+	                </div>
+	            </div>
+
+
+
+                {%if current_user.phone%}
+
+	            <div class="ui-form-item ui-border-b">
+                    <label>车辆选择</label>
+                    <div class="ui-select">
+                        <select name="car">
+                        {%for i in current_user.drivers%}
+						<option value="{{i.id}}">车牌{{i.number}}，车长{{i.length}} </option>
+						{%endfor%}
+                        </select>
+                    </div>
+                </div>
+                {%endif%}
+
+                <div class="ui-form-item ui-border-b">
+                        <label>发车日期</label>
+                        <div class="ui-select-group">
+                            
+                            <div class="ui-select">
+                                <select name="mon" id="mon" onchange='daybank()'>
+                                </select>
+                            </div>
+                            <div class="ui-select">
+                                <select name="day" id="day">
+                                </select>
+                            </div>
+                            <div class="ui-select">
+                                <select name="zone">
+                                    <option value="全天" selected="">全天</option>
+                                    <option value="上午">上午</option>
+                                    <option value="下午">下午</option>
+                                    <option value="晚上">晚上</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+	<script>
+var date=new Date;
+//年
+var year = date.getFullYear()
+// 月
+var month=date.getMonth()+1;
+// 日
+var dat = date.getDate()
+var curMonthDays = new Date(date.getFullYear(), (date.getMonth() + 1), 0).getDate();
+
+for(var i=0;i<3;i++){
+	if(month+i>12){
+		break;
+	}
+	var opt = document.createElement ("option");
+	opt.value = month+i;
+	opt.innerText = month+i+'月';
+	document.getElementById('mon').appendChild(opt);
+
+}
+for(var i=0;i<=(curMonthDays-dat);i++){
+	if(dat+i>32){
+		break;
+	}
+
+	var opt = document.createElement ("option");
+	opt.value = dat+i;
+	opt.innerText = dat+i+'日';
+	if(i==0){
+		opt.innerText = dat+i+'日(今天)';
+	}
+	if(i==1){
+		opt.innerText = dat+i+'日(明天)';
+	}
+	if(i==2){
+		opt.innerText = dat+i+'日(后天)';
+	}
+	document.getElementById('day').appendChild(opt);
+
+}
+
+function daybank(){
+	mom = parseInt(document.getElementById("mon").value);
+	var curMonthDays = new Date(year, mom, 0).getDate();
+	document.getElementById("day").options.length = 0;
+	// alert(mom);
+	// alert(curMonthDays);
+	for(var i=1;i<=curMonthDays;i++){
+		if(i>32){
+			break;
+		}
+
+		var opt = document.createElement ("option");
+		opt.value = i;
+		opt.innerText = i+'日';
+		
+		document.getElementById('day').appendChild(opt);
+
+	}
+
+
+
+}
+	</script>
+                <div class="ui-form-item ui-border-b">
+                    <label style="color:red">运费</label>
+                    <input type="text" value="" name="price" style="color:red">
+                </div>
+
+                <div class="ui-form-item ui-form-item-textarea ui-border-b">
+                        <label>
+                            备注
+                        </label>
+                        <textarea placeholder="如填写拼车零担车
+剩余方数或其他备注等信息" name="note" style="padding-bottom: 5px;margin-top: 5px;"></textarea>
+                    </div>
+
+
+	            {%if not current_user.phone%}
+	            <div class="ui-form-item ui-border-b">
+                    <label>联系电话</label>
+                    <input type="text" value="" name="phone" placeholder='输入手机号码以便与您联系'>
+                </div>
+                {%endif%}
+
+                <div class="ui-btn-wrap">
+                {%if current_user.phone%}
+                <div class="ui-btn-wrap">
+                <input type="submit" value="发布信息" class="ui-btn-lg ui-btn-danger"> 
+                </div>
+                 <div class="ui-btn-wrap">
+	            	<button class="ui-btn-lg ui-btn-primary active">快捷填写</button>
+	            </div>
+                 {%else%}
+<input type="submit" value="发布返程车信息并注册司机" class="ui-btn-lg ui-btn-danger"> 
+                {%endif%}
+               
+	                 
+	            </div>
+
+
+	            
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+	        </form>
+	    </div>
+	</section>
+	
+
+</section>
+
+
+
+
+
 
 <script src="{{url_for('static',filename='city.js')}}"></script>
 <script type="text/javascript">
+
+var selectdiv1 = document.createElement("div");
+selectdiv1.className = 'ui-select';
+
+var selectdiv2 = document.createElement("div");
+selectdiv2.className = 'ui-select';
+
+var selectdiv3 = document.createElement("div");
+selectdiv3.className = 'ui-select';
+
 var sheng = document.createElement("select");
 var shi = document.createElement("select");
 var qu = document.createElement("select");
+
 var area = document.getElementById("area");
+
 
 sheng.setAttribute('name', 'start_sheng');
 shi.setAttribute('name', 'start_shi');
 qu.setAttribute('name', 'start_qu');
-area.appendChild(sheng);
-area.appendChild(shi);
-area.appendChild(qu);
+
+selectdiv1.appendChild(sheng);
+selectdiv2.appendChild(shi);
+selectdiv3.appendChild(qu);
+
+area.appendChild(selectdiv1);
+area.appendChild(selectdiv2);
+area.appendChild(selectdiv3);
 
 
-var endarea = document.getElementById("end_area");
+//------------
+var endselectdiv1 = document.createElement("div");
+endselectdiv1.className = 'ui-select';
+
+var endselectdiv2 = document.createElement("div");
+endselectdiv2.className = 'ui-select';
+
+var endselectdiv3 = document.createElement("div");
+endselectdiv3.className = 'ui-select';
+
 var end_sheng = document.createElement("select");
 var end_shi = document.createElement("select");
 var end_qu = document.createElement("select");
+
+var end_area = document.getElementById("end_area");
+
+
 end_sheng.setAttribute('name', 'end_sheng');
 end_shi.setAttribute('name', 'end_shi');
 end_qu.setAttribute('name', 'end_qu');
-endarea.appendChild(end_sheng);
-endarea.appendChild(end_shi);
-endarea.appendChild(end_qu);
+
+endselectdiv1.appendChild(end_sheng);
+endselectdiv2.appendChild(end_shi);
+endselectdiv3.appendChild(end_qu);
+
+end_area.appendChild(endselectdiv1);
+end_area.appendChild(endselectdiv2);
+end_area.appendChild(endselectdiv3);
 
 
-end_sheng.options[0] = new Option("请输入省",'');
-end_shi.options[0] = new Option("请输入市",'');
-end_qu.options[0] = new Option("请输入区/县",'');
+
+end_sheng.options[0] = new Option("省",'');
+end_shi.options[0] = new Option("市",'');
+end_qu.options[0] = new Option("区/县",'');
 
 
 
-sheng.options[0] = new Option("请输入省",'');
-shi.options[0] = new Option("请输入市",'');
-qu.options[0] = new Option("请输入区/县",'');
+sheng.options[0] = new Option("省",'');
+shi.options[0] = new Option("市",'');
+qu.options[0] = new Option("区/县",'');
 
 // 循环第一步,把省循环进select
 for (var i = 0; i < city.length; i++) {
@@ -80,7 +304,7 @@ for (var i = 0; i < city.length; i++) {
 	// 循环第二步,把所有的市都循环进select
 	sheng.onchange = function(){
 		shi.options.length = 0;
-		shi.options[shi.length] = new Option("请输入市",'');
+		shi.options[shi.length] = new Option("市",'');
 		for (var j = 0; j < city[sheng.selectedIndex-1].city.length; j++) {
 			shi.options[shi.length] = new Option(city[sheng.selectedIndex-1].city[j].name,city[sheng.selectedIndex-1].city[j].name)
 		}
@@ -89,7 +313,7 @@ for (var i = 0; i < city.length; i++) {
 
 	end_sheng.onchange = function(){
 		end_shi.options.length = 0;
-		end_shi.options[end_shi.length] = new Option("请输入市",'');
+		end_shi.options[end_shi.length] = new Option("市",'');
 		for (var j = 0; j < city[end_sheng.selectedIndex-1].city.length; j++) {
 			end_shi.options[end_shi.length] = new Option(city[end_sheng.selectedIndex-1].city[j].name,city[end_sheng.selectedIndex-1].city[j].name)
 		}
@@ -98,14 +322,14 @@ for (var i = 0; i < city.length; i++) {
 
 	shi.onchange = function(){
 		qu.options.length = 0;
-		qu.options[qu.length] = new Option("请输入区/县",'');
+		qu.options[qu.length] = new Option("区/县",'');
 		for (var k = 0; k < city[sheng.selectedIndex-1].city[shi.selectedIndex-1].area.length; k++) {
 			qu.options[qu.length] = new Option(city[sheng.selectedIndex-1].city[shi.selectedIndex-1].area[k],city[sheng.selectedIndex-1].city[shi.selectedIndex-1].area[k]);	
 		};
 	}
 	end_shi.onchange = function(){
 		end_qu.options.length = 0;
-		end_qu.options[end_qu.length] = new Option("请输入区/县",'');
+		end_qu.options[end_qu.length] = new Option("区/县",'');
 		for (var k = 0; k < city[end_sheng.selectedIndex-1].city[end_shi.selectedIndex-1].area.length; k++) {
 			end_qu.options[end_qu.length] = new Option(city[end_sheng.selectedIndex-1].city[end_shi.selectedIndex-1].area[k],city[end_sheng.selectedIndex-1].city[end_shi.selectedIndex-1].area[k]);	
 		};
@@ -114,5 +338,26 @@ for (var i = 0; i < city.length; i++) {
 
 
 </script>
-</body>
-</html>
+	<script>
+    $('.ui-dialog-ft button').click(function(){
+        if($(this).data('href')){
+            location.href= $(this).data('href');
+        }
+    });
+    </script>
+<style>
+option{width: 65px;}
+select{width: 65px;}
+button{border-color: #ccc;}
+.ui-btn-primary.active{color: white;}
+	/*.ui-select1{float:left;width: 70px;}*/
+	/*.ui-select2{float:left;}*/
+	/*.ui-select3{float:right;}*/
+	/*.ui-border-b{float: left;}*/
+	.ui-select-group{width: 100%;}
+.ui-btn-danger:before{border:0px;}
+</style>
+{% endblock %}
+
+
+

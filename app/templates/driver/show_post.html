@@ -10,8 +10,8 @@
 	出发地：{{dp.start_address}} <br>
 	达到地：{{dp.end_address}}<br>
 	车辆信息： <br>
-	车牌{{dp.posts.number}} <br>
-	车长{{dp.posts.length}} <br>
+	车牌{{dp.driverPosts.number}} <br>
+	车长{{dp.driverPosts.length}} <br>
 	费用：{{dp.start_price}}<br><br>
 	<form method="post" action="{{url_for('driver.send_order')}}">
 	 <input type="hidden" value="{{dp.id}}" name="id">
