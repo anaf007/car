@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}支付信息确认{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<header class="ui-header ui-header-positive ui-border-b">
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>支付信息</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+<section class="ui-container">
+<section id="notice">
+    <div class="demo-item">
+        <div class="demo-block">
+            <section class="ui-notice">
+                <p>订单编号：{{op.order}}</p>
+                <p>装货地点：{{op.goods_order_pay.start_xiangxi_address}}</p>
+                <p>卸货地点：{{op.goods_order_pay.end_xiangxi_address}}</p>
+                <p>装货时间：{{op.goods_order_pay.start_car_time|dateformat("Y-M-d")}}{{op.goods_order_pay.start_zone}}</p>
+
+                {%if op.goods_order_pay.note%}
+                <p>备注信息：{{op.goods_order_pay.note}}</p>
+
+                {%endif%}
+                <p>车辆信息：{{op.goods_order_pay.car_length}},{{op.goods_order_pay.tiji}},{{op.goods_order_pay.zhongliang}},{{op.goods_order_pay.car_type}},{{op.goods_order_pay.select_car_type}}</p>              
+                <p>报价运费：{{op.goods_order_pay.start_price}}</p>
+                <p>实际运费：{{op.goods_order_pay.end_price}}</p>
+                <p>支付定金：{{op.pay_price}}</p>
+                <p>支付完毕后请在指定的时间前到装货地点装货，如有违约则无法退还支付的定金。</p>
+                <div class="ui-notice-btn">
+                    <button class="ui-btn-primary ui-btn-lg" onclick="javascript:window.location.href='/zhifudingjin_confirm'">支付</button>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+</section>
+<style>
+	.ui-notice p{color: red;}
+</style>
+{% endblock %}
+
+
+  
+
+
+
+

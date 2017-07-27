@@ -141,8 +141,8 @@ def autoregister():
 	username_str = ''
 	password_str = ''
 	str_time =  time.time()
-	username_str = str(int(int(str_time)*1.301))+username_str
-	username_str += 'AU'
+	username_str = 'AU'
+	username_str += str(int(int(str_time)*1.301))
 	for i in range(2):
 		username_str += random.choice(choice_str)
 
@@ -162,6 +162,10 @@ def autoregister():
 	else:
 		return redirect(url_for('.autoregister'))
 
+@auth.route('/autologin/<int:id>')
+def autologin(id):
+	login_user(User.query.get_or_404(id))
+	return redirect(url_for('main.index'))
 
 
 

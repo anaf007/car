@@ -144,7 +144,7 @@ class User(UserMixin,db.Model):
 	#付款者
 	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
 	#用户邮件
-	user_msgs = db.relationship('User_msg', backref='user_msg')
+	user_msgs = db.relationship('User_msg', backref='user_msg',primaryjoin='User_msg.users == User.id')
 	
 
 	def __init__(self,**kwargs):
@@ -404,17 +404,18 @@ class Category_attribute(db.Model):
 		return self.name
 
 
-#用户信息表
+#用户消息表
 class User_msg(db.Model):
 	__tablename__ = 'user_msgs'
 	id = db.Column(db.Integer,primary_key=True)
 	title = db.Column(db.String(64))
-	phone = db.Column(db.String(11))
 	body = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime(),default=datetime.utcnow)
+	#是否显示？
 	show = db.Column(db.Integer,default=0)
+	#状态0已发送未读 1已读 -1删除 2已确认,已确认跟已读区别就是已确认就是支付内容一定的删除了
 	state = db.Column(db.Integer())
-	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	users = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 """
@@ -576,7 +577,7 @@ class Goods(db.Model):
 	#开始报价运费
 	start_price = db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
-	#实际运费   接单结算运费 系统抽取比例  系统调节
+	#实际运费   接单结算运费 定金抽取比例在订单列表  系统调节
 	end_price =  db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
 	#接单者
@@ -620,7 +621,7 @@ class Order_pay(db.Model):
 	create_time = db.Column(db.DateTime,default=datetime.utcnow)
 	#支付时间
 	pay_time = db.Column(db.DateTime)
-	#-1失效 0创建未审核，自行预约 1审核通过未支付 2已支付 
+	#-1失效 0创建 1审核通过未支付 2已支付 
 	state = db.Column(db.Integer,default=0)
 	#支付者，不能直接关联货主或者车辆信息表  因为一个车可能是多个用户使用
 	pay_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -735,7 +736,7 @@ class Driver_self_order(db.Model):
 	goods = db.Column(db.Integer, db.ForeignKey('goods.id'))
 	create_time = db.Column(db.DateTime,default=datetime.utcnow)
 	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
-	static = db.Column(db.Integer(),default=0)
+	state = db.Column(db.Integer(),default=0)
 
 
 

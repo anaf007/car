@@ -13,9 +13,39 @@
 	{%if goods.car_length%}{{goods.car_length}}{%endif%}{%if goods.tiji%}{{goods.tiji}}{%endif%}{%if goods.zhongliang%}{{goods.zhongliang}}{%endif%}
 	<!-- {{goods.driver_self_post_id}} -->
 	{%for i in goods.driver_self_post_id%}<br>
+	<div>
 	{{i.id}}:{{i.create_time}},{{i.driver_self_order_driver.driver_user.phone}} 
-	<a href="{{url_for('superadmin.make_goods_comfirm',goodsid=goods.id,driverid=i.driver_self_order_driver.id,confirmid=i.id,)}}">[推送]</a><br>
+	获得运费：<input type="text" name="price" id="price"> <br>
+	<a href="#" onclick="comfire(this,'{{goods.id}}','{{i.driver_self_order_driver.id}}','{{i.id}}');">[推送]</a><br>
+	</div>
 	{%endfor%}
 	<hr>
+
+	<script>
+	function comfire(athis,goodsid,driverid,confirmid){
+		var b = athis.parentNode.childNodes; 
+		var price = 0.00;
+		for(var i=0;i<b.length;i++){
+			if(b[i].type=='text'){
+				price = b[i].value;
+			}
+		}
+		goodsid = parseInt(goodsid);
+		driverid = parseInt(driverid);
+		confirmid = parseInt(confirmid);
+		price =  (parseFloat(price)).toFixed(2);
+		// alert(price);
+		if(isNaN(price)){
+			alert('请输入运费价格。');
+			return;
+		}
+		window.location.href="/superadmin/make_goods_comfirm/"
+		+goodsid+"/"
+		+driverid+"/"
+		+confirmid+"/"
+		+price;
+		
+	}
+	</script>
 </body>
 </html>

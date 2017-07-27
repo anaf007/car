@@ -30,7 +30,7 @@ import datetime as datime
 #只能司机查看首页的货物信息
 def index():
 	#查询发车时间大于当前时间
-	goods = Goods.query.filter(Goods.state==0).filter(Goods.start_car_time>datetime.utcnow()).order_by('create_time').all()
+	goods = Goods.query.filter(Goods.state==0).filter(Goods.start_car_time>=datetime.utcnow()).order_by('create_time').all()
 	return render_template('goods/index.html',goods = goods)
 
 
@@ -117,7 +117,7 @@ def send_goods_post():
 	good.end_xiangxi_address = end_sheng+end_shi+end_qu+end_xiangxi_address
 	
 	#装车时间
-	good.start_car_time = timestr
+	good.start_car_time = timestr+' 23:59:59 '
 	#装车时段
 	good.start_zone = request.form.get('zone')
 	#备注

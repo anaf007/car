@@ -6,6 +6,28 @@
 
 
 {% block body %}
+
+{%if msg_list %}
+<div class="ui-dialog">
+    <div class="ui-dialog-cnt">
+        <header class="ui-dialog-hd ui-border-b">
+            <h3>{{msg_list.title}}</h3>
+            <i class="ui-dialog-close" data-role="button"></i>
+        </header>
+        <div class="ui-dialog-bd">
+            <div>{{msg_list.body|safe}}</div>
+        </div>
+        <div class="ui-dialog-ft">
+            <!-- <button type="button" data-role="button">取消</button> -->
+            <!-- <button type="button" data-role="button">确定</button> -->
+        </div>
+    </div>        
+</div>
+<script class="demo-script">
+$(".ui-dialog").dialog("show");
+</script>
+{%endif%}
+
 <header class="ui-header ui-header-positive ui-border-b">
             
             <div class="ui-searchbar-wrap ui-border-b focus" style="background-color:transparent;">
@@ -17,7 +39,7 @@
                     </div>
                 </div>
 
-                <i class="ui-icon-news" style='color:black;'></i>
+                <a href="{{url_for('usercenter.msg_list')}}"><i class="ui-icon-news" style='color:black;'></i></a>
                 <!-- <i class="ui-icon-news ui-reddot" style='color:black;'></i> -->
             </div>
            

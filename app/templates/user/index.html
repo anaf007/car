@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}用户登录{% endblock %}
+{% block title %}首页{% endblock %}
 {% block head %}
          {{ super() }}
 {% endblock %}
@@ -40,28 +40,31 @@
 
 
 <ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
-    <li><div><i class='ui-icon-order'></i></div><i>信息认证</i></li>
-    <li><div><i class='ui-icon-personal'></i></div><i>我的钱包</i></li>
+    <li><div><i class='icon-credit-card icon-2x' style='color:#2E8B57'></i></div><i>信息认证</i></li>
+    <li><div><i class='icon-money icon-2x' style='color:#2E8B57'></i></div><i>我的钱包</i></li>
     <!-- <li><div><i class='ui-icon-cart'></i></div><i></i>已完成</li> -->
     {%if current_user.role.name=='司机'%}
-    <li><div><i class='ui-icon-dressup'></i></div><i>车辆信息</i></li>
+    <li><div><i class='icon-truck icon-2x' style='color:#2E8B57'></i></div><i>车辆信息</i></li>
     {%endif%}
     {%if current_user.role.name=='货主'%}
     <li><div><i class='ui-icon-dressup'></i></div><i>企业信息</i></li>
     {%endif%}
    
 </ul>
-<ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
-    <li><div><i class='ui-icon-dressup'></i></div><i>推荐有奖</i></li>
-    <li><div><i class='ui-icon-dressup'></i></div><i>我的名片</i></li>
-    <li><div><i class='ui-icon-dressup'></i></div><i>设置</i></li>
-</ul>
-<ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
-    <li data-href='{{url_for(".show_order")}}'><div><i class='ui-icon-dressup'></i></div><i>下单信息</i></li>
-    <li><div><i class='ui-icon-dressup'></i></div><i>接单信息</i></li>
-    <li><div><i class='ui-icon-dressup'></i></div><i>违约信息</i></li>
-</ul>
 
+<ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
+    <li data-href='{{url_for(".show_order")}}'><div>
+    <i class='icon-file icon-2x' style='color:#2E8B57'></i></div><i>下单信息</i></li>
+    <li data-href='{{url_for(".selforder")}}'><div>
+    <i class='icon-paste icon-2x' style='color:#2E8B57'></i></div><i>接单信息</i></li>
+    
+    <li><div><i class='icon-remove-sign icon-2x' style='color:#2E8B57'></i></div><i>违约信息</i></li>
+</ul>
+<ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
+    <li><div><i class='icon-exchange icon-2x' style='color:#2E8B57' ></i></div><i>货运专线</i></li>
+    <li><div><i class='icon-group icon-2x' style='color:#2E8B57'></i></div><i>大客户</i></li>
+    <li><div><i class='icon-cog icon-2x' style='color:#2E8B57'></i></div><i>设置</i></li>
+</ul>
 <p>&nbsp;</p>
 </section>
 

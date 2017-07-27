@@ -9,7 +9,7 @@ from . import usercenter
 from .. import db
 import random,os,datetime
 from  flask.ext.login import login_required,current_user
-from  ..models import Permission,User,Driver
+from  ..models import Permission,User,Driver,Order_pay
 from app.decorators import permission_required
 
 @usercenter.route('/index')
@@ -130,4 +130,15 @@ def show_order():
     return render_template('user/show_order.html')
 
 
+@usercenter.route('/msg_list')
+@login_required
+def msg_list():
+    return render_template('user/msg_list.html')
 
+
+#自身接单下单
+@usercenter.route('/self_order')
+def selforder():
+    op = Order_pay.query.filter(Order_pay.order_pay_user==current_user).order_by(Order_pay.id).all()
+    print op
+    return render_template('user/selforder.html',op=op)

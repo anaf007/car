@@ -7,7 +7,7 @@ Author: by anaf
 from flask import render_template,redirect,url_for,request,flash,current_app,make_response,Response
 from . import main
 from .. import db
-from ..models import Article,Comment,Permission,CategoryTop,Category,Goods
+from ..models import Article,Comment,Permission,CategoryTop,Category,Goods,User_msg,Order_pay
 from  flask.ext.login import login_required,current_user
 from ..decorators import admin_required,permission_required
 from .forms import PostForm,CommentForm
@@ -52,7 +52,8 @@ def article(id=0):
 def index():
     # categorts = CategoryTop.query.all()
     goods = Goods.query.order_by('id desc').all()
-    return render_template('main/index.html',goods=goods)
+    msg_list = User_msg.query.filter(User_msg.user_msg==current_user).filter(User_msg.state==0).first()
+    return render_template('main/index.html',goods=goods,msg_list=msg_list)
 
 @main.route('/index')
 def index_main():
@@ -114,6 +115,33 @@ def show_post(id):
 	comments = pagination.items
 	return render_template('_post.html', post=post, form=form,comments=comments, pagination=pagination)
 
+
+
+#支付订单，显示
+@main.route('/zhifudingjin')
+@login_required
+def zhifudingjin():
+    op = Order_pay.query.filter(Order_pay.order_pay_user==current_user).filter(Order_pay.state==0).first()
+    print op
+    # msg = User_msg.query.filter(User_msg.user_msg==current_user).filter(User_msg.state==0).first()
+    return render_template('main/zhifudingjin.html',op=op)
+
+#确认支付 此处应该有定时任务 微信支付链接
+@main.route('/zhifudingjin_confirm')
+@login_required
+def zhifudingjin_confirm():
+    #获取未订单
+    op = Order_pay.query.filter(Order_pay.order_pay_user==current_user).filter(Order_pay.state==0).first()
+    op.state = 2 #支付完成
+    op.goods_order_pay.state = 2 #订单完成
+    msg = User_msg.query.filter(User_msg.state==0).filter(User_msg.user_msg==current_user).first()
+    db.session.add(op)
+    msg.state = 2
+    msg.body = u'您已经确认支付了该条支付信息'
+    
+    db.session.add(msg)
+    db.session.commit()
+    return render_template('main/zhifudingjin_confirm.html')
 
 
 

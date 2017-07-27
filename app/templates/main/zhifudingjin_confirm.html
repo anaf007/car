@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}支付完成{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<header class="ui-header ui-header-positive ui-border-b">
+    <i class="ui-icon-return" onclick="javascript:window.location.href='/'"></i><h1>支付信息完成</h1>
+</header>
+
+<section class="ui-container">
+<section id="notice">
+    <div class="demo-item">
+        <div class="demo-block">
+            <section class="ui-notice">
+                
+                <p>支付完毕，请在指定的时间前到装货地点装货，如有违约则无法退还支付的定金。</p>
+                <div class="ui-notice-btn">
+                    <button class="ui-btn-primary ui-btn-lg" onclick="javascript:window.location.href='/'">完成</button>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+</section>
+<style>
+	.ui-notice p{color: red;}
+</style>
+{% endblock %}
+
+
+  
+
+
+
+
