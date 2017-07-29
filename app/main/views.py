@@ -143,6 +143,13 @@ def zhifudingjin_confirm():
     db.session.commit()
     return render_template('main/zhifudingjin_confirm.html')
 
+@main.route('/driver_self_confirm/<int:id>')
+def driver_self_confirm(id=0):
+    goods = Goods.query.get_or_404(id)
+    goods.state=3
+    db.session.add(goods)
+    db.session.commit()
+    return redirect(url_for('usercenter.index'))
 
 
 #ckeditor图片上传

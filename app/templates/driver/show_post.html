@@ -1,22 +1,133 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-	<meta charset="UTF-8">
-	<title>show_post</title>
-</head>
-<body>
-	<h1>车源详细信息：</h1>
-	标题：{{dp.title}} <br>
-	出发地：{{dp.start_address}} <br>
-	达到地：{{dp.end_address}}<br>
-	车辆信息： <br>
-	车牌{{dp.driverPosts.number}} <br>
-	车长{{dp.driverPosts.length}} <br>
-	费用：{{dp.start_price}}<br><br>
-	<form method="post" action="{{url_for('driver.send_order')}}">
-	 <input type="hidden" value="{{dp.id}}" name="id">
-	<input type="submit" value="[选车下单]">
-</form>
+{% extends "base.html" %}
+{% block title %}车辆信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
 
-</body>
-</html>
+
+{% block body %}
+
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>车辆信息，编号：{{dp.id}}</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+
+
+<section id="ui-container" style=''>
+
+		<section id="form">
+			<div class="demo-item"></div>
+			<div class="ui-form ui-border-t">
+		        <form action="{{url_for('driver.send_order')}}" method="post">
+		        	<input type="hidden" name="driverid" value="{{dp.id}}">
+
+		
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		                <i class='icon-home icon-large' style='color:#548B54'></i>[出发]
+		                {{dp.start_address}}
+		            </div>
+
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+	                    <i class='icon-truck icon-large' style='color:#1E90FF'></i>[目的]
+	                    {{dp.end_address}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-calendar icon-large' style='color:#FF6A6A'></i>[发车时间]
+	                    {{dp.start_car_time|dateformat("Y-M-d")}}&nbsp;{{dp.zone}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-suitcase icon-large' style='color:#EE6363'></i>[车牌号码]
+	                    {{dp.driverPosts.number}}&nbsp;<span style='color:red;font-size:18px;'></span>
+	                </div>                
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-list-alt icon-large' style='color:#8A2BE2'></i>[车辆]
+	                    {%if dp.driverPosts.length%}
+	                    {{dp.driverPosts.length}}
+	                    {%endif%}
+	                    {%if dp.driverPosts.tiji%}
+	                    {{dp.driverPosts.tiji}}
+	                    {%endif%}
+	                    {%if dp.driverPosts.zhongliang%}
+	                    {{dp.driverPosts.zhongliang}}
+	                    {%endif%}
+	                    {{dp.driverPosts.car_type}}           
+	                    
+	                </div>
+
+	                {%if dp.note%}
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-align-left icon-large' style='color:#FFA500'></i>[备注]
+	                    &nbsp;{{dp.note}}&nbsp;
+	                </div>
+	                {%endif%}
+
+	                
+
+	                <div class="ui-form-item ui-border-b" style="color:red">
+	                    <label>运费(元)</label>
+	                    <input type="text" value="{{dp.start_price}}" name="price" style="color:red" disabled="disabled">
+	                </div>
+
+
+	                {%if not current_user.phone%}
+		            <div class="ui-form-item ui-border-b">
+	                    <label>联系电话</label>
+	                    <input type="text" value="" name="phone" placeholder='输入手机号码以便与您联系'>
+	                </div>
+	                {%else%}
+	                <div class="ui-form-item ui-border-b">
+	                    <label>装货车辆</label>
+	                    <div class="ui-select">
+	                        <select name="car">
+	                        {%for i in current_user.drivers%}
+							<option value="{{i.id}}">车牌{{i.number}}，车长{{i.length}} </option>
+							{%endfor%}
+	                        </select>
+	                    </div>
+	                </div>
+	                {%endif%}
+
+	                <div class="ui-btn-wrap">
+	                
+						<input type="submit" value="立即预约" class="ui-btn-lg ui-btn-danger"> <br>
+						<a class="ui-btn-lg ui-btn-primary" href="tel:07713103126"><i class='icon-phone icon-1x' ></i>&nbsp;电话沟通马上接单</a>
+	                </div>
+				
+		        </form>
+		    </div>
+		</section>
+	
+	
+
+</section>
+
+
+
+
+
+
+
+<script>
+$('.ui-actionsheet button').click(function(){
+    if($(this).data('href')){
+        location.href= $(this).data('href');
+    }
+});
+</script>
+<style>
+	#ui-container{
+		border-top:45px solid transparent;
+		border-bottom:60px solid transparent;
+	}
+</style>
+{% endblock %}
+
+
+
+
+
+

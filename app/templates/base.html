@@ -31,17 +31,17 @@
 
             {%if current_user.is_authenticated %}
             {%if current_user.role.name == '司机'%}
-            <li data-href="{{url_for('driver.add_post')}}" class="ui-border-r"><div>发布接单信息</div></li>
+            <li data-href="{{url_for('driver.add_post')}}" class="ui-border-r"><div>发布信息</div></li>
             <li data-href="{{url_for('usercenter.index')}}"><div>用户中心</div></li>
 
             {%endif%}
             {%if current_user.role.name == '货主'%}
-            <li data-href="{{url_for('goods.send_goods')}}" class="ui-border-r"><div>预约返程车</div></li>
+            <li data-href="{{url_for('goods.send_goods')}}" class="ui-border-r"><div>发布信息</div></li>
             <li data-href="{{url_for('usercenter.index')}}"><div>用户中心</div></li>
             {%endif%}
             {%if current_user.role.name =='普通用户'%}
-             <li data-href="{{url_for('driver.add_post')}}" class="ui-border-r"><div>发布返程车</div></li>
-             <li data-href="{{url_for('goods.send_goods')}}" class="ui-border-r"><div>预约返程车</div></li>
+             <li data-href="{{url_for('driver.add_post')}}" class="ui-border-r"><div>发布车信息</div></li>
+             <li data-href="{{url_for('goods.send_goods')}}" class="ui-border-r"><div>发布货信息</div></li>
 
             {%endif%}
             

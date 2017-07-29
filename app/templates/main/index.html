@@ -57,9 +57,9 @@ $(".ui-dialog").dialog("show");
     <selection class="slider">
         <div class="ui-slider" id="slider1" style="height:80px;">
             <ul class="ui-slider-content" style="width: 300%;">
-                <li><span style="background-image:url({{url_for('static',filename='images/1.jpg',_external=True)}});"></span></li>
-                <li><span style="background-image:url({{url_for('static',filename='images/2.jpg',_external=True)}})"></span></li>
-                <li><span style="background-image:url({{url_for('static',filename='images/3.jpg',_external=True)}})"></span></li>
+                <li><span style="background-image:url({{url_for('static',filename='images/1.jpg')}});"></span></li>
+                <li><span style="background-image:url({{url_for('static',filename='images/2.jpg')}})"></span></li>
+                <li><span style="background-image:url({{url_for('static',filename='images/3.jpg')}})"></span></li>
             </ul>
         </div>
     </selection>
@@ -124,13 +124,27 @@ $(".ui-dialog").dialog("show");
     </div>
     <div>
         <ul class="ui-tiled" style="padding:20px 0;">
+            
+            {%if current_user.role.name=='司机'%}
             <li><a href="{{url_for('driver.add_post')}}" style="color:#2E8B57"><i class='icon-edit icon-2x'></i><div>发布车源</div></a></li>
             <li><a href="{{url_for('goods.index')}}" style="color:#2E8B57"><i class='icon-briefcase icon-2x'></i><div>找货</div></a></li>
-            {%if current_user.role.name=='普通用户'%}
-            <li><a href="{{url_for('goods.send_goods')}}" style="color:#2E8B57"><i class='icon-edit icon-2x'></i><div>发货货源</div></a></li>
-            {%else%}
-            <li><a href="{{url_for('usercenter.show_order')}}" style="color:#2E8B57"><i class='icon-user icon-2x'></i><div>我的发布</div></a></li>
             {%endif%}
+
+             {%if current_user.role.name=='货主'%}
+            <li><a href="{{url_for('goods.send_goods')}}" style="color:#2E8B57"><i class='icon-edit icon-2x'></i><div>发布货源</div></a></li>
+            <li><a href="{{url_for('driver.index')}}" style="color:#2E8B57"><i class='icon-truck icon-2x'></i><div>找车</div></a></li>
+            {%endif%}
+
+            
+            {%if current_user.role.name=='普通用户'%}
+            <li><a href="{{url_for('goods.index')}}" style="color:#2E8B57"><i class='icon-briefcase icon-2x'></i><div>找货</div></a></li>
+            <li><a href="{{url_for('driver.index')}}" style="color:#2E8B57"><i class='icon-truck icon-2x'></i><div>找车</div></a></li>
+            {%else%}
+            
+
+            {%endif%}
+
+            <li><a href="#" style="color:#2E8B57"><i class='icon-group icon-2x'></i><div>大客户</div></a></li>
         </ul>
     </div>
 

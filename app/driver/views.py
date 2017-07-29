@@ -8,7 +8,7 @@ Author: by anaf
 from  flask.ext.login import login_required,current_user
 from ..decorators import goods_required,permission_required,driver_required
 from . import driver
-from ..models import Permission,Driver,User,Driver_post,Role,Goods,Order_pay,Order_Task
+from ..models import Permission,Driver,User,Driver_post,Role,Goods,Order_pay,Order_Task,Consignor,Goods_self_order
 from flask import render_template,request,redirect,url_for,flash,abort
 from app import db,scheduler
 from datetime import datetime
@@ -19,11 +19,9 @@ from decimal import Decimal
 import datetime as datime
 
 
-#需要登陆，且需要货主权限
 @driver.route('/')
 @driver.route('/index/')
 @login_required
-@goods_required
 def index():
 	#查询时间大于今天，并且状态=0，  这个 filter时间查询花了1个多小时
 	dp = Driver_post.query.filter(Driver_post.state==0).filter(Driver_post.start_car_time>datetime.utcnow()).order_by('create_time').all()
@@ -141,7 +139,7 @@ def add_posts():
 		d = Driver.query.get_or_404(int(request.form.get('car')))
 
 	car = d
-	starttime = timestr
+	starttime = timestr +' 23:59:59 '
 	price = request.form.get('price')
 	note = request.form.get('note')
 
@@ -187,7 +185,6 @@ def add_posts():
 
 
 @driver.route('/show_post/<int:id>')
-@goods_required
 def show_post(id=0):
 	dp = Driver_post.query.get_or_404(id)
 	return render_template('driver/show_post.html',dp = dp)
@@ -232,16 +229,67 @@ def register_driver_post():
 		flash(u'校验数据错误')
 	return redirect(url_for('.register_driver'))
 
-#接车下单货主访问
+
+#货主自助下单预约车辆
 @driver.route('/send_order',methods=['POST'])
 @login_required
-@goods_required
 def send_order():
-	id = request.form.get('id')
+
+	driverid = request.form.get('driverid')
 	try:
-		dp = Driver_post.query.get_or_404(int(id))
+		dp = Driver_post.query.get_or_404(int(driverid))
 	except Exception, e:
 		abort(403)
+
+	cs = Consignor()
+
+	if current_user.phone=='' or current_user.phone ==None:
+		phone = request.form.get('phone')
+		if not phone:
+			flash(u'请输入手机号码。','error')
+			return redirect(url_for('main.index'))
+		if User.query.filter_by(phone=phone).first():
+			flash(u'该手机号码已经被注册，请登录后再发布。','login')
+			return redirect(url_for('auth.login'))
+		cs.users = current_user
+		cs.phone = phone
+		cs.name = u'默认公司名称'
+		
+		cs.note = u'默认公司信息，联系电话'+phone
+		
+		r = Role.query.filter_by(name=u'货主').first()
+		try:
+			db.session.add(cs)
+			current_user.role =  r
+			current_user.phone =  phone
+			db.session.add(current_user)
+
+			db.session.commit()
+		except Exception, e:
+			flash(u'数据错误，添加失败：%s'%str(e),'error')
+			db.session.rollback()
+			return redirect(url_for('.show_goods'))
+	else:
+		cs = Consignor.query.filter(Consignor.consignor_user==current_user).first()
+	
+	print dp
+	print cs
+	selfgoodspost = Goods_self_order.query.filter_by(driver_post=dp.id,consignors=cs.id).first()
+	
+	if selfgoodspost:
+		flash(u'您已经预约过了，请不要重复预约','error')
+		return redirect(url_for('main.index'))
+	else:
+		flash(u'预约成功，系统审核通过将电话通知您。','success')
+		db.session.add(Goods_self_order(driver_post_self_order=dp,consignors_selft_order=cs))
+
+	#预约人数+1
+	print dp.make_count
+	dp.make_count  = dp.make_count+1
+	db.session.add(dp)
+	db.session.commit()
+
+
 	return render_template('driver/send_order.html',dp=dp)
 
 

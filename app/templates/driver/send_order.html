@@ -1,33 +1,100 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>send_order</title>
-</head>
-<body>
-	车辆详细信息： <br>
-	发车地点 {{dp.start_address}}	 <br>
-	抵达地点 {{dp.end_address}}	<br>
-	发车时间 {{dp.start_car_time}}<br>
-	车牌：{{dp.driverPosts.number}}	<br>
-	车长：{{dp.driverPosts.length}}	<br>
-	运费：{{dp.start_price}}	<br>
-	备注： {{dp.note}}<br>
-	<span style='color:red'>您的账户金额为:{{current_user.price}}元，<br>
-	 确认之后需要交纳{{dp.start_price|float*1.0-current_user.price|float}}元保障金作为司机的运费！<br>
-	如果司机违约，保障金将返还进您的余额.并可随时提现， <br>
-	如果司机完成配送服务后，款项将有系统打至司机账户做为运费。
-	</span>
-	<form method="post" action="{{url_for('.confirm_order')}}">
-<input type="hidden" value="{{dp.id}}" name="id" >
-货运信息列表： <br>
-<select name="goods">
- {%for i in current_user.consignors.goods_id%}
-	<option value="{{i.id}}">货物信息：{{i.name}}</option>
- {%endfor%}
-</select>
-<input type="submit" value="确认下单并支付定金">
+{% extends "base.html" %}
+{% block title %}预约完成{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <!-- <i class="ui-icon-return" onclick="{{url_for('main.index')}}"></i> -->
+    <h1>预约成功</h1>
+</header>
+
+<section class="ui-container">
+	<section id="notice">
+	    <div class="demo-item">
+	        <p class="demo-desc">车辆信息详情</p>
+	        <div class="demo-block">
+	            <section id="form">
+			<div class="demo-item"></div>
+			<div class="ui-form ui-border-t">
+		        
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		                <i class='icon-home icon-large' style='color:#548B54'></i>[出发]
+		                {{dp.start_shi}}{{dp.start_qu}}{{dp.start_address}}
+		            </div>
+
+		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+	                    <i class='icon-truck icon-large' style='color:#1E90FF'></i>[目的]
+	                   {{dp.end_shi}}{{dp.end_qu}}{{dp.end_address}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-calendar icon-large' style='color:#FF6A6A'></i>[装车时间]
+	                    {{dp.start_car_time|dateformat("Y-M-d")}}&nbsp;{{dp.zone}}
+	                </div>
+
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-suitcase icon-large' style='color:#8A2BE2'></i>[车牌号]
+	                    {{dp.driverPosts.number}}
+	                </div>
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-suitcase icon-large' style='color:#8A2BE2'></i>[车辆信息]
+	                    {%if dp.driverPosts.length%}
+	                    {{dp.driverPosts.length}}
+	                    {%endif%}
+	                    {%if dp.driverPosts.tiji%}
+	                    {{dp.driverPosts.tiji}}
+	                    {%endif%}
+	                    {%if dp.driverPosts.zhongliang%}
+	                    {{dp.driverPosts.zhongliang}}
+	                    {%endif%}
+	                    {{dp.driverPosts.car_type}}  
+	                </div>   
+	                {%if dp.note%}
+	                <div class="ui-form-item ui-border-b">
+	                    <i class='icon-align-left icon-large' style='color:#FFA500'></i>[备注]
+	                    &nbsp;{{dp.note}}&nbsp;
+	                </div>
+	                {%endif%}            
+
+	               
+
+	                <div class="ui-form-item ui-border-b" style="color:red">
+	                    <label>运费(元)</label>
+	                    <input type="text" value="{{dp.start_price}}" name="price" style="color:red">
+	                </div>
+
+	               <div class="demo-block" style="color:red">
+	                    您的预约信息已成功提交，后台正在进行匹配，稍后会电话通知您。	                    
+	                    <span style='color:blue;'>如您（公司）是需要长期用车，可点击下方“申请长期用车”获得最专业的的车辆运输专线。</span>
+	                </div>
+
+
+	                
+
+	                <div class="ui-btn-wrap">
+	                
+						<input type="submit" value="完成" class="ui-btn-lg ui-btn-danger" onclick="javascript:window.location='{{url_for('main.index')}}';"> 
+	                </div>
+
+	                <div class="ui-btn-wrap" style="border-bottom:50px;">
+	                
+						<input type="submit" value="申请长期用车" class="ui-btn-lg ui-btn-primary"> 
+	                </div>
+
+	                <div class="ui-btn-wrap">
+	                
+						
+	                </div>
+				
+		    </div>
+		</section>
 	
-</form>
-</body>
-</html>
+	        </div>
+	    </div>
+	</section>
+<section>
+{% endblock %}
+

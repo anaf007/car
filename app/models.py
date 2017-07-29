@@ -454,6 +454,12 @@ class Driver(db.Model):
 	# users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	#车长
 	length = db.Column(db.String(255))
+	#车型
+	car_type = db.Column(db.String(255))
+	#体积
+	tiji = db.Column(db.String(255))
+	#重量
+	zhongliang = db.Column(db.String(255))
 	#品牌
 	# brand =  db.Column(db.String(255))
 	#车牌号
@@ -478,7 +484,7 @@ class Driver(db.Model):
 	note = db.Column(db.Text)
 	#车辆证件照片   一
 	driver_images = db.relationship('Driver_images', backref='driverImages',lazy='dynamic')
-	#直接关联车辆信息表driver_posts 不关联这个表了,2017-07-21-司机自助下单  直接关联这个表不用发布信息所以不用关联下面这个了
+	#直接关联车辆信息表driver_posts ,2017-07-21-司机自助下单  直接关联这个表不用发布信息所以不用关联下面这个了
 	order_pay = db.relationship('Order_pay', backref='order_pays',lazy='dynamic',primaryjoin='Order_pay.drivers_id == Driver.id')
 	post = db.relationship('Driver_post', backref='driverPosts',lazy='dynamic',primaryjoin='Driver_post.driver_id == Driver.id')
 	#司机自助下单货物用户
@@ -530,6 +536,9 @@ class Consignor(db.Model):
 	# driver_post = db.relationship('Driver_post', backref='driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Consignor.id')
 	#货物表
 	goods_id = db.relationship('Goods', backref='consignorsGoods',lazy='dynamic',primaryjoin='Goods.consignors_id == Consignor.id')
+	#货主自助下单
+	goods_self_order = db.relationship('Goods_self_order', backref='consignors_selft_order',uselist='False')
+
 
 
 #货主发布的货物信息表
@@ -587,7 +596,7 @@ class Goods(db.Model):
 	# derver_posts_id =  db.Column(db.Integer, db.ForeignKey('driver_post.id'))
 	#接单时间
 	receive_time = db.Column(db.DateTime) 
-	#状态 -2失效订单超时未支付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok   其他状态等待 ?4初期未付款状态?
+	#状态 -2失效订单超时未支付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3司机已经运送抵达ok  4系统确认已经抵达ok 完成   其他状态等待 ?4初期未付款状态?
 	state = db.Column(db.Integer(),default=0)
 	order_pay = db.relationship('Order_pay', backref='goods_order_pay',lazy='dynamic',primaryjoin='Order_pay.goods_id == Goods.id')
 	#预约数量
@@ -681,6 +690,11 @@ class Driver_post(db.Model):
 	#外键
 	order_pay = db.relationship('Order_pay', backref='driver_posts_order_pays',uselist='False')
 
+	goods_self_order = db.relationship('Goods_self_order', backref='driver_post_self_order',uselist='False')
+	#预约次数
+	make_count = db.Column(db.Integer,default=0)
+
+
 
 class Order_Task(db.Model):
 	__tablename__ = 'order_tasks'
@@ -738,7 +752,15 @@ class Driver_self_order(db.Model):
 	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
 	state = db.Column(db.Integer(),default=0)
 
-
+#货主自助下单 车辆预约表
+class Goods_self_order(db.Model):
+	__tablename__ = 'goods_self_orders'
+	id = db.Column(db.Integer,primary_key=True)
+	driver_post = db.Column(db.Integer, db.ForeignKey('driver_posts.id'))
+	consignors = db.Column(db.Integer, db.ForeignKey('consignors.id'))
+	create_time = db.Column(db.DateTime,default=datetime.utcnow)
+	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
+	state = db.Column(db.Integer(),default=0)
 
 
 

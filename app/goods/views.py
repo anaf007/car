@@ -263,12 +263,12 @@ def send_order():
 	db.session.commit()
 
 
-	start_price = float(gd.start_price)*0.3
-	if current_user.price < start_price:
-		show_price = start_price
-	else:
-		show_price = 0
-	return render_template('goods/send_order.html',gd=gd,show_price=show_price)
+	# start_price = float(gd.start_price)*0.3
+	# if current_user.price < start_price:
+	# 	show_price = start_price
+	# else:
+	# 	show_price = 0
+	return render_template('goods/send_order.html',gd=gd)
 
 
 #确认接货下单  司机访问

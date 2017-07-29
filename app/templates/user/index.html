@@ -28,7 +28,7 @@
 {{getSend_Driver_post_Count(current_user.drivers)}}次&nbsp;接单0次&nbsp;违约0次
 {%endif%}
 {%if current_user.role.name=='货主'%}
-{{current_user.consignors.goods_id.count()}}次&nbsp;接单0次&nbsp;违约0次
+0次&nbsp;接单0次&nbsp;违约0次
 {%endif%}
 		</p>
 	</div>
@@ -47,7 +47,7 @@
     <li><div><i class='icon-truck icon-2x' style='color:#2E8B57'></i></div><i>车辆信息</i></li>
     {%endif%}
     {%if current_user.role.name=='货主'%}
-    <li><div><i class='ui-icon-dressup'></i></div><i>企业信息</i></li>
+    <li><div><i class='icon-list-alt icon-2x' style='color:#2E8B57'></i></div><i>企业信息</i></li>
     {%endif%}
    
 </ul>

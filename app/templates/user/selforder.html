@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}下单列表{% endblock %}
+{% block title %}接单列表{% endblock %}
 {% block head %}
          {{ super() }}
 {% endblock %}
@@ -8,7 +8,7 @@
 {% block body %}
 
 <header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>下单列表</h1>
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>接单列表</h1>
     <!-- <button class="ui-btn">回首页</button> -->
 </header>
 
@@ -21,7 +21,7 @@
 
     	
 
-        {%if i.goods_order_pay.state==3%}
+        {%if i.goods_order_pay.state==3 or i.goods_order_pay.state==4%}
     	<div class="ui-tag-freelimit">
         <!-- <p><span>时间{{i.create_time}}</span></p> -->
         <h4>订单号：{{i.order}}</h4>        
@@ -36,6 +36,7 @@
         <p>卸货地点：【{{i.goods_order_pay.end_xiangxi_address}}】</p>
         <p>装货时间：{{i.goods_order_pay.start_car_time|dateformat("Y-M-d")}}&nbsp;{{i.goods_order_pay.start_zone}}</p>            
         <p>联系电话：0771-3815241</p> 
+       <button class="ui-btn-lg ui-btn-primary" onclick="fok('{{i.goods_order_pay.id}}')">完成</button>
         {%endif%}
     </li>
     {%endfor%}
@@ -48,6 +49,13 @@
 	background-color: red;
 }
 </style>
+<script>
+	function fok(id){
+		if(confirm('请再次确认，已经货物送达目的地。否则提前完成视为违约！\n如果已经将货物送达目的地，请点击“确定“，如未送达请点击”取消“。')==true){
+			window.location.href='/driver_self_confirm/'+id;
+		}
+	}
+</script>
 {% endblock %}
 
 
