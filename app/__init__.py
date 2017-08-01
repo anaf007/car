@@ -82,6 +82,9 @@ def create_app(config_name):
 
 	
 	config[config_name].init_app(app)
+
+	#注册自定义过滤器 替换模板手机号码
+	app.jinja_env.filters['replace_substring'] = replace_substring
 	
 
 	return app
@@ -156,6 +159,15 @@ def configure_create_admin(app):
 	admin_app.add_view(Admin_logout(name=u'退出'))
 	admin_app.init_app(app)
 
+
+#替换手机号码保留后3位数
+def replace_substring(phone):
+	phone = str(phone)
+	# print phone[:-3]
+	# print phone[-3:]
+	# print phone.replace(phone[:-3],'***')
+	# return '1'
+	return phone.replace(phone[:-4],'***')
 
 
 

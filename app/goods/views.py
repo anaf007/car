@@ -198,6 +198,8 @@ def show_goods(id=0):
 	gd = Goods.query.get_or_404(id)
 	if gd.start_car_time<datetime.utcnow():
 		return u'发车时间不能小于当前时间，该信息已过期！<a href="/">返回主页</a>'
+	
+
 	return render_template('goods/show_goods.html',gd = gd)
 
 
@@ -248,13 +250,13 @@ def send_order():
 		d = Driver.query.get_or_404(int(request.form.get('car')))
 
 	selfdriverpost = Driver_self_order.query.filter_by(goods=gd.id,driver=d.id).first()
-	
+	print request.form.get('price')
 	if selfdriverpost:
 		flash(u'您已经预约过了，请不要重复预约','error')
 		return redirect(url_for('main.index'))
 	else:
 		flash(u'预约成功，系统审核通过将电话通知您。','success')
-		db.session.add(Driver_self_order(driver_self_orders=gd,driver_self_order_driver=d))
+		db.session.add(Driver_self_order(driver_self_orders=gd,driver_self_order_driver=d,price=request.form.get('price')))
 
 
 	#预约人数+1

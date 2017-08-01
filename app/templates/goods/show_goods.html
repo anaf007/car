@@ -83,8 +83,16 @@
 	                </div> -->
 
 	                <div class="ui-form-item ui-border-b" style="color:red">
-	                    <label>运费(元)</label>
-	                    <input type="text" value="{{gd.start_price}}" name="price" style="color:red" disabled="disabled">
+	                    预约运费(元)
+	                    <span style='text-align: center;'>
+	                    
+	                    <i class='icon-minus-sign icon-large' onclick='sub()'></i>
+	                    <span>&nbsp;</span>
+	                    <span id='pricespan'>{{gd.start_price}}</span>	
+	                    <span>&nbsp;</span>  
+	                    <i class='icon-plus-sign icon-large' onclick='add()'></i> 
+	                     </span>           
+	                    <input type="hidden" value="{{gd.start_price}}" name="price" id='price'>
 	                </div>
 
 
@@ -106,7 +114,20 @@
 	                </div>
 	                {%endif%}
 
-	                <div class="ui-btn-wrap">
+	            
+		        <ul class="ui-list ui-list-pure ui-border-tb">
+		        	{%for s in gd.driver_self_post_id%}
+	                <li class="ui-border-t">
+	                    <p><span class="date">{{s.create_time.strftime("%m/%d %H:%M")}}
+	                    用户{{s.driver_self_order_driver.driver_user.phone|string|replace_substring()}}预约价格:{{s.price}}元</span></p>
+	                    <!-- <h4>{{s.consignors}}:预约运费价格:{{s.price}}元</h4> -->
+	                </li>
+	                {%endfor%}
+	                
+	                
+	            </ul>
+
+	            <div class="ui-btn-wrap">
 	                
 						<input type="submit" value="立即预约" class="ui-btn-lg ui-btn-danger"> <br>
 						<a class="ui-btn-lg ui-btn-primary" href="tel:07713103126"><i class='icon-phone icon-1x' ></i>&nbsp;电话沟通马上接单</a>
@@ -132,11 +153,25 @@ $('.ui-actionsheet button').click(function(){
         location.href= $(this).data('href');
     }
 });
+function add(){
+	var pricespan = document.getElementById('pricespan').innerHTML;
+	var price = document.getElementById('price').value;
+	document.getElementById('pricespan').innerHTML = pricespan -0+50.00;
+	document.getElementById('price').value = price-0+50.00;
+}
+function sub(){
+	var pricespan = document.getElementById('pricespan').innerHTML;
+	var price = document.getElementById('price').value;
+	document.getElementById('pricespan').innerHTML = pricespan -50.00;
+	document.getElementById('price').value = price-50.00;
+
+}
 </script>
 <style>
 	#ui-container{
 		border-top:45px solid transparent;
 		border-bottom:60px solid transparent;
+
 	}
 </style>
 {% endblock %}

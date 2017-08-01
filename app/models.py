@@ -536,8 +536,8 @@ class Consignor(db.Model):
 	# driver_post = db.relationship('Driver_post', backref='driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Consignor.id')
 	#货物表
 	goods_id = db.relationship('Goods', backref='consignorsGoods',lazy='dynamic',primaryjoin='Goods.consignors_id == Consignor.id')
-	#货主自助下单
-	goods_self_order = db.relationship('Goods_self_order', backref='consignors_selft_order',uselist='False')
+	#货主自助下单   一对一uselist='False'？
+	goods_self_order = db.relationship('Goods_self_order', backref='consignors_selft_order',lazy='dynamic')
 
 
 
@@ -751,6 +751,9 @@ class Driver_self_order(db.Model):
 	create_time = db.Column(db.DateTime,default=datetime.utcnow)
 	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
 	state = db.Column(db.Integer(),default=0)
+	#预约价格
+	price =  db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None))
 
 #货主自助下单 车辆预约表
 class Goods_self_order(db.Model):
@@ -761,6 +764,9 @@ class Goods_self_order(db.Model):
 	create_time = db.Column(db.DateTime,default=datetime.utcnow)
 	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
 	state = db.Column(db.Integer(),default=0)
+	#预约价格
+	price =  db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None))
 
 
 
