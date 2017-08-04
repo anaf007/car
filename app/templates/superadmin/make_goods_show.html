@@ -11,12 +11,20 @@
 	[目的]{{goods.end_sheng}}——{{goods.end_shi}}
 	{%if goods.name%}{{goods.name}}{%endif%}
 	{%if goods.car_length%}{{goods.car_length}}{%endif%}{%if goods.tiji%}{{goods.tiji}}{%endif%}{%if goods.zhongliang%}{{goods.zhongliang}}{%endif%}
+	运费价格：{{goods.start_price}}
 	<!-- {{goods.driver_self_post_id}} -->
-	{%for i in goods.driver_self_post_id%}<br>
+	{%for i in goods.driver_self_post_id.order_by('state desc,price')%}
+	<br>
+	<br>
 	<div>
-	{{i.id}}:{{i.create_time}},{{i.driver_self_order_driver.driver_user.phone}} 
-	获得运费：<input type="text" name="price" id="price"> <br>
-	<a href="#" onclick="comfire(this,'{{goods.id}}','{{i.driver_self_order_driver.id}}','{{i.id}}');">[推送]</a><br>
+	预约时间：{{i.create_time}}，预约价格：{{i.price}} 手机号码：{{i.driver_self_order_driver.users.phone}} 
+	获得运费：<input type="text" name="price" id="price"> 
+	{%if i.state%}
+	已推送
+	{%else%}
+	<a href="#" onclick="comfire(this,'{{goods.id}}','{{i.driver_self_order_driver.id}}','{{i.id}}');">[推送]</a>
+	{%endif%}
+	
 	</div>
 	{%endfor%}
 	<hr>

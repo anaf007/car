@@ -83,7 +83,7 @@ def make_goods_comfirm(goodsid=0,driverid=0,confirmid=0,price='0.00'):
 	#因为一辆车有多个用户使用，所以多增加的这个字段用于是当前哪一个用户登录并下单的
 	#
 	#车辆用户  #如果一辆车有多个用户呢？ 或者车队 将报错？
-	op.order_pay_user = driver.driver_user
+	op.order_pay_user = driver.users
 	#接单实际
 	goods.receive_time = datetime.utcnow()
 	goods.state = 1  #1司机已下单
@@ -100,7 +100,7 @@ def make_goods_comfirm(goodsid=0,driverid=0,confirmid=0,price='0.00'):
 	um.title = u'您有一条货物定金支付信息'
 	um.body = u'您已经确认了承载【%s】的货物，<a href="/zhifudingjin">点击支付货物的定金</a>。暂定内容。'%(goods.start_shi+'-'+goods.end_shi)
 	um.state = 0
-	um.user_msg = driver.driver_user
+	um.user_msg = driver.users
 
 	
 	try:

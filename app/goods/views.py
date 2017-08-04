@@ -123,7 +123,11 @@ def send_goods_post():
 	#备注
 	good.note = request.form.get('note')
 	#报价运费
-	good.start_price = request.form.get('price')
+	price = request.form.get('price')
+	if not price:
+		flash(u'数据校验失败,请输入预约价格','error')
+		return redirect(url_for('.send_goods'))
+	good.start_price = price
 	#状态0刚发布信息
 	good.state = 0
 

@@ -119,7 +119,7 @@
 		        	{%for s in gd.driver_self_post_id%}
 	                <li class="ui-border-t">
 	                    <p><span class="date">{{s.create_time.strftime("%m/%d %H:%M")}}
-	                    用户{{s.driver_self_order_driver.driver_user.phone|string|replace_substring()}}预约价格:{{s.price}}元</span></p>
+	                    用户{{s.driver_self_order_driver.users.phone|string|replace_substring()}}预约价格:{{s.price}}元</span></p>
 	                    <!-- <h4>{{s.consignors}}:预约运费价格:{{s.price}}元</h4> -->
 	                </li>
 	                {%endfor%}

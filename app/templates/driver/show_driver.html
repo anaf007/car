@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block title %}车辆信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='webuploader/webuploader.css')}}">
+<script type="text/javascript" src="{{url_for('static',filename='webuploader/webuploader.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='webuploader/jquery.js')}}"></script>
+
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>车辆信息</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+
+
+<section class='ui-container'>
+{%for message in get_flashed_messages(category_filter=['success'])%}
+<div class="ui-tooltips ui-tooltips-warn">
+<div class="ui-tooltips-cnt ui-border-b">
+    <i></i>{{message}}
+</div>	
+</div>	
+{%endfor%}
+
+
+	<section id="form">
+		<div class="ui-form ui-border-t">
+	        <form action="{{url_for('driver.show_post_p')}}" method="post">
+	        	<input type="hidden" name="id" value="{{driver.id}}">
+	            <div class="ui-form-item ui-border-b">
+	                <label style="width:75px;">车牌号码</label>
+	                <input type="text" value="{{driver.number}}" name="number" placeholder='请输入车牌号码'>
+	            </div>
+	            <div class="ui-form-item ui-border-b" >
+                    <label style="width:75px;">车身长度</label>
+                    <div class="ui-select">
+                        <select name="chechang">
+                        <option value="0">{{driver.length}},{{driver.tiji}},{{driver.zhongliang}}</option>
+                        	 {%for i in carinfo%}
+                            <option value="{{i.id}}">{{i.length}},{{i.tiji}},{{i.zhongliang}}</option>
+                        	{%endfor%}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="ui-form-item ui-border-b" >
+                    <label style="width:75px;">车辆类型</label>
+                    <div class="ui-select">
+                        <select name="chexing">
+                        	<option value="{{driver.car_type}}">{{driver.car_type}}</option>
+                        	{%for i in cartype%}
+                            <option value="{{i.name}}">{{i.name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                </div>
+
+
+
+
+                <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;" >
+                            
+
+
+                			<!-- 行驶证照片 -->
+                	</div>
+	            </div>
+
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			<!-- 车头照 -->
+                	</div>
+	            </div>
+
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			<!-- 车身照 -->
+                	</div>
+	            </div>
+
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			<!-- 车尾照 -->
+                	</div>
+	            </div>
+
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			<!-- 人车照 -->
+                	</div>
+	            </div>
+
+
+                <div class="ui-btn-wrap">
+	                <button class="ui-btn-lg ui-btn-danger">
+	                    确定并修改
+	                </button>
+	            </div>
+
+	            <p>&nbsp;</p>
+	            <p>&nbsp;</p>
+	            <p>&nbsp;</p>
+	            <p>&nbsp;</p>
+
+
+	        </form>
+	    </div>
+	</section>
+	
+
+</section>
+
+<script>
+    // 初始化Web Uploader
+var uploader = WebUploader.create({
+
+    // 选完文件后，是否自动上传。
+    auto: true,
+
+    // swf文件路径
+    swf: BASE_URL + '{{url_for("static",filename="webuploader/Uploader.swf")}}',
+
+    // 文件接收服务端。
+    server: "{{url_for('main.index')}}",
+
+    // 选择文件的按钮。可选。
+    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+    pick: '#filePicker',
+
+    // 只允许选择图片文件。
+    accept: {
+        title: 'Images',
+        extensions: 'gif,jpg,jpeg,bmp,png',
+        mimeTypes: 'image/*'
+    }
+});
+
+// 当有文件添加进来的时候
+uploader.on( 'fileQueued', function( file ) {
+var $li = $(
+        '<div id="' + file.id + '" class="file-item thumbnail">' +
+            '<img>' +
+            '<div class="info">' + file.name + '</div>' +
+        '</div>'
+        ),
+    $img = $li.find('img');
+
+
+    // $list为容器jQuery实例
+    $list.append( $li );
+
+    // 创建缩略图
+    // 如果为非图片文件，可以不用调用此方法。
+    // thumbnailWidth x thumbnailHeight 为 100 x 100
+    uploader.makeThumb( file, function( error, src ) {
+        if ( error ) {
+            $img.replaceWith('<span>不能预览</span>');
+            return;
+        }
+
+        $img.attr( 'src', src );
+    }, thumbnailWidth, thumbnailHeight );
+});
+
+// 文件上传过程中创建进度条实时显示。
+uploader.on( 'uploadProgress', function( file, percentage ) {
+    var $li = $( '#'+file.id ),
+        $percent = $li.find('.progress span');
+
+    // 避免重复创建
+    if ( !$percent.length ) {
+        $percent = $('<p class="progress"><span></span></p>')
+                .appendTo( $li )
+                .find('span');
+    }
+
+    $percent.css( 'width', percentage * 100 + '%' );
+});
+
+// 文件上传成功，给item添加成功class, 用样式标记上传成功。
+uploader.on( 'uploadSuccess', function( file ) {
+    $( '#'+file.id ).addClass('upload-state-done');
+});
+
+// 文件上传失败，显示上传出错。
+uploader.on( 'uploadError', function( file ) {
+    var $li = $( '#'+file.id ),
+        $error = $li.find('div.error');
+
+    // 避免重复创建
+    if ( !$error.length ) {
+        $error = $('<div class="error"></div>').appendTo( $li );
+    }
+
+    $error.text('上传失败');
+});
+
+// 完成上传完了，成功或者失败，先删除进度条。
+uploader.on( 'uploadComplete', function( file ) {
+    $( '#'+file.id ).find('.progress').remove();
+});
+</script>
+
+
+
+
+<script>
+// $('.ui-actionsheet button').click(function(){
+//     if($(this).data('href')){
+//         location.href= $(this).data('href');
+//     }
+// });
+</script>
+<style>
+option{width: 65px;}
+select{width: 65px;}
+.ui-btn-primary.active{color: white;}
+	/*.ui-select1{float:left;width: 70px;}*/
+	/*.ui-select2{float:left;}*/
+	/*.ui-select3{float:right;}*/
+	/*.ui-border-b{float: left;}*/
+	.ui-select-group{width: 100%;}
+	.ui-tab-content{background-color: rgba(255,255,255);margin-top:0px;}
+	/*.ui-form-item{padding: 0px;margin: 0px;}*/
+</style>
+{% endblock %}
+
+
+
+
+

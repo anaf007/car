@@ -8,7 +8,8 @@ Author: by anaf
 from  flask.ext.login import login_required,current_user
 from ..decorators import goods_required,permission_required,driver_required
 from . import driver
-from ..models import Permission,Driver,User,Driver_post,Role,Goods,Order_pay,Order_Task,Consignor,Goods_self_order
+from ..models import Permission,Driver,User,Driver_post,Role,Goods,Order_pay,\
+Order_Task,Consignor,Goods_self_order,Car_Info,Car_Type
 from flask import render_template,request,redirect,url_for,flash,abort
 from app import db,scheduler
 from datetime import datetime
@@ -53,6 +54,17 @@ def reg_driver_add():
 @login_required
 def add_post():
 	return render_template('driver/add_post.html')
+
+
+#显示车辆信息
+@driver.route('/show_driver/<int:id>')
+@login_required
+def show_driver(id=0):
+	driver = Driver.query.get_or_404(id)
+	carinfo = Car_Info.query.order_by(Car_Info.sort).all()
+	cartype = Car_Type.query.all()
+	return render_template('driver/show_driver.html',driver=driver,carinfo = carinfo,cartype=cartype)
+
 
 
 #添加车源信息，此处应该进行系统匹配并发送邮件消息 短信等各种操作
@@ -183,11 +195,40 @@ def add_posts():
 	return redirect(url_for('.add_post'))
 
 
-
+#显示车辆车源信息
 @driver.route('/show_post/<int:id>')
 def show_post(id=0):
 	dp = Driver_post.query.get_or_404(id)
 	return render_template('driver/show_post.html',dp = dp)
+
+@driver.route('/show_post',methods=['POST'])
+def show_post_p():
+	driverid = request.form.get('id')
+	chechang = request.form.get('chechang')
+	chexing = request.form.get('chexing')
+	number = request.form.get('number').upper()
+	drivers = Driver.query.get_or_404(driverid)
+	try:
+		if int(chechang)!=0:
+			chechang = Car_Info.query.get_or_404(int(chechang))
+			drivers.length = chechang.length
+			drivers.tiji = chechang.tiji
+			drivers.zhongliang = chechang.zhongliang
+		
+		
+		drivers.number = number
+		drivers.car_type = chexing
+		db.session.add(drivers)
+		db.session.commit()
+	except Exception, e:
+		print '--------'
+		print str(e)
+		print '--------'
+		return redirect(url_for('main.index'))
+	
+	
+	return redirect(url_for('usercenter.car'))
+
 
 
 #注册司机
@@ -272,8 +313,6 @@ def send_order():
 	else:
 		cs = Consignor.query.filter(Consignor.consignor_user==current_user).first()
 	
-	print dp
-	print cs
 	selfgoodspost = Goods_self_order.query.filter_by(driver_post=dp.id,consignors=cs.id).first()
 	
 	if selfgoodspost:
@@ -284,7 +323,7 @@ def send_order():
 		db.session.add(Goods_self_order(driver_post_self_order=dp,consignors_selft_order=cs))
 
 	#预约人数+1
-	print dp.make_count
+
 	dp.make_count  = dp.make_count+1
 	db.session.add(dp)
 	db.session.commit()

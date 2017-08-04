@@ -111,10 +111,10 @@ class User(UserMixin,db.Model):
 	mail = db.Column(db.String(100),unique=True) 
 	#手机号，也可以用于登陆
 	phone  = db.Column(db.String(100),index=True,unique=True)
-	#货主表 一对一   
-	consignors  = db.relationship('Consignor', backref='consignor_user',uselist=False)
+	#货主表 一对一   uselist=False
+	consignors  = db.relationship('Consignor', backref='users',uselist=False)
 	#创建者负责人  多对一  relationship  不会在表中显示行
-	drivers  = db.relationship('Driver', backref='driver_user',primaryjoin='Driver.user_id == User.id',lazy='dynamic')
+	drivers  = db.relationship('Driver', backref='users',lazy='dynamic')
 	#车队
 	fleet_id  = db.Column(db.Integer())
 	#账户保障金
@@ -140,7 +140,7 @@ class User(UserMixin,db.Model):
 	#货物发布者 这里不做货物发布了   货物发布应当链接到货主表
 	# goods_id = db.relationship('Goods',backref='user_goods',primaryjoin='Goods.user_id == User.id')
 	#货物司机接单者
-	car_goods_id = db.relationship('Goods',backref='car_goods_user',primaryjoin='Goods.car_user_id == User.id')
+	car_goods_id = db.relationship('Goods',backref='users',lazy='dynamic')
 	#付款者
 	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
 	#用户邮件
@@ -488,7 +488,7 @@ class Driver(db.Model):
 	order_pay = db.relationship('Order_pay', backref='order_pays',lazy='dynamic',primaryjoin='Order_pay.drivers_id == Driver.id')
 	post = db.relationship('Driver_post', backref='driverPosts',lazy='dynamic',primaryjoin='Driver_post.driver_id == Driver.id')
 	#司机自助下单货物用户
-	driver_self_post_id = db.relationship('Driver_self_order', backref='driver_self_order_driver',lazy='dynamic',primaryjoin='Driver_self_order.driver == Driver.id')
+	driver_self_post = db.relationship('Driver_self_order', backref='driver_self_order_driver',lazy='dynamic',primaryjoin='Driver_self_order.driver == Driver.id')
 
 
 

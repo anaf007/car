@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}预约信息列表{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>预约信息列表</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+<section class='ui-container'>
+	
+<ul class="ui-list ui-list-pure ui-border-tb">
+
+	{%for i in current_user.drivers%}
+	{%for j in i.driver_self_post.order_by('id desc')%}
+    <li class="ui-border-t">
+    	{%if j.state%}
+
+    	<div class="ui-tag-freelimit">
+    	{%else%}
+		<div>
+    	{%endif%}
+
+        <p>[{{j.driver_self_orders.start_shi}}-{{j.driver_self_orders.end_shi}}]
+        装车时间:{{j.driver_self_orders.start_car_time|dateformat("Y-M-d")}}
+        {{j.driver_self_orders.start_zone}}</p>
+        <h4>预约时间{{j.create_time.strftime("%m/%d %H:%M")}} &nbsp;预约价格:{{j.price}}</h4>        
+                 
+        </div>
+    </li>
+    {%endfor%}
+    {%endfor%}
+
+</ul>
+</section>
+<style>
+.ui-tag-freelimit:before {
+	content: '已接';
+	background-color: red;
+}
+</style>
+{% endblock %}
+
+

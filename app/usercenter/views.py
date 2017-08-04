@@ -16,7 +16,7 @@ from app.decorators import permission_required
 @usercenter.route('/')
 @usercenter.route('/<username>')
 def index(username=''):
-    d = Driver.query.filter_by(driver_user=current_user).first()
+    d = Driver.query.filter_by(users=current_user).first()
     return render_template('user/index.html',user=current_user)
 
 @usercenter.route('/edit_profile')
@@ -135,10 +135,52 @@ def show_order():
 def msg_list():
     return render_template('user/msg_list.html')
 
+#预约信息
+@usercenter.route('/mark')
+@login_required
+def mark():
+    return render_template('user/mark.html')
+
+#车辆信息
+@usercenter.route('/car')
+@login_required
+def car():
+    return render_template('user/car.html')
+
+
+#我的信息
+@usercenter.route('/userinfo')
+@login_required
+def userinfo():
+    return render_template('user/userinfo.html')
+
+#我的钱包
+@usercenter.route('/apay')
+@login_required
+def apay():
+    return render_template('user/apay.html')
+
+#货运专线
+@usercenter.route('/freight_line')
+@login_required
+def freight_line():
+    return render_template('user/freight_line.html')
+
+#大客户
+@usercenter.route('/dakehu')
+@login_required
+def dakehu():
+    return render_template('user/dakehu.html')
+
+#用户设置
+@usercenter.route('/setting')
+@login_required
+def setting():
+    return render_template('user/setting.html')
 
 #自身接单下单
 @usercenter.route('/self_order')
 def selforder():
-    op = Order_pay.query.filter(Order_pay.order_pay_user==current_user).order_by(Order_pay.id).all()
+    op = Order_pay.query.filter(Order_pay.order_pay_user==current_user).order_by(Order_pay.id.desc()).all()
     print op
     return render_template('user/selforder.html',op=op)

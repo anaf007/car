@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}车辆列表{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>车辆列表</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+<section class='ui-container'>
+	<ul class="ui-list ui-list-pure ui-border-tb" style="float:left;border-bottom:10px transparent solid">
+	    <li class="ui-border-t" style="float:left;width:100%;">
+	    <a href="{{url_for('driver.register_driver')}}">
+	        <i class='icon-ambulance icon-4x'style='color:#458B00;float:left;width:25%;margin-left:20px;'></i>
+	        <div style="float:left;width:65%;color:#000000;">
+	        	<p style="float:left;padding-left:0px;color:#CD5555;">添加车辆信息</p>
+	        	<p style="float:left;padding-left:0px;font-size:14px;">添加车辆，认证信息，提高信誉，让更多货主主动联系您。</p>
+	        </div>
+	        
+	    </a>
+	    </li>
+	    
+	</ul>
+	
+<ul class="ui-list ui-list-text ui-list-link ui-border-tb">
+
+	{%for i in current_user.drivers%}
+	
+    <li class="ui-border-t" data-href="{{url_for('driver.show_driver',id=i.id)}}">
+    	
+		<div>
+
+        <p></p>
+        <h4>车牌:{{i.number}}&nbsp;{{i.length}}</h4>        
+                 
+        </div>
+    </li>
+    {%endfor%}
+
+</ul>
+</section>
+<style>
+.ui-tag-freelimit:before {
+	content: '成功';
+	background-color: red;
+}
+</style>
+{% endblock %}
+
+

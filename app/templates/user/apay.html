@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}我的钱包{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
+    <i class="ui-icon-return" onclick="history.back()"></i><h1>我的钱包</h1>
+    <!-- <button class="ui-btn">回首页</button> -->
+</header>
+
+<section class='ui-container'>
+	“我的钱包”功能暂未开通。届时加入用户资金功能，费用优先扣去账户资金  <br>
+	资金信用等级 资金越高推荐越靠前， 这样做利于我们聚集资金。<br>
+	加入优惠券功能，如推荐注册的奖励 并不能实际提现。
+
+</section>
+
+{% endblock %}
+
+
