@@ -7,7 +7,7 @@ note:数据库模型函数
 
 from werkzeug.security import generate_password_hash,check_password_hash
 from app import db
-from flask.ext.login import UserMixin,AnonymousUserMixin
+from flask_login import UserMixin,AnonymousUserMixin
 from .import login_manager
 from datetime import datetime
 import hashlib,random
@@ -145,7 +145,8 @@ class User(UserMixin,db.Model):
 	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
 	#用户邮件
 	user_msgs = db.relationship('User_msg', backref='user_msg',primaryjoin='User_msg.users == User.id')
-	
+	#一对一 用户信息表
+	user_info  = db.relationship('User_info', backref='user_infos',uselist=False)
 
 	def __init__(self,**kwargs):
 		super(User,self).__init__(**kwargs)
@@ -226,25 +227,26 @@ class User(UserMixin,db.Model):
 			 except Exception, e:
 			 	db.session.rollback()
 
-	#多对多关注关系辅助方法
-	# def follow(self, user):
-	# 	if not self.is_following(user):
-	# 		f = Follow(follower=self,followed=user)
-	# 		db.session.add(f)
-	# 		db.session.commit()
-
-	# def unfollow(self, user):
-	# 	f = self.followed.filter_by(followed_id=user.id).first()
-	# 	if f:
-	# 		db.session.delete(f)
-			# db.session.commit()
-
-	# def is_following(self, user):
-	# 	return self.followed.filter_by(followed_id=user.id).first() is not None
-	# 	return fo is not None
-
-	# def is_followed_by(self, user):
-	# 	return self.followers.filter_by(follower_id=user.id).first() is not None
+class User_info(db.Model):
+	__tablename__ = 'user_infos'
+	id = db.Column(db.Integer,primary_key=True)	
+	#姓名
+	name = db.Column(db.String(64))	
+	#真实姓名
+	lastname = db.Column(db.String(64))	
+	#信用等级
+	level = db.Column(db.Integer,default=1)
+	#信息登录 1未认证 2已认证 3系统设置诚信会员 -1黑名单
+	info_level = db.Column(db.Integer,default=1)
+	#推荐人数 
+	recommended = db.Column(db.Integer,default=0)
+	#下单次数
+	order_times = db.Column(db.Integer,default=0)
+	#接单次数
+	order_number = db.Column(db.Integer,default=0)
+	#违约次数
+	treaty_number = db.Column(db.Integer,default=0)
+	users = db.Column(db.Integer,db.ForeignKey('users.id'))
 
 
 #验证角色

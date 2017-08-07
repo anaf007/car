@@ -2,7 +2,7 @@
 
 from . import superadmin
 from flask import render_template,flash,redirect,url_for,request,abort
-from  flask.ext.login import login_required,current_user
+from  flask_login import login_required,current_user
 from app.models import Goods,Driver,Driver_self_order,User_msg,Order_pay
 from datetime import datetime
 from ..decorators import *

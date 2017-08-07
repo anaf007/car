@@ -8,7 +8,7 @@ note:货源信息栏目，首页货物显示及某些司机看的页面，只能
 
 from . import goods
 from flask import render_template,flash,redirect,url_for,request,abort
-from  flask.ext.login import login_required,current_user
+from  flask_login import login_required,current_user
 from ..decorators import permission_required
 from app.models import Permission,Goods,Order_pay,Driver,\
 Order_Task,Driver_post,Consignor,User,Role,Car_Info,Car_Type,Driver_self_order
@@ -151,6 +151,7 @@ def send_goods_post():
 		good.zhongliang = request.form.get('zhongliang')
 
 	#没有货主的公司先系统默认注册一个公司
+	print current_user.consignors
 
 	if not current_user.consignors:
 		phone = request.form.get('phone')
@@ -158,7 +159,7 @@ def send_goods_post():
 			flash(u'该手机号码已经被注册，请登录后再发布。','login')
 			return redirect(url_for('auth.login'))
 
-		consignor.consignor_user = current_user
+		consignor.users = current_user
 		consignor.name = u'系统默认的公司名称'
 		consignor.note = u'联系电话：'+phone
 		consignor.state = 0 #未开通 未认证信息

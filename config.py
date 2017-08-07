@@ -27,6 +27,15 @@ class Config:
 
 	REDIS_QUEUE_KEY = 'my_queue'
 
+	#微信配置
+	CORP_ID = 'wxb6eb5bc8b62ee6d8'
+	SECRET = '5bdcb41b6dffd749d50a217c12609c55'
+
+	#qq登录配置
+	QQ_APP_ID = os.getenv('QQ_APP_ID', '101187283')
+	QQ_APP_KEY = os.getenv('QQ_APP_KEY', '993983549da49e384d03adfead8b2489')
+
+
 	# PERMANENT_SESSION_LIFETIME = 31
 
 	@staticmethod

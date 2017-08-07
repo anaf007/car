@@ -8,7 +8,7 @@ from flask import render_template,abort,request,current_app,url_for,make_respons
 from . import usercenter
 from .. import db
 import random,os,datetime
-from  flask.ext.login import login_required,current_user
+from  flask_login import login_required,current_user
 from  ..models import Permission,User,Driver,Order_pay
 from app.decorators import permission_required
 

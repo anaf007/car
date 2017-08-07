@@ -6,7 +6,7 @@ note:auth视图函数
 """
 from flask import render_template,redirect,request,url_for,flash,make_response,current_app,session
 from . import auth
-from flask.ext.login import login_user,login_required,logout_user,current_user
+from flask_login import login_user,login_required,logout_user,current_user
 from ..models import User,Driver,Permission,Role,Consignor
 from .forms import LoginForm,Register_goods
 from app import db

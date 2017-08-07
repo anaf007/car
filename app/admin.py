@@ -7,17 +7,17 @@ note:admin视图函数
 
 
 from flask import Flask,request,redirect,url_for
-from flask.ext.admin import Admin, BaseView, expose
+from flask_admin import Admin, BaseView, expose
 from app import db
 from app.models import Article,Category,User,User_msg,Category_attribute,Comment,Role,CategoryTop
-from flask.ext.admin.contrib.sqla import ModelView
-from flask.ext.login import current_user,login_required
+from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user,login_required
 from wtforms.validators import Required
 from wtforms import TextAreaField
 from wtforms.widgets import TextArea
 from jinja2 import Markup
 from flask_admin.form import rules
-from flask.ext.admin.contrib.fileadmin import FileAdmin
+from flask_admin.contrib.fileadmin import FileAdmin
 import hashlib
 from .decorators import admin_required
 import os.path as op

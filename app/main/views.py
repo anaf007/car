@@ -8,7 +8,7 @@ from flask import render_template,redirect,url_for,request,flash,current_app,mak
 from . import main
 from .. import db
 from ..models import Article,Comment,Permission,CategoryTop,Category,Goods,User_msg,Order_pay
-from  flask.ext.login import login_required,current_user
+from  flask_login import login_required,current_user
 from ..decorators import admin_required,permission_required
 from .forms import PostForm,CommentForm
 import os,random,datetime
@@ -208,6 +208,7 @@ def Get_Nav():
     return dict(Get_Nav=get)
 
 
+#在线人数 但是并不是显示总是  未使用G
 @main.route('/online')
 def online():
     return Response('Online: %s' % ', '.join(get_online_users()),mimetype='text/plain')

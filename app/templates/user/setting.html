@@ -13,11 +13,42 @@
 </header>
 
 <section class='ui-container'>
-	“用户设置”功能暂未开通。届时加入用户设置功能<br>
-	修改登录密码  修改支付 密码 修改头像  帮助中心 关于系统等功能 
+<ul class="ui-list ui-list-link ui-border-tb">
+    <li>
+        <div class="ui-avatar">
+            <span style="background-image:url('{{current_user.gravatar(size=120)}}');"></span>
+        </div>
+        <div class="ui-list-info ui-border-t">
+            <h4 class="ui-nowrap">修改头像</h4>
+        </div>
+    </li>
+    
+</ul>
+
+<div class="ui-form-item ui-border-c">
+<label>
+
+</label>
+
+<div class="ui-form-item ui-form-item-link ui-border-b">
+<a href="#">修改登录密码</a>
+</div>
+<div class="ui-form-item ui-form-item-link ui-border-b">
+<a href="#">修改支付密码</a>
+</div>
+<div class="ui-form-item ui-form-item-link ui-border-b">
+<a href="#">帮助中心</a>
+</div>
+<div class="ui-form-item ui-form-item-link ui-border-b">
+<a href="#">关于系统</a>
+</div>
+
  
 </section>
-
+<style>
+	.ui-form-item label:not(.ui-switch):not(.ui-checkbox):not(.ui-checkbox-s):not(.ui-radio){width: 135px;}
+	.ui-form-item input, .ui-form-item textarea{padding-left:115px;}
+</style>
 {% endblock %}
 
 

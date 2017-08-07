@@ -10,20 +10,22 @@ def create_app(config_name):
 """
 
 from flask import Flask,render_template
-from flask.ext.mail import Mail
-from flask.ext.moment import Moment
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_mail import Mail
+from flask_moment import Moment
+from flask_sqlalchemy import SQLAlchemy
 from config import config
-from flask.ext.login import LoginManager
-from flask.ext.admin import Admin
+from flask_login import LoginManager
+from flask_admin import Admin
 from flask_babelex import Babel
 from flask_redis import FlaskRedis
 from flask_debugtoolbar import DebugToolbarExtension
-from flask.ext.bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap
 from rq import Queue
 from rq.job import Job
 
 from flask_apscheduler import APScheduler
+
+
 
 scheduler = APScheduler()
 
@@ -43,6 +45,7 @@ redis_store = FlaskRedis()
 toolbar = DebugToolbarExtension()
 bootstrap = Bootstrap()
 
+
 # q = Queue(connection=conn)
 # import queue_daemon
 
@@ -60,8 +63,10 @@ login_manager.refresh_view = 'auth.login'
 app = Flask(__name__)
 def create_app(config_name):
 	
+	
 	app.config.from_object(config[config_name])
 	app.config['REDIS_QUEUE_KEY'] = 'my_queue'
+
 
 	# queue_daemon(app)
 
@@ -85,6 +90,8 @@ def create_app(config_name):
 
 	#注册自定义过滤器 替换模板手机号码
 	app.jinja_env.filters['replace_substring'] = replace_substring
+
+	
 	
 
 	return app
@@ -138,15 +145,15 @@ def configure_blueprint(app):
 
 
 def configure_config(app):
-	
 	app.config['BABEL_DEFAULT_LOCALE'] = 'zh_CN'
 	app.config['UPLOAD_FOLDER_ADMIN_IMAGES'] ='\\static\\uploads\\admin\\images'
 	app.config['UPLOAD_FOLDER_ADMIN'] ='\\static\\uploads\\admin'
 	
 
+#flask-admin
 def configure_create_admin(app):
 	from app.admin_views import MyAdminIndexView
-	admin_app = Admin(name='chahua3287',index_view=MyAdminIndexView())
+	admin_app = Admin(name='car',index_view=MyAdminIndexView())
 	from admin import *
 	admin_app.add_view(ModelView_User(db.session,name=u'用户管理'))
 	admin_app.add_view(ModelView_Article(db.session,name=u'文章管理'))
@@ -163,10 +170,6 @@ def configure_create_admin(app):
 #替换手机号码保留后3位数
 def replace_substring(phone):
 	phone = str(phone)
-	# print phone[:-3]
-	# print phone[-3:]
-	# print phone.replace(phone[:-3],'***')
-	# return '1'
 	return phone.replace(phone[:-4],'***')
 
 

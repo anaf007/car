@@ -3,7 +3,7 @@
 Created 2017-05-30
 Author: by anaf
 """
-from flask.ext.wtf import Form
+from flask_wtf import Form
 from wtforms import StringField,PasswordField,BooleanField,SubmitField
 from wtforms.validators import Required,Length,Email
 

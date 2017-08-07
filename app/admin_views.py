@@ -1,6 +1,6 @@
 #coding=utf-8
 from flask.ext import admin,login
-from flask.ext.admin import helpers, expose
+from flask_admin import helpers, expose
 from flask import redirect,url_for,request
 from wtforms import form, fields, validators
 from .decorators import admin_required

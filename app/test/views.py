@@ -19,13 +19,14 @@ redis = Redis()
 from app import app
 # app = app._get_current_object()
 
+from wechatpy import WeChatClient
+# from flask_oauthlib.client import OAuth
+# client = WeChatClient('app_id', 'secret')
+# user = client.user.get('user id')
+# menu = client.menu.get()
+# client.message.send_text('user id', 'content')
 
-@codetest.route('/2')
-def index2():
-	ot = Order_Task.query.filter_by(order_str='a2').first()
-	op = Order_pay.query.filter_by(order=ot.order_str).first()
-	print op
-	return 'op'
+
 
 
 @codetest.route('/')
@@ -300,6 +301,43 @@ def addjob():
 	job = jobfromparm(**data)
 	return '12'
 
+import functools
+from wechatpy.enterprise import WeChatClient
+client = WeChatClient(app.config.get('CORP_ID'),app.config.get('SECRET'))
+def oauth(method):
+	@functools.wraps(method)
+	def warpper(*args, **kwargs):
 
+		code = request.args.get('code', None)
+		url = client.oauth.authorize_url(request.url)
+		print url
+		# qr = client.oauth.qrconnect_url(url)
+
+		if code:
+			try:
+				user_info = client.oauth.get_user_info(code)
+			except Exception as e:
+				print e.errmsg, e.errcode
+				# 这里需要处理请求里包含的 code 无效的情况
+				abort(403)
+			else:
+				session['user_info'] = user_info
+		else:
+			return redirect(url)
+
+		return method(*args, **kwargs)
+	return warpper
+
+
+@codetest.route('/weixinlogin')
+@oauth
+def weixinlogin():
+	user_info = session.get('user_info')
+	return jsonify(data=user_info)
+	
+#正确的地址
+"""
+https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxb6eb5bc8b62ee6d8&redirect_uri=http://zhongyou.tx520.cn&response_type=code&scope=snsapi_base
+"""
 
 

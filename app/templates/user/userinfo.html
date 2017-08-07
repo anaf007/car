@@ -13,7 +13,64 @@
 </header>
 
 <section class='ui-container'>
-	“我的信息”功能暂未开通。届时加入二维码，扫描推荐朋友加入，成功成交一单后 ，双方各奖励200元
+<div class="ui-avatar-one" style="margin:0px auto;margin-top:20px;">
+	<span style="background-image:url('{{current_user.gravatar(size=120)}}');"></span>
+</div>
+<!-- <img src="{{current_user.gravatar(size=80)}}" > <br> -->
+
+<div class="ui-form-item ui-border-b" style="margin-top:10px;">
+<label>联系方式：</label>
+<input type="text" value="{{current_user.phone}}">
+</div>
+<div class="ui-form-item ui-border-b">
+<label>信用等级：</label>
+<input type="text" value="一星会员">
+</div>
+<div class="ui-form-item ui-border-b">
+<label>信息等级：</label>
+<input type="text" value="未认证">
+</div>
+<div class="ui-form-item ui-border-b">
+<label>推荐人数：</label>
+<input type="text" value="0人">
+</div>
+{%if current_user.role.name=='司机'%}
+<div class="ui-form-item ui-border-b">
+<label>预约次数：</label>
+<input type="text" value="{{getSend_Driver_post_Count(current_user.drivers)}}次">
+</div>
+<div class="ui-form-item ui-border-b">
+<label>下单次数：</label>
+<input type="text" value="{{getSend_Driver_post_Count(current_user.drivers)}}次">
+</div>
+
+<div class="ui-form-item ui-border-b">
+<label>接单次数：</label>
+<input type="text" value="0次">
+</div>
+
+<div class="ui-form-item ui-border-b">
+<label>违约次数：</label>
+<input type="text" value="0次">
+</div>
+{%endif%}
+{%if current_user.role.name=='货主'%}
+<div class="ui-form-item ui-border-b">
+<label>下单次数：</label>
+<input type="text" value="0次">
+</div>
+
+<div class="ui-form-item ui-border-b">
+<label>接单次数：</label>
+<input type="text" value="0次">
+</div>
+
+<div class="ui-form-item ui-border-b">
+<label>违约次数：</label>
+<input type="text" value="0次">
+</div>	
+{%endif%} 
+
 
 </section>
 
