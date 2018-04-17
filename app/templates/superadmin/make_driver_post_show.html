@@ -1,0 +1,139 @@
+{% extends "superadmin/base.html" %}
+{% block title %}车运预约表详细{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+
+{%for message in get_flashed_messages(category_filter=['error'])%}
+<div class="alert alert-warning">
+    <a href="#" class="close" data-dismiss="alert">
+        &times;
+    </a>
+    <strong>{{message}}</strong>
+</div>
+{%endfor%}
+
+<div class="row" >
+	<div class="col-xs-8">
+		<h2>车牌号码{{dp.driver.number}}，
+		{%if dp.driver.user.user_infos.info_level==1%}未认证{%endif%}
+    {%if dp.driver.user.user_infos.info_level==2%}已认证{%endif%}
+    {%if dp.driver.user.user_infos.info_level==3%}诚信会员{%endif%}
+		</h2>
+	</div>
+	<div class="col-xs-4">
+		<h3>联系电话：{{dp.driver.user.phone}}</h3>
+	</div>
+
+</div>
+<div class="row" >
+	<div class="col-xs-4">
+		<h2>车运编号：{{dp.id}}</h2>
+	</div>
+	<div class="col-xs-8">
+		<h3>装车点：{{dp.start_address}}</h3>
+	</div>
+
+</div>
+<div class="row" >
+	<div class="col-xs-4">
+		<h2></h2>
+	</div>
+	<div class="col-xs-8">
+		<h3>卸车点：{{dp.end_address}}</h3>
+	</div>
+</div>
+<div class="row" >
+	<div class="col-xs-8">
+		<div class="row" >
+			<div class="col-xs-6">
+				<h2>预约人数：{{dp.make_count}}人</h2>
+			</div>
+			<div class="col-xs-6">
+				<h3>装车时间：{{dp.start_car_time|dateformat("Y-M-d")}}&nbsp;{{dp.start_zone}}</h3>
+			</div>
+		</div>
+		<div class="row" >
+			<div class="col-xs-6">
+				<h2>发布时间：{{dp.create_time|dateformat("Y-M-d")}}</h2>
+			</div>
+			<div class="col-xs-6">
+				<h1>运费：{{dp.start_price}}</h1>
+			</div>
+		</div>
+
+	</div>
+	<div class="col-xs-4 text-center" >
+		
+		<div class="row" style="background-color: #00F5FF;">
+			<div class="col-xs-12">
+				{%if dp.end_price%}
+				<h1>实际运费：{{dp.end_price}}</h1>
+				{%else%}
+				<div class="col-xs-12">
+					<div class="form-group">
+					<label for="name">&nbsp;</label>
+					<input type="text" class="form-control" id="price" 
+						   placeholder="请输入司机的支付定金">
+					</div>
+				</div>
+				
+				{%endif%}
+			</div>
+		</div>
+		
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-8">
+
+	</div>
+	<div class="col-xs-4 text-center" style="background-color: #f8df96;">
+		<h2>
+		{{dp.state}}
+		</h2>
+	</div>
+</div>
+<table class="table table-hover">
+  <caption>预约的货主</caption>
+  <thead>
+    <tr>
+      <th>预约价格</th>
+      <th>预约时间</th>
+      <th>手机号</th>
+      <th>账户等级</th>
+      <th>操作</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  	{%for i in dp.goods_self_orders.order_by('state ,price')%}
+    <tr>
+    <th>{{i.price}}</th>
+    <th>{{i.create_time}}</th>
+    <th>{{i.consignor.user.phone}}</th>
+    <th>{{i.consignor.user.user_infos.treaty_number}}次</th>
+    <th>
+    {%if i.consignor.user.user_infos.info_level==1%}未认证{%endif%}
+    {%if i.consignor.user.user_infos.info_level==2%}已认证{%endif%}
+    {%if i.consignor.user.user_infos.info_level==3%}诚信会员{%endif%}
+    </th>
+    
+    <th>
+	
+    </th>
+     
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+</div>
+
+{% endblock %}
+

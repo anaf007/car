@@ -7,13 +7,9 @@
 
 {% block body %}
 
-<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>用户设置</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
 
 <section class='ui-container'>
-<ul class="ui-list ui-list-link ui-border-tb">
+<!-- <ul class="ui-list ui-list-link ui-border-tb">
     <li>
         <div class="ui-avatar">
             <span style="background-image:url('{{current_user.gravatar(size=120)}}');"></span>
@@ -23,7 +19,7 @@
         </div>
     </li>
     
-</ul>
+</ul> -->
 
 <div class="ui-form-item ui-border-c">
 <label>
@@ -31,10 +27,10 @@
 </label>
 
 <div class="ui-form-item ui-form-item-link ui-border-b">
-<a href="#">修改登录密码</a>
+<a href="{{url_for('usercenter.yinhangka')}}">银行卡管理</a>
 </div>
 <div class="ui-form-item ui-form-item-link ui-border-b">
-<a href="#">修改支付密码</a>
+<a href="{{url_for('usercenter.change_pay_pwd')}}">修改支付密码</a>
 </div>
 <div class="ui-form-item ui-form-item-link ui-border-b">
 <a href="#">帮助中心</a>

@@ -23,12 +23,12 @@
 		        	<input type="hidden" name="driverid" value="{{dp.id}}">
 
 		
-		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		            <div class="ui-form-item ui-border-b" >
 		                <i class='icon-home icon-large' style='color:#548B54'></i>[出发]
 		                {{dp.start_address}}
 		            </div>
 
-		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		            <div class="ui-form-item ui-border-b" >
 	                    <i class='icon-truck icon-large' style='color:#1E90FF'></i>[目的]
 	                    {{dp.end_address}}
 	                </div>
@@ -40,21 +40,21 @@
 
 	                <div class="ui-form-item ui-border-b">
 	                    <i class='icon-suitcase icon-large' style='color:#EE6363'></i>[车牌号码]
-	                    {{dp.driverPosts.number}}&nbsp;<span style='color:red;font-size:18px;'></span>
+	                    {{dp.driver.number}}
 	                </div>                
 
 	                <div class="ui-form-item ui-border-b">
 	                    <i class='icon-list-alt icon-large' style='color:#8A2BE2'></i>[车辆]
-	                    {%if dp.driverPosts.length%}
-	                    {{dp.driverPosts.length}}
+	                    {%if dp.driver.length%}
+	                    {{dp.driver.length}}
 	                    {%endif%}
-	                    {%if dp.driverPosts.tiji%}
-	                    {{dp.driverPosts.tiji}}
+	                    {%if dp.driver.tiji%}
+	                    {{dp.driver.tiji}}
 	                    {%endif%}
-	                    {%if dp.driverPosts.zhongliang%}
-	                    {{dp.driverPosts.zhongliang}}
+	                    {%if dp.driver.zhongliang%}
+	                    {{dp.driver.zhongliang}}
 	                    {%endif%}
-	                    {{dp.driverPosts.car_type}}           
+	                    {{dp.driver.car_type}}           
 	                    
 	                </div>
 
@@ -66,11 +66,20 @@
 	                {%endif%}
 
 	                
-
-	                <div class="ui-form-item ui-border-b" style="color:red">
-	                    <label>运费(元)</label>
-	                    <input type="text" value="{{dp.start_price}}" name="price" style="color:red" disabled="disabled">
+					<div class="ui-form-item ui-border-b" style="color:red">
+	                    预约运费(元)
+	                    <span style='text-align: center;'>
+	                    
+	                    <i class='icon-minus-sign icon-large' onclick='sub()'></i>
+	                    <span>&nbsp;</span>
+	                    <span id='pricespan'>{{dp.start_price}}</span>	
+	                    <span>&nbsp;</span>  
+	                    <i class='icon-plus-sign icon-large' onclick='add()'></i> 
+	                     </span>           
+	                    <input type="hidden" value="{{dp.start_price}}" name="price" id='price'>
 	                </div>
+
+	                
 
 
 	                {%if not current_user.phone%}
@@ -79,22 +88,13 @@
 	                    <input type="text" value="" name="phone" placeholder='输入手机号码以便与您联系'>
 	                </div>
 	                {%else%}
-	                <div class="ui-form-item ui-border-b">
-	                    <label>装货车辆</label>
-	                    <div class="ui-select">
-	                        <select name="car">
-	                        {%for i in current_user.drivers%}
-							<option value="{{i.id}}">车牌{{i.number}}，车长{{i.length}} </option>
-							{%endfor%}
-	                        </select>
-	                    </div>
-	                </div>
+	                
 	                {%endif%}
 
 	                <div class="ui-btn-wrap">
 	                
 						<input type="submit" value="立即预约" class="ui-btn-lg ui-btn-danger"> <br>
-						<a class="ui-btn-lg ui-btn-primary" href="tel:07713103126"><i class='icon-phone icon-1x' ></i>&nbsp;电话沟通马上接单</a>
+						<a class="ui-btn-lg ui-btn-primary" href="tel:15907711863"><i class='icon-phone icon-1x' ></i>&nbsp;电话沟通马上承运</a>
 	                </div>
 				
 		        </form>
@@ -117,12 +117,26 @@ $('.ui-actionsheet button').click(function(){
         location.href= $(this).data('href');
     }
 });
+function add(){
+	var pricespan = document.getElementById('pricespan').innerHTML;
+	var price = document.getElementById('price').value;
+	document.getElementById('pricespan').innerHTML = pricespan -0+50.00;
+	document.getElementById('price').value = price-0+50.00;
+}
+function sub(){
+	var pricespan = document.getElementById('pricespan').innerHTML;
+	var price = document.getElementById('price').value;
+	document.getElementById('pricespan').innerHTML = pricespan -50.00;
+	document.getElementById('price').value = price-50.00;
+
+}
 </script>
 <style>
 	#ui-container{
 		border-top:45px solid transparent;
 		border-bottom:60px solid transparent;
 	}
+	.ui-footer{display: none;}
 </style>
 {% endblock %}
 

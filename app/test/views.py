@@ -2,20 +2,20 @@
 
 from . import codetest
 from flask import current_app
-from app import redis_store
+# from app import redis_store
 from app import scheduler
 import random,time
 from forms import AddTaskForm
-from app.models import Redis_Task,Order_Task,Order_pay
+from app.models import Order_pay
 from flask import request,render_template,redirect,abort,session,jsonify,url_for
 from app import db
 from rq import Worker, Queue, Connection
 from rq.job import Job
-from app.redis_worker import conn
+# from app.redis_worker import conn
 import uuid
-from redis import Redis
+# from redis import Redis
 import logging
-redis = Redis()
+# redis = Redis()
 from app import app
 # app = app._get_current_object()
 
@@ -310,7 +310,6 @@ def oauth(method):
 
 		code = request.args.get('code', None)
 		url = client.oauth.authorize_url(request.url)
-		print url
 		# qr = client.oauth.qrconnect_url(url)
 
 		if code:

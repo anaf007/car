@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}用户登录{% endblock %}
+{% block title %}下单列表{% endblock %}
 {% block head %}
          {{ super() }}
 {% endblock %}
@@ -7,10 +7,7 @@
 
 {% block body %}
 
-<header class="ui-header ui-header-positive ui-border-b">
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>下单列表</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
+
 
 <section class="ui-container">
 
@@ -19,19 +16,24 @@
 
 {%if current_user.drivers%}
 {%for i in current_user.drivers%}
-{%for j in i.post.order_by('create_time desc')%}
+	{%for j in i.driver_posts.order_by('id desc').paginate(1,30,False).items%}
 <li class="ui-border-t">
-    <p><span>发车时间：</span><span class="date">[{{j.start_car_time}}</span>]</p>
+    <p><span>预约人数：</span><span class="date">{{j.make_count}}人</span>，运费：{{j.start_price}}</p>
     <h4>{{j.title}} </h4>
 </li>
 {%endfor%}
 {%endfor%}
 {%endif%}
+
 {%if current_user.consignors%}
-{%for j in current_user.consignors.goods_id.order_by('create_time desc')%}
+{%for j in current_user.consignors.goodsed.order_by('create_time desc').paginate(1,30,False).items%}
+{%if j.state==0%}
+<li class="ui-border-t" data-href='{{url_for("goods.edit_goods",id=j.id)}}'>
+{%else%}
 <li class="ui-border-t">
-    <p><span>装货时间：</span><span class="date">[{{j.start_car_time}}</span>]</p>
-    <h4>{{j.title}} </h4>
+{%endif%}
+    <p>[{{j.start_shi}}-{{j.end_shi}}]<span>装货时间:</span><span class="date">{{j.start_car_time|dateformat("M月d日")}}</span>,运费{{j.start_price}}</p>
+    <h4>预约人数:{{j.make_count}}人,{{j.tiji}}&nbsp;{{j.car_length}}&nbsp;{{j.car_type}}&nbsp;{{j.zhongliang}}&nbsp;</h4>
 </li>
 {%endfor%}
 {%endif%}

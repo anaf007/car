@@ -12,7 +12,7 @@ from .forms import LoginForm,Register_goods
 from app import db
 import random,time
 
-
+from flask_wechatpy import Wechat, wechat_required,oauth
 
 # @auth.route('/verify')
 # def verify():
@@ -134,9 +134,23 @@ def register_goods_post():
 		flash(u'校验数据错误')
 	return redirect(url_for('.register_goods'))
 
-
+#自动注册 微信登录
 @auth.route('/autoregister')
+@oauth(scope='snsapi_userinfo')
 def autoregister():
+	try:
+		wechat_id = session.get('wechat_user_id','')
+	except Exception, e:
+		wechat_id = ''
+	if wechat_id:
+		user = User.query.filter_by(wx_open_id=session.get('wechat_user_id')).first()
+	else:
+		user = []
+	if user:
+		login_user(user,True)
+		return redirect(url_for('main.index'))
+
+
 	choice_str = 'ABCDEFGHJKLNMPQRSTUVWSXYZ'
 	username_str = ''
 	password_str = ''
@@ -154,7 +168,7 @@ def autoregister():
 
 	user = User.query.filter_by(username=username).first()
 	if user is None:
-		user = User(username=username,password=password)
+		user = User(username=username,password=password,wx_open_id=wechat_id)
 		db.session.add(user)
 		db.session.commit()
 		login_user(user,True)

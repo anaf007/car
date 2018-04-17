@@ -4,20 +4,31 @@ Created 2017-05-29
 Author: by anaf
 """
 
-from flask import render_template,abort,request,current_app,url_for,make_response,flash,redirect
+from flask import render_template,abort,request,current_app,url_for,make_response,flash,redirect,session
 from . import usercenter
 from .. import db
 import random,os,datetime
 from  flask_login import login_required,current_user
-from  ..models import Permission,User,Driver,Order_pay
+from  ..models import Permission,User,Driver,Order_pay,Tixianchengqing,Goods
 from app.decorators import permission_required
+from app import flask_wechat
 
 @usercenter.route('/index')
 @usercenter.route('/')
 @usercenter.route('/<username>')
+@login_required
 def index(username=''):
-    d = Driver.query.filter_by(users=current_user).first()
-    return render_template('user/index.html',user=current_user)
+    if current_user.role.name==u'普通用户':
+        return redirect(url_for('main.index'))
+    try:
+        user = flask_wechat.user.get(current_user.wx_open_id)
+        if user['headimgurl']:
+            headimgurl = user['headimgurl']
+        else:
+            headimgurl = ''
+    except Exception, e:
+        headimgurl = ''
+    return render_template('user/index.html',user=current_user,headimgurl=headimgurl)
 
 @usercenter.route('/edit_profile')
 def edit_profile():
@@ -77,59 +88,21 @@ def UploadFileImage():
     return response
 
 
-#用户关注
-@usercenter.route('/follow/<username>')
+
+#货运信息
+@usercenter.route('/huoyunxinxi')
 @login_required
-@permission_required(Permission.FOLLOW)
-def follow(username):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash(u'关注失败')
-        return redirect(url_for('.index'))
-    if current_user.is_following(user):
-        flash(u'您已经关注过该用户了')
-        return redirect(url_for('.index', username=username))
-    current_user.follow(user)
-    return redirect(url_for('.index',username=username))
+def huoyunxinxi():
+    op = Order_pay.query.filter(Order_pay.user==current_user).order_by(Order_pay.id.desc()).all()
+    return render_template('user/huoyunxinxi.html',op=op)
 
-
-#关注
-@usercenter.route('/followers/<username>')
-def followers(username):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash('Invalid user.')
-        return redirect(url_for('.index'))
-    page = request.args.get('page', 1, type=int)
-    pagination = user.followers.paginate(page, per_page=10,error_out=False)
-    follows = [{'user': item.follower, 'timestamp': item.timestamp} 
-                for item in pagination.items]
-    return render_template('followers.html', user=user, title="Followers of",endpoint='.followers', pagination=pagination,follows=follows)
-
-
-#取消关注
-@usercenter.route('/unfollow/<username>')
-@login_required
-@permission_required(Permission.FOLLOW)
-def unfollow(username):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash(u'取消关注失败')
-        return redirect(url_for('.index'))
-    if current_user.is_following(user):
-        current_user.unfollow(user)
-        return redirect(url_for('.index', username=username))
-    
-    return redirect(url_for('.index',username=username))
-
-
-
+#显示订单
 @usercenter.route('/show_order')
 @login_required
 def show_order():
     return render_template('user/show_order.html')
 
-
+#用小消息列表
 @usercenter.route('/msg_list')
 @login_required
 def msg_list():
@@ -166,11 +139,20 @@ def apay():
 def freight_line():
     return render_template('user/freight_line.html')
 
-#大客户
-@usercenter.route('/dakehu')
+#推荐拿奖
+@usercenter.route('/tuijiannajiang')
 @login_required
-def dakehu():
-    return render_template('user/dakehu.html')
+def tuijiannajiang():
+    res = flask_wechat.qrcode.create({
+        'expire_seconds': 1800,
+        'action_name': 'QR_SCENE',
+        'action_info': {
+            'scene': {'scene_id': current_user.id},
+            }
+        })
+    # return '<img src="%s" width="300" height="300">'%flask_wechat.qrcode.get_url(res)
+    imgstr = flask_wechat.qrcode.get_url(res)
+    return render_template('user/tuijiannajiang.html',imgstr=imgstr)
 
 #用户设置
 @usercenter.route('/setting')
@@ -181,6 +163,115 @@ def setting():
 #自身接单下单
 @usercenter.route('/self_order')
 def selforder():
-    op = Order_pay.query.filter(Order_pay.order_pay_user==current_user).order_by(Order_pay.id.desc()).all()
-    print op
+    op = Order_pay.query.filter(Order_pay.user==current_user).order_by(Order_pay.id.desc()).all()
     return render_template('user/selforder.html',op=op)
+
+#修改支付密码
+@usercenter.route('/change_pay_pwd')
+@login_required
+def change_pay_pwd():
+    return render_template('user/change_pay_pwd.html')
+
+
+#修改支付密码
+@usercenter.route('/change_pay_pwd',methods=['POST'])
+@login_required
+def change_pay_pwd_p():
+    old_pwd = request.form.get('old_pwd','')
+    new_pwd = request.form.get('new_pwd','')
+    re_new_pwd = request.form.get('re_new_pwd','')
+    if not old_pwd or not new_pwd or not re_new_pwd or len(new_pwd)<6 or len(new_pwd)>18 or not current_user.verify_pay_pwd(old_pwd) or new_pwd!=re_new_pwd:
+        flash(u'输入错误或验证错误，请重新输入','error')
+        return redirect(url_for('.change_pay_pwd'))
+    current_user.pay_pwd = new_pwd
+    db.session.add(current_user)
+    db.session.commit()
+    flash(u'支付密码修改成功。','success')
+    return redirect(url_for('.change_pay_pwd'))
+
+#银行卡
+@usercenter.route('/yinhangka')
+@login_required
+def yinhangka():
+    return render_template('user/yinhangka.html')
+
+@usercenter.route('/yinhangka',methods=['POST'])
+@login_required
+def yinhangka_p():
+    suoshuyinhang = request.form.get('suoshuyinhang','')
+    kaihuhang = request.form.get('kaihuhang','')
+    kahao = request.form.get('kahao','')
+    if not current_user.user_infos.kahao:
+        current_user.user_infos.kahao = kahao
+        current_user.user_infos.suoshuyinhang = suoshuyinhang
+        current_user.user_infos.kaihuhang = kaihuhang
+    try:
+        db.session.add(current_user)
+        db.session.commit()
+        flash(u'添加银行卡完成。','success')
+    except Exception, e:
+        flash(u'添加银行卡失败。','error')
+    return redirect(url_for('.yinhangka'))
+
+#提现申请
+@usercenter.route('/tixianshenqing',methods=['POST'])
+@login_required
+def tixianshenqing():
+    zhifumima = request.form.get('zhifumima','')
+    try:
+        if session['zhifumima']>=5:
+            flash(u'输入错误次数过多，请明天再试。','error')
+            return redirect(url_for('.apay'))
+    except Exception, e:
+        session['zhifumima'] = 0
+    if current_user.verify_pay_pwd(zhifumima):
+        tcq = Tixianchengqing()
+        tcq.user = current_user
+        tcq.price = current_user.price
+        current_user.price = 0
+        tcq.note = current_user.user_infos.kahao+ u" 金额："+str(tcq.price) + '.'
+        try:
+            db.session.add(tcq)
+            db.session.add(current_user)
+            db.session.commit()
+            flash(u'提现申请成功，款项将在3天内打进您的银行账户','success')
+        except Exception, e:
+            flash(u'提现失败','error')
+            db.session.rollback()
+        session['zhifumima'] = 0
+    else:
+        session['zhifumima'] = session['zhifumima']+1
+    return redirect(url_for('.apay'))
+
+
+#货主确认完成
+@usercenter.route('/consignor_finish/<int:opid>',methods=['GET'])
+@login_required
+def consignor_finish(opid=0):
+    try:
+        op = Order_pay.query.get_or_404(opid)
+        if op.goodsed.consignor != current_user.consignors or op.goodsed.state !=3:
+            return redirect(url_for('main.index'))
+        # gqf = Goods.query.filter((Goods.state==3)&(Goods.consignor==current_user.consignors)).first()
+        # if gqf ==3:
+        op.goodsed.state =4
+        aprice = op.driver.user.lock_price
+        op.driver.user.price += aprice
+        op.driver.user.lock_price = 0
+        db.session.add(op)
+        db.session.commit()
+        if aprice > 0.00:
+            flask_wechat.message.send_text(op.driver.user.wx_open_id,u'货主已确认货物安全抵达，您的钱包已增加%s元。'%aprice)
+
+        # else:
+        #     return redirect(url_for('main.index'))
+    except Exception, e:
+        pass
+    return redirect(url_for('usercenter.huoyunxinxi'))
+
+
+@usercenter.route('/huoyunxinxi_show/<int:id>',methods=['GET'])
+@login_required
+def huoyunxinxi_show(id=0):
+    return render_template('user/huoyunxinxi_show.html',op=Order_pay.query.get_or_404(id))
+    

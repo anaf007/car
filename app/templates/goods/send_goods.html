@@ -1,19 +1,11 @@
 {% extends "base.html" %}
-{% block title %}预约返程车信息{% endblock %}
+{% block title %}发布货物信息{% endblock %}
 {% block head %}
          {{ super() }}
 {% endblock %}
 
 
 {% block body %}
-
-<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>预约返程车信息</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
-
-
-
 <section class='ui-container'>
 {%for message in get_flashed_messages(category_filter=['error'])%}
 <div class="ui-tooltips ui-tooltips-warn">
@@ -56,7 +48,7 @@ $(".ui-dialog").dialog("show");
 	            </div>
 	            <div class="ui-form-item ui-border-b">
                     <label>详细地址</label>
-                    <input type="text" value="" name="start_xiangxi_address">
+                    <input type="text" value="{{jie}}" name="start_xiangxi_address" id="startAddress">
                 </div>
 
 
@@ -172,7 +164,7 @@ function daybank(){
 	</script>
 
 				<div class="ui-form-item ui-form-item-link ui-border-b" onclick="onshowinfo()">
-                        <a href="#">展开用车详细(整车、拼车、零担)[选填]</a>
+                        <a href="#">用车详细(整车/拼车,吨位、方数)[选填]</a>
                 </div>
 
                 <div class="ui-form-item ui-border-b" style="color:red">
@@ -197,21 +189,16 @@ function daybank(){
 
                 <div class="ui-btn-wrap">
                 {%if current_user.phone%}
-                <input type="submit" value="预约返程车" class="ui-btn-lg ui-btn-danger"> 
-                 <div class="ui-btn-wrap">
+                <input type="submit" value="发布货物信息" class="ui-btn-lg ui-btn-danger"> 
+                 <!-- <div class="ui-btn-wrap">
 	            	<button class="ui-btn-lg ui-btn-primary active">快捷填写</button>
-	            </div>
+	            </div> -->
                  {%else%}
-<input type="submit" value="预约返程车并注册货主" class="ui-btn-lg ui-btn-danger"> 
+<input type="submit" value="发布货运信息并注册货主" class="ui-btn-lg ui-btn-danger"> 
                 {%endif%}
 
 
-                
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-
-			<div class="ui-actionsheet">  
+                <div class="ui-actionsheet">  
 				<div class="ui-actionsheet-cnt" style="text-align:left;">
 					<h4>用车详细（选填）</h4> 
 					<div class="ui-tab" id="tab1">
@@ -224,14 +211,14 @@ function daybank(){
 				        <li style="background-color:white;">
 				        	<div class="ui-form-item ui-border-b">
 		                        <label>货品名称</label>
-		                        <input type="text" placeholder="输入货选择货品名称" name="zhengche" onfocus="on_selectname();" onblur="on_lost_selectname();" id="name">
+		                        <input type="text" placeholder="输入2-4字货品名称" name="zhengche" onfocus="on_selectname();" onblur="on_lost_selectname();" id="name">
 		                    </div>
 
 		                    <div class="demo-block" style="padding-top:10px;display:none" id="nameselect">
 					            <div class="ui-label-list">
+					                <label class="ui-label" onclick="addpname('海鲜鱼虾 ')">海鲜鱼虾</label>
 					                <label class="ui-label" onclick="addpname('普货 ')">普货</label>
-					                <label class="ui-label" onclick="addpname('机械配件 ')">机械配件</label>
-					                <label class="ui-label" onclick="addpname('设备 ')">设备</label>
+					                <label class="ui-label" onclick="addpname('机械设备 ')">机械设备</label>
 					                <label class="ui-label" onclick="addpname('酒水饮料 ')">酒水饮料</label>
 					                <label class="ui-label" onclick="addpname('农产品 ')">农产品</label>
 					                <label class="ui-label" onclick="addpname('重货 ')">重货</label>
@@ -264,7 +251,7 @@ function daybank(){
 		                    </div>
 
 		                    <div class="ui-form-item ui-border-b" style="padding:0px;margin:0px;">
-		                        <label style="float:left;width:50px;padding-left: 10px;text-align: left">车长</label>
+		                        <label style="float:left;width:50px;padding-left: 10px;text-align: left">车型</label>
 		                        <div class="ui-select">
 		                            <select name="chexing">
 		                            	{%for i in cartype%}
@@ -302,7 +289,9 @@ function daybank(){
 					<!-- <button>完成</button>  -->
 					<button type="button" class="ui-btn-lg ui-btn-danger" style="border-color:#ccc;" data-href="#" onclick="onhiddeninfo()">完成</button>
 				</div>         
+			</div>        
 			</div>
+			
 			<script type="text/javascript">
 			function onshowinfo(){
 				$('.ui-actionsheet').addClass('show');
@@ -387,6 +376,11 @@ end_area.appendChild(endselectdiv3);
 
 
 
+
+
+
+
+
 end_sheng.options[0] = new Option("省",'');
 end_shi.options[0] = new Option("市",'');
 end_qu.options[0] = new Option("区/县",'');
@@ -396,6 +390,20 @@ end_qu.options[0] = new Option("区/县",'');
 sheng.options[0] = new Option("省",'');
 shi.options[0] = new Option("市",'');
 qu.options[0] = new Option("区/县",'');
+var shengfen = '{{sheng|string}}';
+var pshi = '{{shi|string}}';
+var pqu = '{{qu|string}}';
+if(shengfen){
+	sheng.options[0] = new Option(shengfen.substring(0,2),shengfen.substring(0,2));	
+}
+if(pshi){
+	shi.options[0] = new Option(pshi,pshi);
+}
+if(pqu){
+	qu.options[0] = new Option(pqu,pqu);
+}
+
+
 
 // 循环第一步,把省循环进select
 for (var i = 0; i < city.length; i++) {
@@ -436,47 +444,32 @@ for (var i = 0; i < city.length; i++) {
 	}
 };
 
-
-</script>
-<script class="demo-script">
-        (function (){
-            var slider = new fz.Scroll('#slider1', {
-                role: 'slider',
-                indicator: true,
-                autoplay: true,
-                interval: 3000
-            });
-
-            slider.on('beforeScrollStart', function(fromIndex, toIndex) {
-                console.log(fromIndex,toIndex)
-            });
-
-            slider.on('scrollEnd', function(cruPage) {
-                console.log(cruPage)
-            });
-        })();
-	</script>
-	<script>
-
-	(function (){
-            var tab = new fz.Scroll('#tab1', {
-		        role: 'tab',
-		        autoplay: false,
-		        interval: 3000
-		    });
-		    /* 滑动开始前 */
-		    tab.on('beforeScrollStart', function(fromIndex, toIndex) {
-		        console.log(fromIndex,toIndex);// from 为当前页，to 为下一页
-		    })
-		})();
-		</script>
-<script>
 $('.ui-actionsheet button').click(function(){
     if($(this).data('href')){
         location.href= $(this).data('href');
     }
 });
+(function (){
+    var tab = new fz.Scroll('#tab1', {
+        role: 'tab',
+        autoplay: false,
+        interval: 3000
+    });
+    var tab2 = new fz.Scroll('#tab2', {
+        role: 'tab',
+        autoplay: false,
+        interval: 3000
+    });
+    /* 滑动开始前 */
+    tab.on('beforeScrollStart', function(fromIndex, toIndex) {
+        console.log(fromIndex,toIndex);// from 为当前页，to 为下一页
+    })
+})();
+
 </script>
+
+
+
 <style>
 option{width: 65px;}
 select{width: 65px;}
@@ -485,9 +478,10 @@ select{width: 65px;}
 	/*.ui-select2{float:left;}*/
 	/*.ui-select3{float:right;}*/
 	/*.ui-border-b{float: left;}*/
-	.ui-select-group{width: 100%;}
+	/*.ui-select-group{width: 100%;}*/
 	.ui-tab-content{background-color: rgba(255,255,255);margin-top:0px;}
 	/*.ui-form-item{padding: 0px;margin: 0px;}*/
+	.ui-footer{display: none;}
 </style>
 {% endblock %}
 

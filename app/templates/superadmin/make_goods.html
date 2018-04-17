@@ -1,23 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>make_index</title>
-</head>
-<body>
-	{%for i in goods%}
-	ID:{{i.id}},预约人数：{{i.make_count}}
-	<a href="{{url_for('superadmin.make_goods_show',id=i.id)}}">
-			[出发]{{i.start_sheng}}——{{i.start_shi}},
-			[目的]{{i.end_sheng}}——{{i.end_shi}}
-			
-			</p>
-			<p style='color:#cccccc'>
-				<i class='icon-suitcase icon-large' ></i>
-				{%if i.name%}{{i.name}}{%endif%}
-				{%if i.car_length%}{{i.car_length}}{%endif%}{%if i.tiji%}{{i.tiji}}{%endif%}{%if i.zhongliang%}{{i.zhongliang}}{%endif%}</p>
-	</a>
-	<hr>
-	{%endfor%}
-</body>
-</html>
+{% extends "superadmin/base.html" %}
+{% block title %}货物预约信息表{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+{%for message in get_flashed_messages(category_filter=['error'])%}
+<div class="alert alert-warning">
+    <a href="#" class="close" data-dismiss="alert">
+        &times;
+    </a>
+    <strong>{{message}}</strong>
+</div>
+{%endfor%}
+
+<table class="table table-hover">
+  <caption>货物预约信息表</caption>
+  <thead>
+    <tr>
+      <th>货物编号</th>
+      <th>预约人数</th>
+      <th>出发地</th>
+      <th>目的地</th>
+      <th>价格</th>
+      <th>货物名称</th>
+      <th>车辆要求(车长/体积/重量)</th>
+      <th>装货时间</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  	{%for i in goods%}
+    <tr>
+      <td>{{i.id}}</td>
+      <td>{{i.make_count}}人</td>
+      <td>{{i.start_sheng}}-{{i.start_shi}}</td>
+      <td>{{i.end_sheng}}-{{i.end_shi}}</td>
+      <td>{{i.start_price}}</td>
+      <td>{%if i.name%}{{i.name}}{%endif%}</td>
+      <td>{{i.select_car_type}}
+      {{i.car_length}}/
+      {{i.tiji}}/
+      {{i.zhongliang}}</td>
+      <td>{{i.start_car_time|dateformat("Y-M-d")}}{{i.start_zone}}</td>
+      <td>
+      {%if i.state==1%}已推送{%endif%}
+<a href="{{url_for('superadmin.make_goods_show',id=i.id)}}">查看预约详情</a>
+      </td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+
+

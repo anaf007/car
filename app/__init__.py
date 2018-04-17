@@ -2,14 +2,14 @@
 """filename:app/__init__.py
 Created 2017-05-29
 Author: by anaf
-note:初始化函数，书本教程确实坑
+note:初始化函数，坑1
 把“app = Flask(__name__)”放到create_app里面 
 后面需要到app不知道怎么取
 不能from app import app
 def create_app(config_name):
 """
 
-from flask import Flask,render_template
+from flask import Flask,render_template,session
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -17,22 +17,28 @@ from config import config
 from flask_login import LoginManager
 from flask_admin import Admin
 from flask_babelex import Babel
-from flask_redis import FlaskRedis
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_bootstrap import Bootstrap
 from rq import Queue
 from rq.job import Job
+from datetime import timedelta
 
 from flask_apscheduler import APScheduler
+from flask_wechatpy import Wechat, wechat_required, oauth
 
+from wechatpy.replies import TextReply
+from wechatpy.replies import create_reply
+
+
+from wechatpy.enterprise import WeChatClient
+from flask_admin.contrib.sqla import ModelView
+
+from flask_cache import Cache
 
 
 scheduler = APScheduler()
-
-from redis import Redis
-redis = Redis()
-
-# from app.redis_worker import conn
+flask_wechat = Wechat()
+# client = WeChatClient('wxbdd2d9798f27f33a', '7d7b898b7e27957c5d1a11d407be61e0')
 
 DEFAULT_APP_NAME = 'car'
 
@@ -41,9 +47,9 @@ moment = Moment()
 db = SQLAlchemy()
 login_manager = LoginManager()
 babel = Babel()
-redis_store = FlaskRedis()
 toolbar = DebugToolbarExtension()
 bootstrap = Bootstrap()
+cache = Cache()
 
 
 # q = Queue(connection=conn)
@@ -57,15 +63,14 @@ login_manager.session_protection ='strong'
 # login_manager.login_view = 'auth.login'
 #自动注册
 login_manager.login_view = 'auth.autoregister'
-# login_manager.login_views = 'auth.login'
 login_manager.login_message = u"请登录后访问该页面."
 login_manager.refresh_view = 'auth.login'
 app = Flask(__name__)
+
 def create_app(config_name):
 	
 	
 	app.config.from_object(config[config_name])
-	app.config['REDIS_QUEUE_KEY'] = 'my_queue'
 
 
 	# queue_daemon(app)
@@ -80,16 +85,17 @@ def create_app(config_name):
 	configure_create_admin(app)
 
 	
-
-
-	# from .admins import admin_b as admins_blueprint
-	# app.register_blueprint(admins_blueprint)
-
-	
 	config[config_name].init_app(app)
 
 	#注册自定义过滤器 替换模板手机号码
 	app.jinja_env.filters['replace_substring'] = replace_substring
+
+
+
+
+	#wx item
+	
+
 
 	
 	
@@ -115,15 +121,18 @@ def configure_extensions(app):
 	mail.init_app(app)
 	moment.init_app(app)
 	db.init_app(app)
-	redis_store.init_app(app)
-	
+	flask_wechat.init_app(app)
 	babel.init_app(app)
 	# toolbar.init_app(app)
 	login_manager.init_app(app)
 	bootstrap.init_app(app)
 
 	scheduler.init_app(app)
+	#flask定时器
 	scheduler.start()
+
+	cache.init_app(app)
+
 
 
 def configure_blueprint(app):
@@ -135,10 +144,13 @@ def configure_blueprint(app):
 	app.register_blueprint(driver_blueprint,url_prefix='/driver')
 	from .goods import goods as goods_blueprint
 	app.register_blueprint(goods_blueprint,url_prefix='/consignor')
-	from .test import codetest as codetest_blueprint
-	app.register_blueprint(codetest_blueprint,url_prefix='/codetest')
+	# from .test import codetest as codetest_blueprint
+	# app.register_blueprint(codetest_blueprint,url_prefix='/codetest')
 	from .usercenter import usercenter as user_blueprint
 	app.register_blueprint(user_blueprint,url_prefix='/usercenter')
+
+	from .wechat import wechat as wechat_blueprint
+	app.register_blueprint(wechat_blueprint,url_prefix='/wechat')
 
 	from .superadmin import superadmin as superadmin_blueprint
 	app.register_blueprint(superadmin_blueprint,url_prefix='/superadmin')
@@ -152,18 +164,29 @@ def configure_config(app):
 
 #flask-admin
 def configure_create_admin(app):
+	from app.models import User,Driver,Goods,Driver_post,Position,User_msg,Consignor,Order_pay,Driver_self_order
 	from app.admin_views import MyAdminIndexView
-	admin_app = Admin(name='car',index_view=MyAdminIndexView())
-	from admin import *
-	admin_app.add_view(ModelView_User(db.session,name=u'用户管理'))
-	admin_app.add_view(ModelView_Article(db.session,name=u'文章管理'))
-	admin_app.add_view(ModelView_Category(db.session,name=u'栏目管理'))
-	admin_app.add_view(ModelView_CategoryTop(db.session,name=u'顶级栏目'))
-	# admin_app.add_view(ModelView(User_msg,db.session,name=u'留言管理'))
+	admin_app = Admin(name='car', template_mode='bootstrap3')
+	# admin_app = Admin(name='car',index_view=MyAdminIndexView())
+	admin_app.add_view(ModelView(User, db.session))
+	# admin_app.add_view(ModelView(Driver, db.session))
+	admin_app.add_view(ModelView(Driver_post, db.session))
+	admin_app.add_view(ModelView(Position, db.session))
+	admin_app.add_view(ModelView(User_msg, db.session))
+	# admin_app.add_view(ModelView(Consignor, db.session))
+	# admin_app.add_view(ModelView(Goods, db.session))
+	admin_app.add_view(ModelView(Order_pay, db.session))
+	admin_app.add_view(ModelView(Driver_self_order, db.session))
+	# from admin import *
+	# admin_app.add_view(ModelView_User(db.session,name=u'用户管理'))
+	# admin_app.add_view(ModelView_Article(db.session,name=u'文章管理'))
+	# admin_app.add_view(ModelView_Category(db.session,name=u'栏目管理'))
+	# admin_app.add_view(ModelView_CategoryTop(db.session,name=u'顶级栏目'))
+	# admin_app.add_view(ModelView(User,db.session,name=u'留言管理'))
 	# admin_app.add_view(ModelView(Category_attribute,db.session,name=u'栏目属性表(不要随意更改)'))
 	# admin_app.add_view(ModelView(Comment,db.session,name=u'评论管理'))
-	admin_app.add_view(Admin_static_file(path,'/static', name=u'文件管理'))
-	admin_app.add_view(Admin_logout(name=u'退出'))
+	# admin_app.add_view(Admin_static_file(path,'/static', name=u'文件管理'))
+	# admin_app.add_view(Admin_logout(name=u'退出'))
 	admin_app.init_app(app)
 
 
@@ -172,19 +195,13 @@ def replace_substring(phone):
 	phone = str(phone)
 	return phone.replace(phone[:-4],'***')
 
+#设置会话过期时间。。
+@app.before_request
+def make_session_permanent():
+	session.permanent = True
+	#1440一天24*60分钟
+	app.permanent_session_lifetime = timedelta(minutes=1440)
 
 
-
-def queue_daemon(app, rv_ttl=500):
-	while 1:
-		msg = redis.blpop(app.config['REDIS_QUEUE_KEY'])
-		func, key, args, kwargs = loads(msg[1])
-		try:
-			rv = func(*args, **kwargs)
-		except Exception, e:
-			rv = e
-		if rv is not None:
-			redis.set(key, dumps(rv))
-			redis.expire(key, rv_ttl)
 
 

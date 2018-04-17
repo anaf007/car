@@ -1,0 +1,47 @@
+{% extends "superadmin/base.html" %}
+{% block title %}微信素材{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+
+
+
+    <form action="" method="post" enctype="multipart/form-data">
+    <div class="row">
+      <div class="col-xs-4"><input type="file" name="sucaifile" id=""></div>
+      <div class="col-xs-4">图片选择 (请勿有中文名称)</div>
+      <div class="col-xs-4"><input type="submit" value="提交"></div>
+    </div>
+       
+      
+    </form>
+
+  
+
+
+<table class="table table-hover">
+  <caption>所有素材表</caption>
+  <thead>
+     <tr>
+      <th>图片素材</th>
+    </tr>
+  </thead>
+  <tbody>
+   
+
+    {%for i in sucaifile.item%}
+    <tr>
+      <td><img src="{{i.url}}" alt="" width="300" height="300">, 
+      <br>{{i.url}}<br>media_id:{{i.media_id}}</td>
+    {%endfor%}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+
+

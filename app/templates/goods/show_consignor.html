@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% block title %}企业信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='webuploader/webuploader.css')}}">
+<script type="text/javascript" src="{{url_for('static',filename='webuploader/webuploader.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='webuploader/jquery.js')}}"></script>
+
+
+
+
+<section class='ui-container'>
+{%for message in get_flashed_messages(category_filter=['success'])%}
+<div class="ui-tips ui-tips-success">
+    <i></i><span>{{message}}</span>
+</div>	
+{%endfor%}
+
+
+	<section id="form">
+		<div class="ui-form ui-border-t">
+	        <form action="{{url_for('goods.show_consignor_p')}}" method="post" enctype="multipart/form-data">
+	        	<input type="hidden" name="id" value="">
+	            <div class="ui-form-item ui-border-b">
+	                <label style="width:75px;">企业名称</label>
+	                <input type="text" value="{{current_user.consignors.name}}" name="name" placeholder=''>
+	            </div>
+                <div class="ui-form-item ui-border-b">
+                    <label style="width:75px;">企业地址</label>
+                    <input type="text" value="{{current_user.consignors.address}}" name="address" placeholder=''>
+                </div>
+	            <div class="ui-form-item ui-border-b">
+	                <label style="width:75px;">负责人名</label>
+	                <input type="text" value="{{current_user.consignors.fuzheren}}" name="fuzheren" placeholder=''>
+	            </div>
+	            <div class="ui-form-item ui-border-b">
+	                <label style="width:75px;">身份证号</label>
+	                <input type="text" value="{{current_user.consignors.shenfenzheng}}" name="number" placeholder=''>
+	            </div>
+	            
+{%if current_user.consignors.state==0%}
+                <div class="ui-form-item ui-border-b" >
+                    <label>营业证件</label>
+                    <div >
+                        <input type="file" name="yingyezhizhao" id="">
+                    </div>
+                </div>
+
+
+                <div class="ui-form-item ui-border-b" >
+                    <label>身份证件</label>
+                    <div >
+                        <input type="file" name="shenfenzhong" id="">
+                    </div>
+                </div>
+                
+
+
+
+
+                <!-- <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/a1.jpg" width="95%" height="160" style="border-radius: 15px;" >                                        			
+                	</div>
+	            </div> -->
+<!--
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			
+                	</div>
+	            </div>
+
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			
+                	</div>
+	            </div>
+
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			
+                	</div>
+	            </div>
+
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			
+                	</div>
+	            </div>
+-->
+
+                <div class="ui-btn-wrap">
+	                <button class="ui-btn-lg ui-btn-danger">
+	                    确定并修改
+	                </button>
+	            </div>
+{%endif%}
+	            <p>&nbsp;</p>
+	            <p>&nbsp;</p>
+	            <p>&nbsp;</p>
+	            <p>&nbsp;</p>
+
+
+	        </form>
+	    </div>
+	</section>
+	
+
+</section>
+
+<script>
+    // 初始化Web Uploader
+var uploader = WebUploader.create({
+
+    // 选完文件后，是否自动上传。
+    auto: true,
+
+    // swf文件路径
+    swf: BASE_URL + '{{url_for("static",filename="webuploader/Uploader.swf")}}',
+
+    // 文件接收服务端。
+    server: "{{url_for('main.index')}}",
+
+    // 选择文件的按钮。可选。
+    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+    pick: '#filePicker',
+
+    // 只允许选择图片文件。
+    accept: {
+        title: 'Images',
+        extensions: 'gif,jpg,jpeg,bmp,png',
+        mimeTypes: 'image/*'
+    }
+});
+
+// 当有文件添加进来的时候
+uploader.on( 'fileQueued', function( file ) {
+var $li = $(
+        '<div id="' + file.id + '" class="file-item thumbnail">' +
+            '<img>' +
+            '<div class="info">' + file.name + '</div>' +
+        '</div>'
+        ),
+    $img = $li.find('img');
+
+
+    // $list为容器jQuery实例
+    $list.append( $li );
+
+    // 创建缩略图
+    // 如果为非图片文件，可以不用调用此方法。
+    // thumbnailWidth x thumbnailHeight 为 100 x 100
+    uploader.makeThumb( file, function( error, src ) {
+        if ( error ) {
+            $img.replaceWith('<span>不能预览</span>');
+            return;
+        }
+
+        $img.attr( 'src', src );
+    }, thumbnailWidth, thumbnailHeight );
+});
+
+// 文件上传过程中创建进度条实时显示。
+uploader.on( 'uploadProgress', function( file, percentage ) {
+    var $li = $( '#'+file.id ),
+        $percent = $li.find('.progress span');
+
+    // 避免重复创建
+    if ( !$percent.length ) {
+        $percent = $('<p class="progress"><span></span></p>')
+                .appendTo( $li )
+                .find('span');
+    }
+
+    $percent.css( 'width', percentage * 100 + '%' );
+});
+
+// 文件上传成功，给item添加成功class, 用样式标记上传成功。
+uploader.on( 'uploadSuccess', function( file ) {
+    $( '#'+file.id ).addClass('upload-state-done');
+});
+
+// 文件上传失败，显示上传出错。
+uploader.on( 'uploadError', function( file ) {
+    var $li = $( '#'+file.id ),
+        $error = $li.find('div.error');
+
+    // 避免重复创建
+    if ( !$error.length ) {
+        $error = $('<div class="error"></div>').appendTo( $li );
+    }
+
+    $error.text('上传失败');
+});
+
+// 完成上传完了，成功或者失败，先删除进度条。
+uploader.on( 'uploadComplete', function( file ) {
+    $( '#'+file.id ).find('.progress').remove();
+});
+</script>
+
+
+
+
+<script>
+// $('.ui-actionsheet button').click(function(){
+//     if($(this).data('href')){
+//         location.href= $(this).data('href');
+//     }
+// });
+</script>
+<style>
+option{width: 65px;}
+select{width: 65px;}
+.ui-btn-primary.active{color: white;}
+	/*.ui-select1{float:left;width: 70px;}*/
+	/*.ui-select2{float:left;}*/
+	/*.ui-select3{float:right;}*/
+	/*.ui-border-b{float: left;}*/
+	.ui-select-group{width: 100%;}
+	.ui-tab-content{background-color: rgba(255,255,255);margin-top:0px;}
+	/*.ui-form-item{padding: 0px;margin: 0px;}*/
+</style>
+{% endblock %}
+
+
+
+
+

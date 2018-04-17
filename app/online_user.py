@@ -5,7 +5,7 @@
 time：2017-06-19
 author：anaf
 '''
-from app import redis_store
+# from app import redis_store
 from datetime import datetime
 import time
 from flask import current_app
@@ -16,7 +16,7 @@ def mark_online(user_id):
 	expires = now + (current_app.config['ONLINE_LAST_MINUTES'] * 60) + 10
 	all_users_key = 'online-users/%d' % (now // 60)
 	user_key = 'user-activity/%s' % user_id
-	p = redis_store.pipeline()
+	# p = redis_store.pipeline()
 	p.sadd(all_users_key, user_id)
 	p.set(user_key, now)
 	p.expireat(all_users_key, expires)

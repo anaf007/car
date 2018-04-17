@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}车辆列表主页{% endblock %}
+{% block title %}车运信息列表{% endblock %}
 {% block head %}
       {{ super() }}
 {% endblock %}
@@ -76,16 +76,16 @@
 			</p>
 			<p style='color:#cccccc'>
 				<i class='icon-bar-chart icon-large' ></i>
-				{%if i.driverPosts.length%}{{i.driverPosts.length}}{%endif%}
-				{%if i.driverPosts.tiji%}{{i.driverPosts.tiji}}{%endif%}
-				{%if i.driverPosts.zhongliang%}{{i.driverPosts.zhongliang}}{%endif%}
-				{%if i.driverPosts.car_type%}{{i.driverPosts.car_type}}{%endif%}
+				{%if i.driver.length%}{{i.driver.length}}{%endif%}
+				{%if i.driver.tiji%}{{i.driver.tiji}}{%endif%}
+				{%if i.driver.zhongliang%}{{i.driver.zhongliang}}{%endif%}
+				{%if i.driver.car_type%}{{i.driver.car_type}}{%endif%}
 			</p>
 			</a>
 		</div>
 		
 		<div style="float:right;text-align:center;color:#1E90FF;padding-right:5px;">
-		<a href="tel:07713103126">
+		<a href="tel:15907711863">
 			<p><i class='icon-phone-sign icon-4x' style='color:#1E90FF'></i></p>
 			<p>快捷办理</p>
 		</a>
@@ -93,6 +93,9 @@
 	</div>
 </div>
 {%endfor%} 
+<style>
+	.ui-footer{display: none;}
+</style>
 {% endblock %}
 
 

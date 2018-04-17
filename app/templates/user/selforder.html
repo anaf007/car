@@ -7,36 +7,31 @@
 
 {% block body %}
 
-<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>接单列表</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
 
-<section class='ui-container'>
+<section class='ui-container'  id='ui-container'>
 	
 <ul class="ui-list ui-list-pure ui-border-tb">
 	{%for i in op%}
     <li class="ui-border-t">
 
-
-    	
-
-        {%if i.goods_order_pay.state==3 or i.goods_order_pay.state==4%}
-    	<div class="ui-tag-freelimit">
-        <!-- <p><span>时间{{i.create_time}}</span></p> -->
-        <h4>订单号：{{i.order}}</h4>        
-        <p>装货地点：【{{i.goods_order_pay.start_xiangxi_address}}】</p>
-        <p>卸货地点：【{{i.goods_order_pay.end_xiangxi_address}}】</p>
-        <p>装货时间：{{i.goods_order_pay.start_car_time|dateformat("Y-M-d")}}&nbsp;{{i.goods_order_pay.start_zone}}</p>            
-        <p>联系电话：0771-3815241</p>            
-        </div>
+        {%if i.goodsed.state==3 or i.goodsed.state==4%}
+        	<div class="ui-tag-freelimit">
+            <!-- <p><span>时间{{i.create_time}}</span></p> -->
+            <h4>订单号：{{i.order}}</h4>        
+            <p>装货地点：【{{i.goodsed.start_xiangxi_address}}】</p>
+            <p>卸货地点：【{{i.goodsed.end_xiangxi_address}}】</p>
+            <p>装货时间：{{i.goodsed.start_car_time|dateformat("Y-M-d")}}&nbsp;{{i.goodsed.start_zone}}</p>            
+            <p>联系电话：{{i.goodsed.consignor.user.phone}}</p>            
+            </div>
         {%else%}
-        <h4>订单号：{{i.order}}</h4>        
-        <p>装货地点：【{{i.goods_order_pay.start_xiangxi_address}}】</p>
-        <p>卸货地点：【{{i.goods_order_pay.end_xiangxi_address}}】</p>
-        <p>装货时间：{{i.goods_order_pay.start_car_time|dateformat("Y-M-d")}}&nbsp;{{i.goods_order_pay.start_zone}}</p>            
-        <p>联系电话：0771-3815241</p> 
-       <button class="ui-btn-lg ui-btn-primary" onclick="fok('{{i.goods_order_pay.id}}')">完成</button>
+            <h4>订单号：{{i.order}}</h4>        
+            <p>装货地点：【{{i.goodsed.start_xiangxi_address}}】</p>
+            <p>卸货地点：【{{i.goodsed.end_xiangxi_address}}】</p>
+            <p>装货时间：{{i.goodsed.start_car_time|dateformat("Y-M-d")}}&nbsp;{{i.goodsed.start_zone}}</p>  
+            {%if i.goodsed.price_is_pay and i.state ==2%} 
+            <p>联系电话：{{i.goodsed.consignor.user.phone}}</p>
+           <button class="ui-btn-lg ui-btn-primary" onclick="fok('{{i.goodsed.id}}')">运输完成</button>
+            {%endif%}
         {%endif%}
     </li>
     {%endfor%}
@@ -56,6 +51,9 @@
 		}
 	}
 </script>
+
+
+
 {% endblock %}
 
 

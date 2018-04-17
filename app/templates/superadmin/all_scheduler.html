@@ -1,0 +1,51 @@
+{% extends "superadmin/base.html" %}
+{% block title %}定时任务信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+
+
+
+<table class="table table-hover">
+  <caption>数据库中的任务</caption>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%for i in sqlsch%}
+    <tr>
+      <td>{{i.id}},{{i.func_id}},{{i.create_time}},{{i.func}},{{i.args}},</td>
+      <td><a href="{{url_for('superadmin.del_scheduler',id=i.id)}}">删除</a></td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+
+<table class="table table-hover">
+  <caption>运行中的任务</caption>
+  <thead>
+    <tr>
+      <th>ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%for i in job%}
+    <tr>
+      <td>{{i}}</td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+
+</div>
+{% endblock %}
+
+

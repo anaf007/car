@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}支付信息确认{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+
+<section class="ui-container">
+<section id="notice">
+    <div class="demo-item">
+        <div class="demo-block">
+        {%if current_user.role.name=='司机'%}
+            <section class="ui-notice">
+                <p>订单编号：{{op.order}}</p>
+                <p>装货地点：{{op.goodsed.start_xiangxi_address}}</p>
+                <p>卸货地点：{{op.goodsed.end_xiangxi_address}}</p>
+                <p>装货时间：{{op.goodsed.start_car_time|dateformat("Y-M-d")}}{{op.goodsed.start_zone}}</p>
+
+                {%if op.goodsed.note%}
+                <p>备注信息：{{op.goodsed.note}}</p>
+
+                {%endif%}
+                <p>车辆信息：{{op.goodsed.car_length}},{{op.goodsed.tiji}},{{op.goodsed.zhongliang}},{{op.goodsed.car_type}},{{op.goodsed.select_car_type}}</p>              
+                <p>报价运费：{{op.goodsed.start_price}}</p>
+                <p>实际运费：{{op.goodsed.end_price}}</p>
+                <p>支付定金：{{op.pay_price}}</p>
+                <p>支付完毕后请在指定的时间前到装货地点装货，如有违约则无法退还支付的定金。</p>
+                <div class="ui-notice-btn">
+                    <button class="ui-btn-primary ui-btn-lg" onclick="callpay()">微信支付</button>
+                </div>
+            </section>
+        {%endif%}
+        
+        </div>
+    </div>
+</section>
+</section>
+<style>
+	.ui-notice p{color: red;}
+</style>
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script type="text/javascript">
+       //调用微信JS api 支付
+       function jsApiCall()
+       {
+           WeixinJSBridge.invoke(
+           'getBrandWCPayRequest', {{ params|safe }},
+            function (res)
+            {
+                WeixinJSBridge.log(res.err_msg);
+                 if(res.err_msg == "get_brand_wcpay_request:ok"){
+                   //支付成功跳转
+                       window.location.href="http://car.anaf.cn/sijizhifu_confirm";
+                   }else{
+                       alert('支付失败');
+                         
+                   }
+                alert(res.err_code+res.err_desc+res.res.err_msg);
+            }
+            );
+       };
+
+       function callpay()
+       {
+           if (typeof WeixinJSBridge == "undefined")
+           {
+               if (document.addEventListener)
+               {
+                   document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+               }
+               else if (document.attachEvent)
+               {
+                   document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+                   document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+               }
+           }
+           else
+           {
+               jsApiCall();
+           }
+       }
+
+ </script>
+{% endblock %}
+
+
+  
+
+
+
+

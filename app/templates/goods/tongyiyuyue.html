@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}确认通知{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='webuploader/webuploader.css')}}">
+<script type="text/javascript" src="{{url_for('static',filename='webuploader/webuploader.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='webuploader/jquery.js')}}"></script>
+
+
+
+
+<section class='ui-container'>
+    <div class="ui-tips ui-tips-success">
+        <i></i>
+        <span>您同意了该价格的预约请求，
+        <br>后台将进行身份信息的验证，
+        <br>验证完毕后将会电话告知您。</span>
+    </div>
+
+</section>
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+

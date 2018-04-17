@@ -23,14 +23,14 @@
 		        	<input type="hidden" name="goodsid" value="{{gd.id}}">
 
 		
-		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		            <div class="ui-form-item ui-border-b" >
 		                <i class='icon-home icon-large' style='color:#548B54'></i>[出发]
-		                {{gd.start_shi}}{{gd.start_qu}}{{gd.start_address}}
+		                {{gd.start_sheng}}{{gd.start_shi}}{{gd.start_qu}}
 		            </div>
 
-		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		            <div class="ui-form-item ui-border-b" >
 	                    <i class='icon-truck icon-large' style='color:#1E90FF'></i>[目的]
-	                    {{gd.end_shi}}{{gd.end_qu}}{{gd.end_address}}
+	                    {{gd.end_sheng}}{{gd.end_shi}}{{gd.end_qu}}
 	                </div>
 
 	                <div class="ui-form-item ui-border-b">
@@ -65,22 +65,7 @@
 	                </div>
 	                {%endif%}
 
-	                <!-- <div class="ui-form-item ui-border-b">
-	                    <i class='icon-hospital icon-large'></i>[企业]
-	                    &nbsp;{{gd.consignorsGoods.name}}&nbsp;
-
-	                    {%if gd.consignorsGoods.state==2%} 
-			            <i class='icon-thumbs-up'></i>诚信企业
-			            {%endif%}
-
-	                    {%if gd.consignorsGoods.state==1%} 
-			            <i class='icon-check'></i>认证企业
-			            {%endif%}
-			            {%if gd.consignorsGoods.state==0%} 
-			            <i class='icon-tag'></i>未认证
-			            
-			            {%endif%}
-	                </div> -->
+	               
 
 	                <div class="ui-form-item ui-border-b" style="color:red">
 	                    预约运费(元)
@@ -107,7 +92,7 @@
 	                    <div class="ui-select">
 	                        <select name="car">
 	                        {%for i in current_user.drivers%}
-							<option value="{{i.id}}">车牌{{i.number}}，车长{{i.length}} </option>
+							<option value="{{i.id}}">{{i.number}}，{{i.length}} </option>
 							{%endfor%}
 	                        </select>
 	                    </div>
@@ -116,10 +101,10 @@
 
 	            
 		        <ul class="ui-list ui-list-pure ui-border-tb">
-		        	{%for s in gd.driver_self_post_id%}
+		        	{%for s in gd.driver_self_posts%}
 	                <li class="ui-border-t">
 	                    <p><span class="date">{{s.create_time.strftime("%m/%d %H:%M")}}
-	                    用户{{s.driver_self_order_driver.users.phone|string|replace_substring()}}预约价格:{{s.price}}元</span></p>
+	                    用户{{s.driver.user.phone|string|replace_substring()}}预约价格:{{s.price}}元</span></p>
 	                    <!-- <h4>{{s.consignors}}:预约运费价格:{{s.price}}元</h4> -->
 	                </li>
 	                {%endfor%}
@@ -130,7 +115,7 @@
 	            <div class="ui-btn-wrap">
 	                
 						<input type="submit" value="立即预约" class="ui-btn-lg ui-btn-danger"> <br>
-						<a class="ui-btn-lg ui-btn-primary" href="tel:07713103126"><i class='icon-phone icon-1x' ></i>&nbsp;电话沟通马上接单</a>
+						<!-- <a class="ui-btn-lg ui-btn-primary" href="tel:07713103126"><i class='icon-phone icon-1x' ></i>&nbsp;电话沟通马上接单</a> -->
 	                </div>
 				
 		        </form>
@@ -171,7 +156,6 @@ function sub(){
 	#ui-container{
 		border-top:45px solid transparent;
 		border-bottom:60px solid transparent;
-
 	}
 </style>
 {% endblock %}

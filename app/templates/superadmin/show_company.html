@@ -1,0 +1,50 @@
+{% extends "superadmin/base.html" %}
+{% block title %}{{company.name}}{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+
+
+<div class="row" >
+	<div class="col-xs-4"><h2>公司编号：{{company.id}}</h2></div>
+	<div class="col-xs-8">
+	<h2>{%if company.state ==0%}
+      未认证
+      {%endif%}
+      {%if company.state ==1%}
+      待审核
+      <a href="{{url_for('superadmin.finish_company',id=company.id)}}">确认信息无误</a>
+      <a href="{{url_for('superadmin.forbid_company',id=company.id)}}">不通过</a>
+      {%endif%}
+      {%if company.state ==2%}
+      已通过
+      <a href="{{url_for('superadmin.repeal_company',id=company.id)}}">撤销</a>
+      {%endif%}</a></h2>
+      </div>
+	<div class="col-xs-12"><h2>公司信息：{{company.name}}</h2></div>
+	<div class="col-xs-12"><h2>公司地址：{{company.address}}</h2></div>
+	<div class="col-xs-4"><h2>负责人姓名：{{company.fuzheren}}</h2></div>
+	<div class="col-xs-8"><h2>身份证：{{company.shenfenzheng}}</h2></div>
+</div>
+
+
+<div class="row" >
+{%for i in company.consignor_imagesed%}
+<div class="col-xs-6">
+	<img src="{{i.url}}" class="img-rounded" width="500",height='500'>
+	 <p>{{i.name}}</p>
+</div>
+{%endfor%}	
+</div>
+
+
+
+</div>
+
+{% endblock %}
+

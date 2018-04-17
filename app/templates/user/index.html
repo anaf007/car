@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}首页{% endblock %}
+{% block title %}用户中心{% endblock %}
 {% block head %}
          {{ super() }}
 {% endblock %}
@@ -10,26 +10,38 @@
 	
 
 <section class="ui-container" style='border-bottom:60px solid transparent;'>
-<div style="background-color:#00CD66;color:white;padding-top:10px;">
+<div style="background-color:#18b4ed;color:white;padding-top:10px;">
 <div style="float:left;width:100%;">
 	
-	<p style="float:right;padding-right:5px;"><a href="tel:0771-3815241" style="color:white;">联系客服</a></p>	
+    <p style="float:right;padding-right:5px;"><a href="tel:15907711863" style="color:white;">联系客服</a></p>  
+   
 </div>
 	
 	<div class="ui-avatar-one" style="margin:0px auto;">
-		<span style="background-image:url('{{user.gravatar(size=120)}}');"></span>
-		
+		{%if headimgurl%}
+        <span style="background-image:url('{{headimgurl}}');"></span>
+        {%else%}
+                <span style="background-image:url('{{current_user.gravatar(size=120)}}');"></span>
+        {%endif%}
 	</div>
 	<div style="margin:0px auto;padding-top:10px;text-align:center">
-		<p class="ui-tag-wrap"><i class="ui-tag-vip"></i>{{current_user.phone}}[{{current_user.role.name}}]</p>
+    <p>{{current_user.phone}}</p>
 		<p style="text-align:center">
-			下单
-            {%if current_user.role.name=='司机'%}
-{{getSend_Driver_post_Count(current_user.drivers)}}次&nbsp;接单0次&nbsp;违约0次
+        [{{current_user.role.name}}]
+        {%if current_user.user_infos.info_level==1%}
+        [未认证]
 {%endif%}
-{%if current_user.role.name=='货主'%}
-0次&nbsp;接单0次&nbsp;违约0次
+{%if current_user.user_infos.info_level==2%}
+[已认证]
 {%endif%}
+{%if current_user.user_infos.info_level==3%}
+[诚信会员]
+{%endif%}
+</p>
+		<p style="text-align:center">
+			下单{{current_user.user_infos.order_times}}次&nbsp;
+            接单{{current_user.user_infos.order_number}}次&nbsp;
+            违约{{current_user.user_infos.treaty_number}}次
 		</p>
 	</div>
 	
@@ -47,22 +59,27 @@
     <li data-href='{{url_for(".car")}}'><div><i class='icon-truck icon-2x' style='color:#2E8B57'></i></div><i>车辆信息</i></li>
     {%endif%}
     {%if current_user.role.name=='货主'%}
-    <li><div><i class='icon-list-alt icon-2x' style='color:#2E8B57'></i></div><i>企业信息</i></li>
+    <li data-href='{{url_for("goods.show_consignor")}}'><div><i class='icon-list-alt icon-2x' style='color:#2E8B57'></i></div><i>企业信息</i></li>
     {%endif%}
    
 </ul>
 
 <ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
     <li data-href='{{url_for(".show_order")}}'><div>
-    <i class='icon-file icon-2x' style='color:#2E8B57'></i></div><i>下单信息</i></li>
+    <i class='icon-file icon-2x' style='color:#2E8B57'></i></div><i>下单列表</i></li>
+    {%if current_user.role.name=='货主'%}
+    <li data-href='{{url_for(".huoyunxinxi")}}'><div>
+    <i class='icon-truck icon-2x' style='color:#2E8B57'></i></div><i>货运信息</i></li>
+    {%else%}
     <li data-href='{{url_for(".selforder")}}'><div>
     <i class='icon-paste icon-2x' style='color:#2E8B57'></i></div><i>接单信息</i></li>
+    {%endif%}
     
     <li data-href='{{url_for(".mark")}}'><div><i class='icon-tags icon-2x' style='color:#2E8B57'></i></div><i>我的预约</i></li>
 </ul>
 <ul class="ui-tiled" style="padding: 10px;padding-top: 20px;">
     <li data-href='{{url_for(".freight_line")}}'><div><i class='icon-exchange icon-2x' style='color:#2E8B57' ></i></div><i>货运专线</i></li>
-    <li data-href='{{url_for(".dakehu")}}'><div><i class='icon-group icon-2x' style='color:#2E8B57'></i></div><i>大客户</i></li>
+    <li data-href='{{url_for(".tuijiannajiang")}}'><div><i class='icon-group icon-2x' style='color:#2E8B57'></i></div><i>推荐拿奖</i></li>
     <li data-href='{{url_for(".setting")}}'><div><i class='icon-cog icon-2x' style='color:#2E8B57'></i></div><i>设置</i></li>
 </ul>
 <p>&nbsp;</p>

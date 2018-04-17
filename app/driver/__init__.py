@@ -9,7 +9,7 @@ from flask import Blueprint
 
 driver = Blueprint('driver',__name__)
 
-from . import views 
+from . import driver_views 
 from flask import render_template
 
 # from ..models import Permission

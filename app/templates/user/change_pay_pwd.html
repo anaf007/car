@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}修改支付密码{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+
+<section class='ui-container'>
+
+{%if current_user.verify_pay_pwd('111111')%}
+<div class="ui-tips ui-tips-info">
+    <i></i><span>默认支付密码为“111111”,请修改。</span>
+</div>
+{%endif%}
+
+{%for message in get_flashed_messages(category_filter=['error'])%}
+ <div class="ui-tips ui-tips-warn">
+<i></i><span>{{message}}</span>
+</div>
+
+{%endfor%}
+{%for message in get_flashed_messages(category_filter=['success'])%}
+<div class="ui-tips ui-tips-success">
+    <i></i><span>{{message}}</span>
+</div>
+{%endfor%}
+<form action="" method="post">
+<div class="ui-form ui-border-t">
+<div class="ui-form-item ui-form-item-pure ui-border-b">
+<input type="password" placeholder="原支付密码" name="old_pwd">
+</div>
+<div class="ui-form-item ui-form-item-pure ui-border-b">
+<input type="password" placeholder="新支付密码" name="new_pwd">
+</div>
+<div class="ui-form-item ui-form-item-pure ui-border-b">
+<input type="password" placeholder="再次输入新支付密码" name="re_new_pwd">
+</div>
+
+<div class="ui-btn-wrap">
+    <button class="ui-btn-lg ui-btn-primary">
+        修改
+    </button>
+</div>
+<!-- <div class="ui-form-item ui-form-item-r ui-border-b">
+<input type="text" placeholder="短信验证码">
+<button type="button" class="ui-border-l disabled">重新发送</button>
+</div> -->
+
+</div>
+</form>
+</section>
+
+{% endblock %}
+
+

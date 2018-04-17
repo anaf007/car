@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}支付完成{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<section class="ui-container">
+<section id="notice">
+    <div class="demo-item">
+        <div class="demo-block">
+            <section class="ui-notice">
+                <p>支付完毕，您确定了订单信息，司机将在指定时间前来装货，如司机有违约将全额返还运费并补偿一定的损失。</p>
+                <p>司机装货后，您可在用户中心里查看车辆的位置情况。</p>
+                <div class="ui-notice-btn">
+                    <button class="ui-btn-primary ui-btn-lg" onclick="javascript:window.location.href='/'">完成</button>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+</section>
+<style>
+	.ui-notice p{color: red;}
+</style>
+{% endblock %}
+
+
+  
+
+
+
+

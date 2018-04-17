@@ -1,50 +1,187 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>make_goods_show</title>
-</head>
-<body>
-{{goods.id}},
-{{goods.make_count}},
-	[出发]{{goods.start_sheng}}——{{goods.start_shi}},
-	[目的]{{goods.end_sheng}}——{{goods.end_shi}}
-	{%if goods.name%}{{goods.name}}{%endif%}
-	{%if goods.car_length%}{{goods.car_length}}{%endif%}{%if goods.tiji%}{{goods.tiji}}{%endif%}{%if goods.zhongliang%}{{goods.zhongliang}}{%endif%}
-	运费价格：{{goods.start_price}}
-	<!-- {{goods.driver_self_post_id}} -->
-	{%for i in goods.driver_self_post_id.order_by('state desc,price')%}
-	<br>
-	<br>
-	<div>
-	预约时间：{{i.create_time}}，预约价格：{{i.price}} 手机号码：{{i.driver_self_order_driver.users.phone}} 
-	获得运费：<input type="text" name="price" id="price"> 
-	{%if i.state%}
-	已推送
-	{%else%}
-	<a href="#" onclick="comfire(this,'{{goods.id}}','{{i.driver_self_order_driver.id}}','{{i.id}}');">[推送]</a>
-	{%endif%}
-	
-	</div>
-	{%endfor%}
-	<hr>
+{% extends "superadmin/base.html" %}
+{% block title %}预约表详细{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
 
-	<script>
-	function comfire(athis,goodsid,driverid,confirmid){
-		var b = athis.parentNode.childNodes; 
-		var price = 0.00;
-		for(var i=0;i<b.length;i++){
-			if(b[i].type=='text'){
-				price = b[i].value;
-			}
-		}
-		goodsid = parseInt(goodsid);
-		driverid = parseInt(driverid);
-		confirmid = parseInt(confirmid);
-		price =  (parseFloat(price)).toFixed(2);
-		// alert(price);
-		if(isNaN(price)){
-			alert('请输入运费价格。');
+
+{% block body %}
+<div class="container table-responsive">
+
+
+{%for message in get_flashed_messages(category_filter=['error'])%}
+<div class="alert alert-warning">
+    <a href="#" class="close" data-dismiss="alert">
+        &times;
+    </a>
+    <strong>{{message}}</strong>
+</div>
+{%endfor%}
+
+<div class="row" >
+	<div class="col-xs-8">
+		<h2>公司信息：{{goods.consignor.name}}，
+		{%if goods.consignor.user.user_infos.info_level==1%}未认证{%endif%}
+    {%if goods.consignor.user.user_infos.info_level==2%}已认证{%endif%}
+    {%if goods.consignor.user.user_infos.info_level==3%}诚信会员{%endif%}
+		</h2>
+	</div>
+	<div class="col-xs-4">
+		<h3>联系电话：{{goods.consignor.user.phone}}</h3>
+	</div>
+
+</div>
+<div class="row" >
+	<div class="col-xs-4">
+		<h2>货物编号：{{goods.id}}</h2>
+	</div>
+	<div class="col-xs-8">
+		<h3>起运地：{{goods.start_xiangxi_address}}</h3>
+	</div>
+
+</div>
+<div class="row" >
+	<div class="col-xs-4">
+		<h2>货物名称：{{goods.name}}</h2>
+	</div>
+	<div class="col-xs-8">
+		<h3>目的地：{{goods.end_xiangxi_address}}</h3>
+	</div>
+</div>
+<div class="row" >
+	<div class="col-xs-8">
+		<div class="row" >
+			<div class="col-xs-6">
+				<h2>预约人数：{{goods.make_count}}人</h2>
+			</div>
+			<div class="col-xs-6">
+				<h3>装车时间：{{goods.start_car_time|dateformat("Y-M-d")}}&nbsp;{{goods.start_zone}}</h3>
+			</div>
+		</div>
+		<div class="row" >
+			<div class="col-xs-6">
+				<h2>发布时间：{{goods.create_time|dateformat("Y-M-d")}}</h2>
+			</div>
+			<div class="col-xs-6">
+				<h1>运费：{{goods.start_price}}</h1>
+			</div>
+		</div>
+
+	</div>
+	<div class="col-xs-4 text-center" >
+		<div class="row" style="background-color: #FAEBD7;">
+			<div class="col-xs-12">
+				<h2>
+				<a href="{{url_for('superadmin.change_online_pirce',goodsid=goods.id)}}">
+				{%if goods.online_pirce==0%}线下支付{%endif%}
+				{%if goods.online_pirce==1%}线上支付{%endif%}
+				</a>
+				</h2>
+			</div>
+			
+		</div>
+		<div class="row" style="background-color: #00F5FF;">
+			<div class="col-xs-12">
+				{%if goods.end_price%}
+				<h1>实际运费：{{goods.end_price}}</h1>
+				{%else%}
+				<div class="col-xs-12">
+					<div class="form-group">
+		<label for="name">&nbsp;</label>
+		<input type="text" class="form-control" id="price" 
+			   placeholder="请输入司机的支付定金">
+	</div>
+				</div>
+				
+				{%endif%}
+			</div>
+		</div>
+		
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-8"><h1>车辆要求：
+	{%if goods.select_car_type%}{{goods.select_car_type}}{%endif%}&nbsp;
+	{%if goods.car_length%}{{goods.car_length}}{%endif%}&nbsp;
+	{%if goods.tiji%}{{goods.tiji}}{%endif%}&nbsp;
+	{%if goods.zhongliang%}{{goods.zhongliang}}{%endif%}
+	{%if goods.car_type%}{{goods.car_type}}{%endif%}
+	</h1>
+	</div>
+	<div class="col-xs-4 text-center" style="background-color: #f8df96;">
+		<h2>
+		{%if goods.state==0%}等待司机接单{%endif%} <!-- 推送 -->
+		{%if goods.state==1%}等待司机同意{%endif%} <!-- 等待司机付款 -->
+		{%if goods.state==2%}运输中{%endif%} <!-- 司机已经付款等待运输 -->
+		{%if goods.state==3%}运输完成等待货主确认{%endif%} <!-- 运输完成 -->
+		{%if goods.state==4%}货主已确认订单完成{%endif%} <!-- 交易完成 -->
+		</h2>
+	</div>
+</div>
+<table class="table table-hover">
+  <caption>预约货物的车辆表</caption>
+  <thead>
+    <tr>
+      <th>预约价格</th>
+      <th>预约时间</th>
+      <th>手机号</th>
+      <th>违约次数</th>
+      <th>账户等级</th>
+      <th>预约车辆详情(车长/体积/重量)</th>
+      <th>操作</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  	{%for i in goods.driver_self_posts.order_by('state ,price')%}
+    <tr>
+    <th>{{i.price}}</th>
+    <th>{{i.create_time}}</th>
+    <th>{{i.driver.user.phone}}</th>
+    <th>{{i.driver.user.user_infos.treaty_number}}次</th>
+    <th>
+    {%if i.driver.user.user_infos.info_level==1%}未认证{%endif%}
+    {%if i.driver.user.user_infos.info_level==2%}已认证{%endif%}
+    {%if i.driver.user.user_infos.info_level==3%}诚信会员{%endif%}
+    </th>
+    <th>{{i.driver.number}}&nbsp;
+    {{i.driver.length}}&nbsp;
+    {{i.driver.tiji}}&nbsp;
+    {{i.driver.zhongliang}}&nbsp;
+    {{i.driver.car_type}}&nbsp;
+    </th>
+    <th>
+	{%if i.state==3%}
+    <!-- <a href="/superadmin/make_goods_comfirm/{{goods.id}}/{{i.driver.id}}/{{i.id}}/{{i.price}}" >[接单]</a> 货主已同意 -->
+    <a href="#" onclick="comfire({{goods.id}},{{i.driver.id}},{{i.id}})">[接单]</a> 货主已同意
+    {%endif%}
+    {%if goods.state ==0%}
+	    {%if i.state==0%}
+	    <a href="#" onclick="comfire({{goods.id}},{{i.driver.id}},{{i.id}})">[接单]</a>  &nbsp;&nbsp;&nbsp;
+	    <a href="/superadmin/make_goods_no/{{goods.id}}/{{i.driver.id}}/{{i.id}}" style="color:#EEB4B4">[不接]</a>
+	    {%endif%}
+    {%endif%}
+    {%if i.state==1%}
+	[已推送]
+	<a href="/superadmin/make_goods_repeal/{{goods.id}}/{{i.id}}">撤回</a>
+    {%endif%}
+    </th>
+     
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+</div>
+<script>
+	function comfire(goodsid,driverid,confirmid){
+		var goodsid = parseInt(goodsid);
+		var driverid = parseInt(driverid);
+		var confirmid = parseInt(confirmid);
+		var price = document.getElementById('price').value;
+		
+		if(price==""){
+			alert('请输入司机需要支付的定金。');
 			return;
 		}
 		window.location.href="/superadmin/make_goods_comfirm/"
@@ -55,5 +192,5 @@
 		
 	}
 	</script>
-</body>
-</html>
+{% endblock %}
+

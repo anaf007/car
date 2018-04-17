@@ -9,7 +9,7 @@ from flask import Blueprint,request
 
 main = Blueprint('main',__name__)
 
-from . import views,errors 
+from . import main_views,errors 
 
 from ..models import Permission
 
@@ -22,9 +22,9 @@ def inject_permissions():
 
 
 
-@main.before_request
-def mark_current_user_online():
-	mark_online(request.remote_addr)
+# @main.before_request
+# def mark_current_user_online():
+# 	mark_online(request.remote_addr)
 
 
 

@@ -11,10 +11,6 @@
 <script type="text/javascript" src="{{url_for('static',filename='webuploader/webuploader.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static',filename='webuploader/jquery.js')}}"></script>
 
-<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>车辆信息</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
 
 
 
@@ -30,10 +26,12 @@
 
 	<section id="form">
 		<div class="ui-form ui-border-t">
-	        <form action="{{url_for('driver.show_post_p')}}" method="post">
+	        <form action="{{url_for('driver.show_post_p')}}" method="post" enctype="multipart/form-data">
 	        	<input type="hidden" name="id" value="{{driver.id}}">
 	            <div class="ui-form-item ui-border-b">
-	                <label style="width:75px;">车牌号码</label>
+	                <label style="width:75px;">车牌号码
+
+                    </label>
 	                <input type="text" value="{{driver.number}}" name="number" placeholder='请输入车牌号码'>
 	            </div>
 	            <div class="ui-form-item ui-border-b" >
@@ -59,55 +57,82 @@
                         </select>
                     </div>
                 </div>
+{%if current_user.drivers.filter_by(number=driver.number).first().state==0%}
+                <div class="ui-form-item ui-border-b" >
+                    <label>行驶证</label>
+                    <div >
+                        <input type="file" name="xingshizheng" id="">
+                    </div>
+                </div>
+
+
+                <div class="ui-form-item ui-border-b" >
+                    <label>驾驶证</label>
+                    <div >
+                        <input type="file" name="jiashizheng" id="">
+                    </div>
+                </div>
+                <div class="ui-form-item ui-border-b" >
+                    <label>车头照</label>
+                    <div >
+                        <input type="file" name="chetouzhao" id="">
+                    </div>
+                </div>
+                <div class="ui-form-item ui-border-b" >
+                    <label>车尾照</label>
+                    <div >
+                        <input type="file" name="cheweizhao" id="">
+                    </div>
+                </div>
 
 
 
 
-                <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                <!-- <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
                 	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
-                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;" >
-                            
-
-
-                			<!-- 行驶证照片 -->
+                			<img src="/static/images/a1.jpg" width="95%" height="160" style="border-radius: 15px;" >                                        			
+                	</div>
+	            </div> -->
+<!--
+	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
+                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
+                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
+                			
                 	</div>
 	            </div>
 
 	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
                 	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
                 			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
-                			<!-- 车头照 -->
+                			
                 	</div>
 	            </div>
 
 	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
                 	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
                 			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
-                			<!-- 车身照 -->
+                			
                 	</div>
 	            </div>
 
 	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
                 	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
                 			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
-                			<!-- 车尾照 -->
+                			
                 	</div>
 	            </div>
-
-	            <div class="ui-flex ui-flex-pack-center" style="padding:10px;text-align:center;border-top:0px;border-bottom:0px;">
-                	<div style="border:2px #cccccc dashed;padding-top:5px;border-radius: 15px;">
-                			<img src="/static/images/1.jpg" width="95%" height="160" style="border-radius: 15px;">
-                			<!-- 人车照 -->
-                	</div>
-	            </div>
-
+-->
 
                 <div class="ui-btn-wrap">
 	                <button class="ui-btn-lg ui-btn-danger">
 	                    确定并修改
 	                </button>
 	            </div>
-
+                
+{%endif%}
+<div class="ui-btn-wrap" >
+                 <input type="button" value="联系客服" class="ui-btn-lg ui-btn-primary" > 
+                </div>
 	            <p>&nbsp;</p>
 	            <p>&nbsp;</p>
 	            <p>&nbsp;</p>

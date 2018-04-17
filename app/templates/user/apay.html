@@ -7,26 +7,98 @@
 
 {% block body %}
 
-<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>我的钱包</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
+
 
 <section class='ui-container'>
+{%for message in get_flashed_messages(category_filter=['error'])%}
+<div class="ui-tips ui-tips-warn">
+<i></i><span>{{message}}</span>
+</div>
+{%endfor%}
+{%for message in get_flashed_messages(category_filter=['success'])%}
+<div class="ui-tips ui-tips-success">
+<i></i><span>{{message}}</span>
+</div>
+{%endfor%}
+{%if not current_user.user_infos.kahao and current_user.price>0%}
+<div class="ui-tips ui-tips-info">
+<i></i><span>绑定银行卡才能申请提现。</span>
+</div>
+{%endif%}
+<p class="demo-desc ui-border-b">我的钱包：</p>
 
-<div class="ui-form-item ui-border-b" style="margin-top:10px;">
-<label>信用资金</label>
-<input type="text" value="0元">
+<div class="ui-form-item ui-form-item-r ui-border-b">
+<input type="text" value="钱包资金：{{current_user.price}}元">
+		{%if current_user.price>0 and current_user.user_infos.kahao%}
+		<button type="button" class="ui-border-l" id="tixian">提现</button>
+		{%endif%}
 </div>
-<div class="ui-form-item ui-border-b">
-<label>钱包资金</label>
-<input type="text" value="0元">
-</div>
-<div class="ui-form-item ui-border-b">
-<label>优惠券</label>
-<input type="text" value="0张">
+<div class="ui-form-item ui-form-item-r ui-border-b">
+<input type="text" value="锁定余额：{{current_user.lock_price}}元">
 </div>
 
+<div class="ui-form-item ui-form-item-r ui-border-b">
+<input type="text" value="优惠券：0张">
+</div>
+
+<div class="ui-dialog">
+    <div class="ui-dialog-cnt">
+	    <form action="{{url_for('usercenter.tixianshenqing')}}" method="post" id="tixianforn">
+        <div class="ui-dialog-bd">
+        <div class="ui-form-item ui-form-item-pure">
+            <input type="password" placeholder="请输入支付密码" name="zhifumima">
+        </div>
+
+        </div>
+        
+        <div class="ui-dialog-ft">
+            <button type="button" data-role="button">取消</button>
+            {%if current_user.user_infos.kahao%}
+            <button type="button" data-role="button" onclick="formSubmit()">提现</button>
+            {%endif%}
+        </div>
+        </form>
+    </div>        
+</div>
+
+{%if current_user.tixianchengqings.limit(1).all()%}
+<div class="demo-item">
+    <p class="demo-desc">提现列表：</p>
+    <div class="demo-block">
+        <ul class="ui-list ui-list-pure ui-border-tb">
+        {%for i in current_user.tixianchengqings.order_by('id desc').limit(20)%}
+            <li class="ui-border-t">
+                <p><span>时间：{{i.create_time}}</span></p>
+                <h4>提现金额：{{i.price}}元， 状态：
+                {%if i.state==0%}
+                审核中
+                {%endif%}
+                {%if i.state==1%}
+                打款中
+                {%endif%}
+                {%if i.state==2%}
+                已完成
+                {%endif%}
+    
+                </h4>
+            </li>
+        {%endfor%}
+            
+        </ul>
+    </div>
+</div>
+{%endif%}
 </section>
+<script class="demo-script">
+$("#tixian").click(function(){
+    $(".ui-dialog").dialog("show");
+});
+
+</script>
+<script>
+function formSubmit(){
+  document.getElementById("tixianforn").submit();
+}
+</script>
 {% endblock %}
 

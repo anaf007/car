@@ -1,11 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>superadmin</title>
-</head>
-<body>
-	superadmin-index <br>
-	<a href="{{url_for('superadmin.make_goods')}}">货物预约信息</a>
-</body>
-</html>
+{% extends "superadmin/base.html" %}
+{% block title %}后台主页{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+<div class="container table-responsive">
+<div class="row">
+	
+	<div class="col-xs-2"><h2>CPU:</h2></div>
+	<div class="col-xs-4"><h2>逻辑个数：{{psutil.cpu_count()}}</h2></div>
+	<div class="col-xs-4"><h2>物理个数：{{psutil.cpu_count(logical=False)}}</h2></div>
+	
+</div>
+<div class="row">
+	<div class="col-xs-2"><h4>user:{{cpu.user}}</h4></div>
+	<div class="col-xs-2"><h4>nice:{{cpu.nice}}</h4></div>
+	<div class="col-xs-2"><h4>system:{{cpu.system}}</h4></div>
+	<div class="col-xs-2"><h4>idle:{{cpu.idle}}</h4></div>
+	<div class="col-xs-2"><h4>使用率:{{psutil.cpu_percent()}}%</h4></div>
+</div>
+
+<div class="row">
+	
+	<div class="col-xs-2"><h2>内存:</h2></div>
+	<div class="col-xs-4"><h2>总：{{mem.total//1024//1024}}MB</h2></div>
+	<div class="col-xs-4"><h2>可用:{{mem.available//1024//1024}}MB</h2></div>
+	
+</div>
+
+<div class="row">
+	
+	<div class="col-xs-2"><h2>磁盘:</h2></div>
+	<div class="col-xs-3"><h2>total：{{disk.total//1024//1024//1024}}GB</h2></div>
+	<div class="col-xs-2"><h2>used:{{disk.used//1024//1024//1024}}GB</h2></div>
+	<div class="col-xs-2"><h2>free:{{disk.free//1024//1024//1024}}GB</h2></div>
+	<div class="col-xs-2"><h2>percent:{{disk.percent//1024//1024//1024}}GB</h2></div>
+	
+</div>
+
+
+
+</div>
+
+{% endblock %}

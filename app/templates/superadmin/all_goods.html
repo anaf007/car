@@ -1,0 +1,137 @@
+{% extends "superadmin/base.html" %}
+{% block title %}所有货物信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+{%for message in get_flashed_messages(category_filter=['error'])%}
+<div class="alert alert-warning">
+    <a href="#" class="close" data-dismiss="alert">
+        &times;
+    </a>
+    <strong>{{message}}</strong>
+</div>
+{%endfor%}
+
+<div class="row" >
+<form role="form" method="post">
+
+  <div class="col-xs-1">
+    <div class="form-group">
+    <input type="text" class="form-control" name="goodsid" placeholder="货物ID">
+  </div>
+  </div>
+
+  <div class="col-xs-1">
+    <div class="form-group">
+    <input type="text" class="form-control" name="start_address" placeholder="出发地">
+  </div>
+  </div>
+
+  <div class="col-xs-1">
+    <div class="form-group">
+    <input type="text" class="form-control" name="end_address" placeholder="目的地">
+  </div>
+  </div>
+
+  <div class="col-xs-1">
+    <div class="form-group">
+    <input type="text" class="form-control" name="low_price" placeholder="低价格">
+  </div>
+  </div>
+  <div class="col-xs-1">
+    <div class="form-group">
+    <input type="text" class="form-control" name="height_price" placeholder="高价格">
+  </div>
+  </div>
+
+  <div class="col-xs-2">
+    <div class="form-group">
+    <input type="text" class="form-control" name="start_car_time" placeholder="发车时间2017-09-30">
+
+  </div>
+  </div>
+
+  <div class="col-xs-2">
+    <div class="form-group">
+    <select class="form-control" name='pay_type'>
+      <option value=""  selected="selected">支付方式</option>
+      <option value="1">线上支付</option>
+      <option value="0">线下支付</option>
+    </select>
+  </div>
+  </div>
+
+  <div class="col-xs-1">
+    <button type="submit" class="btn btn-default">查询</button>
+  </div>
+</form>
+  <div class="col-xs-2">
+  <div class="btn-group">
+   <button class="btn btn-default">上一页</button>
+   <button class="btn btn-default">下一页</button>
+</div>
+
+    
+  </div>
+  
+
+  
+</div>
+
+  
+
+
+<table class="table table-hover">
+  <caption>所有货物信息表</caption>
+  <thead>
+    <tr>
+      <th>货物编号</th>
+      <th>出发-目的</th>
+      <th>价格</th>
+      <th>货物名称</th>
+      <th>车辆要求(车长/体积/重量)</th>
+      <th>装货时间</th>
+      <th>发布时间</th>
+      <th>支付方式</th>
+      <th>状态</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+  	{%for i in gd%}
+    <tr>
+      <td>{{i.id}}</td>
+      <td><a href="{{url_for('superadmin.make_goods_show',id=i.id)}}">{{i.start_shi}}->{{i.end_shi}}</a></td>
+      <td>{{i.start_price}}</td>
+      <td>{{i.name}}</td>
+      <td>{{i.select_car_type}}
+      {{i.car_length}}/
+      {{i.tiji}}/
+      {{i.zhongliang}}</td>
+      <td>{{i.start_car_time|dateformat("Y-M-d")}}{{i.start_zone}}</td>
+      <td>{{i.create_time|dateformat("Y-M-d")}}{{i.start_zone}}</td>
+      <td>
+        {%if i.online_pirce==0%} <span style='color:red'>线下支付</span> {%endif%}
+      {%if i.online_pirce==1%}线上支付{%endif%}
+      </td>
+      <td>
+      {%if i.state==0%}已发布{%endif%}
+      {%if i.state==1%}已推送{%endif%}
+      {%if i.state==2%}司机已付款{%endif%}
+      {%if i.state==3%}司机运达{%endif%}
+      {%if i.state==4%}完成{%endif%}
+      </td>
+      <td><a href="#">删除</a></td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+
+

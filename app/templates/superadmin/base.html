@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% block head %}
+	<meta charset="utf-8">
+	<title>{% block title %}{% endblock %}后台管理</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="{{url_for('static',filename='super/css/bootstrap.min.css')}}" rel="stylesheet">
+	<script src="{{url_for('static',filename='super/js/jquery.min.js')}}"></script>
+	<script src="{{url_for('static',filename='super/js/bootstrap.min.js')}}"></script>
+{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-inverse" role="navigation">
+	<div class="container">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">后台管理</a>
+    </div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    用户管理 <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{url_for('superadmin.all_user_info')}}">所有用户</a></li>
+                    <li><a href="{{url_for('superadmin.all_user_message')}}">用户消息</a></li>
+                    <li><a href="{{url_for('superadmin.all_user_position')}}">用户位置</a></li>
+                    <!-- <li class="divider"></li> -->
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    货主 <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{url_for('superadmin.all_company')}}">所有公司信息</a></li>
+                    <li><a href="{{url_for('superadmin.all_goods')}}">所有货物信息</a></li>
+                    <li><a href="{{url_for('superadmin.make_goods')}}">货物预约信息</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    司机<b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">所有车队信息</a></li>
+                    <li><a href="{{url_for('superadmin.all_driver')}}">所有车辆信息</a></li>
+                    <li><a href="{{url_for('superadmin.all_driver_post')}}">所有车运信息</a></li>
+                    <li><a href="{{url_for('superadmin.mark_driver_post')}}">车运预约信息</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    内容管理<b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">首页横幅图片</a></li>
+                    <li><a href="#">首页文字滚动</a></li>
+                    <li><a href="#">首页文字静态</a></li>
+                </ul>
+            </li>
+
+            <li >
+                <a href="{{url_for('superadmin.all_order_pay')}}" >支付资金列表</a>
+            </li>
+
+            <li >
+                <a href="{{url_for('superadmin.all_tixian')}}" >提现申请列表</a>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    微信接口<b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{url_for('superadmin.wx_materia')}}">素材列表</a></li>
+                    <li><a href="#">#</a></li>
+                    <li><a href="#">#</a></li>
+                </ul>
+            </li>
+
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    系统管理<b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{url_for('superadmin.all_scheduler')}}">定时任务</a></li>
+                    <li><a href="#">#</a></li>
+                    <li><a href="#">#</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+	</div>
+</nav>
+
+{% block body %}
+{% endblock %}
+</body>
+
+</html>

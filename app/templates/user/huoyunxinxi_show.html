@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}运输信息{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+
+<section class='ui-container'>
+    
+<ul class="ui-list ui-list-pure ui-border-tb">
+    <li class="ui-border-t">
+
+
+        {%if op.goodsed.state==4%}
+            <div class="ui-tag-freelimit">
+            <!-- <p><span>时间{{op.create_time}}</span></p> -->
+            <h4>订单号：{{op.order}}</h4>
+            <p>卸货地点：【{{op.goodsed.end_xiangxi_address}}】</p>
+            <p>装货时间：{{op.goodsed.start_car_time|dateformat("Y-M-d")}}&nbsp;{{op.goodsed.start_zone}}</p>
+            <p>车辆信息：{{op.driver.number}}&nbsp;{{op.driver.length}}&nbsp;{{op.driver.car_type}}&nbsp;{{op.driver.zhongliang}}&nbsp;</p>        
+            <p>联系电话：1590771863</p>            
+            </div>
+        {%else%}
+            <h4>订单号：{{op.order}}</h4>        
+            <p>装货地点：【{{op.goodsed.start_xiangxi_address}}】</p>
+            <p>卸货地点：【{{op.goodsed.end_xiangxi_address}}】</p>
+            <p>装货时间：{{op.goodsed.start_car_time|dateformat("Y-M-d")}}&nbsp;{{op.goodsed.start_zone}}</p> 
+            <p>车辆信息：{{op.driver.number}}&nbsp;{{op.driver.length}}&nbsp;{{op.driver.car_type}}&nbsp;{{op.driver.zhongliang}}&nbsp;</p>             
+            <p>联系电话：{{op.driver.user.phone}}</p>
+            {%if op.goodsed.state==2%} 
+                {%if op.goodsed.online_pirce%}
+            
+<div id="container" style="width:100%;height:300px;"></div>
+
+
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&key=5e1b3e64caf0d25eb6bca46848269bf9&callback=init"></script> 
+<script>
+    function init(){
+        var longitude = {{op.driver.user.positions.order_by('id desc').first().longitude}};
+        var latitude = {{op.driver.user.positions.order_by('id desc').first().latitude}};
+        var mapObj = new AMap.Map('container', {
+            center: [longitude,latitude],
+            zoom: 13
+
+        });
+        mapObj.plugin(["AMap.ToolBar"], function() {
+            mapObj.addControl(new AMap.ToolBar());
+        });
+        marker = new AMap.Marker({
+            title: '司机位置',
+            map: mapObj
+        });
+    }
+</script>
+            {%endif%}
+            {%endif%}
+            {%if op.goodsed.state==3%} 
+             <div class="ui-btn-wrap">
+                <button class="ui-btn-lg ui-btn-primary" data-href="/usercenter/consignor_finish/{{op.id}}">完成订单</button>
+            </div>
+            {%endif%}
+        {%endif%}
+    </li>
+
+</ul>
+</section>
+<script>
+$('.ui-btn-wrap button').click(function(){
+    if($(this).data('href')){
+        location.href= $(this).data('href');
+    }
+});
+</script>
+<style>
+.ui-tag-freelimit:before {
+    content: '完成';
+    /*background-color: red;*/
+}
+.ui-tag-freelimit{
+    /*background-color: red;*/
+}
+</style>
+{% endblock %}
+
+

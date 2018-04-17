@@ -1,0 +1,49 @@
+{% extends "superadmin/base.html" %}
+{% block title %}车牌号码{{d.name}}{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+
+
+<div class="row" >
+	<div class="col-xs-4"><h2>车辆编号：{{d.id}}</h2></div>
+	<div class="col-xs-8">
+	<h2>{%if d.state ==0%}
+      未认证
+      {%endif%}
+      {%if d.state ==1%}
+      待审核
+      <a href="{{url_for('superadmin.finish_driver',id=d.id)}}">确认信息无误</a>
+      <a href="{{url_for('superadmin.forbid_driver',id=d.id)}}">不通过</a>
+      {%endif%}
+      {%if d.state ==2%}
+      已通过
+      <a href="{{url_for('superadmin.forbid_driver',id=d.id)}}">撤销</a>
+      {%endif%}</a></h2>
+      </div>
+	<div class="col-xs-12"><h2>车牌号码：{{d.number}}</h2></div>
+	<div class="col-xs-12"><h2>运力状况：{{d.length}}，{{d.tiji}}，{{d.zhongliang}}，</h2></div>
+	<div class="col-xs-4"><h2>类型：{{d.car_type}}，</h2></div>
+</div>
+
+
+<div class="row" >
+{%for i in d.driver_images%}
+<div class="col-xs-6">
+	<img src="{{i.url}}" class="img-rounded" width="450",height='450'>
+	 <p>{{i.name}}</p>
+</div>
+{%endfor%}	
+</div>
+
+
+
+</div>
+
+{% endblock %}
+

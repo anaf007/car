@@ -20,14 +20,14 @@
 			<div class="demo-item"></div>
 			<div class="ui-form ui-border-t">
 		        
-		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		            <div class="ui-form-item ui-border-b" >
 		                <i class='icon-home icon-large' style='color:#548B54'></i>[出发]
-		                {{dp.start_shi}}{{dp.start_qu}}{{dp.start_address}}
+		                {{dp.start_sheng}}{{dp.start_shi}}{{dp.start_qu}}
 		            </div>
 
-		            <div class="ui-form-item ui-border-b" style='font-size:12px;'>
+		            <div class="ui-form-item ui-border-b" >
 	                    <i class='icon-truck icon-large' style='color:#1E90FF'></i>[目的]
-	                   {{dp.end_shi}}{{dp.end_qu}}{{dp.end_address}}
+	                   {{dp.end_sheng}}{{dp.end_shi}}{{dp.end_qu}}
 	                </div>
 
 	                <div class="ui-form-item ui-border-b">
@@ -37,20 +37,20 @@
 
 	                <div class="ui-form-item ui-border-b">
 	                    <i class='icon-suitcase icon-large' style='color:#8A2BE2'></i>[车牌号]
-	                    {{dp.driverPosts.number}}
+	                    {{dp.driver.number}}
 	                </div>
 	                <div class="ui-form-item ui-border-b">
 	                    <i class='icon-suitcase icon-large' style='color:#8A2BE2'></i>[车辆信息]
-	                    {%if dp.driverPosts.length%}
-	                    {{dp.driverPosts.length}}
+	                    {%if dp.driver.length%}
+	                    {{dp.driver.length}}
 	                    {%endif%}
-	                    {%if dp.driverPosts.tiji%}
-	                    {{dp.driverPosts.tiji}}
+	                    {%if dp.driver.tiji%}
+	                    {{dp.driver.tiji}}
 	                    {%endif%}
-	                    {%if dp.driverPosts.zhongliang%}
-	                    {{dp.driverPosts.zhongliang}}
+	                    {%if dp.driver.zhongliang%}
+	                    {{dp.driver.zhongliang}}
 	                    {%endif%}
-	                    {{dp.driverPosts.car_type}}  
+	                    {{dp.driver.car_type}}  
 	                </div>   
 	                {%if dp.note%}
 	                <div class="ui-form-item ui-border-b">
@@ -67,8 +67,8 @@
 	                </div>
 
 	               <div class="demo-block" style="color:red">
-	                    您的预约信息已成功提交，后台正在进行匹配，稍后会电话通知您。	                    
-	                    <span style='color:blue;'>如您（公司）是需要长期用车，可点击下方“申请长期用车”获得最专业的的车辆运输专线。</span>
+	                    您的预约信息已成功提交，后台正在进行匹配，稍后会电话通知您。<!-- 	                    
+	                    <span style='color:blue;'>如您（公司）是需要长期用车，可点击下方“申请长期用车”获得最专业的的车辆运输专线。</span> -->
 	                </div>
 
 
@@ -78,12 +78,12 @@
 	                
 						<input type="submit" value="完成" class="ui-btn-lg ui-btn-danger" onclick="javascript:window.location='{{url_for('main.index')}}';"> 
 	                </div>
-
+<!-- 
 	                <div class="ui-btn-wrap" style="border-bottom:50px;">
 	                
 						<input type="submit" value="申请长期用车" class="ui-btn-lg ui-btn-primary"> 
 	                </div>
-
+ -->
 	                <div class="ui-btn-wrap">
 	                
 						

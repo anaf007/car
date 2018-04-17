@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}修改支付密码{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+
+
+<section class='ui-container'>
+
+
+{%for message in get_flashed_messages(category_filter=['error'])%}
+ <div class="ui-tips ui-tips-warn">
+<i></i><span>{{message}}</span>
+</div>
+
+{%endfor%}
+{%for message in get_flashed_messages(category_filter=['success'])%}
+<div class="ui-tips ui-tips-success">
+    <i></i><span>{{message}}</span>
+</div>
+{%endfor%}
+{%if current_user.user_infos.kahao %}
+
+<p class="demo-desc">银行卡：</p>
+<ul class="ui-list ui-list-function ui-border-tb">
+<li class="ui-border-t">
+    <div class="ui-list-info">
+        <h4 class="ui-nowrap">所属银行：{{current_user.user_infos.suoshuyinhang}}</h4>
+    </div>
+    <!-- <div class="ui-btn">删除</div> -->
+</li>
+
+<li class="ui-border-t">
+    <div class="ui-list-info">
+        <h4 class="ui-nowrap">银行卡号：{{current_user.user_infos.kahao[0:4]}}****{{current_user.user_infos.kahao[-4:]}}</h4>
+    </div>
+    <!-- <div class="ui-btn">删除</div> -->
+</li>
+
+<li class="ui-border-t">
+    <div class="ui-list-info">
+        <h4 class="ui-nowrap">开户行：{{current_user.user_infos.kaihuhang}}</h4>
+    </div>
+    <!-- <div class="ui-btn">删除</div> -->
+</li>
+</ul>
+
+{%else%}
+<style>
+.ui-footer{display: none;}
+</style>
+<p class="demo-desc">添加银行卡：</p>
+<form action="" method="post">
+<div class="ui-form ui-border-t">
+
+<div class="ui-form-item ui-border-b">
+    <label>所属银行</label>
+    <div class="ui-select">
+        <select name='suoshuyinhang'>
+            <option selected="selected">中国银行</option>
+            <option>建设银行</option>
+            <option>农业银行</option>
+            <option>工商银行</option>
+            <option>邮政银行</option>
+        </select>
+    </div>
+</div>
+
+<div class="ui-form-item ui-form-item-pure ui-border-b">
+<input type="text" placeholder="开户行，如广东省广州市" name="kaihuhang">
+</div>
+<div class="ui-form-item ui-form-item-pure ui-border-b">
+<input type="text" placeholder="银行卡号" name="kahao">
+</div>
+
+<div class="ui-btn-wrap">
+    <button class="ui-btn-lg ui-btn-primary">
+        添加
+    </button>
+</div>
+<!-- <div class="ui-form-item ui-form-item-r ui-border-b">
+<input type="text" placeholder="短信验证码">
+<button type="button" class="ui-border-l disabled">重新发送</button>
+</div> -->
+
+</div>
+</form>
+{%endif%}
+<div class="ui-btn-wrap">
+    <button class="ui-btn-lg ui-btn-danger">
+        联系客服
+    </button>
+</div>
+</section>
+
+{% endblock %}
+
+

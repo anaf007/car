@@ -5,13 +5,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="format-detection" content="telephone=no">
-        <title>{% block title %}{% endblock %}-anaf</title>
+        <title>{% block title %}-调度猿{% endblock %}</title>
         
         <link rel="stylesheet" href="{{url_for('static',filename='main/css/style.css')}}">
         <link rel="stylesheet" href="{{url_for('static',filename='main/css/font-awesome.min.css')}}">
         <link rel="stylesheet" href="{{url_for('static',filename='main/css/main.css')}}">
         <script src="{{url_for('static',filename='main/js/zepto.min.js')}}"></script>
         <script src="{{url_for('static',filename='main/js/style.js')}}"></script>
+        
 
 
         
@@ -69,9 +70,11 @@
        
         </script>
     </body>
-    <style>
-
-    </style>
+    <script>
+    {{ moment.include_jquery() }}
+        {{ moment.include_moment() }}
+        {{ moment.lang("zh-CN") }} 
+        </script>
 </html>
 
 	

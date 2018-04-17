@@ -1,0 +1,66 @@
+{% extends "superadmin/base.html" %}
+{% block title %}支付资金列表{% endblock %}
+{% block head %}
+         {{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container table-responsive">
+
+{%for message in get_flashed_messages(category_filter=['error'])%}
+<div class="alert alert-warning">
+    <a href="#" class="close" data-dismiss="alert">
+        &times;
+    </a>
+    <strong>{{message}}</strong>
+</div>
+{%endfor%}
+
+<div class="row">
+   <div class="col-xs-10">
+
+
+   </div>
+
+   <div class="col-xs-2">
+      <div class="btn-group">
+      <button class="btn btn-default">上一页</button>
+      <button class="btn btn-default">下一页</button>
+      </div>
+   </div>
+
+</div>
+
+
+<table class="table table-hover">
+  <caption>支付资金列表</caption>
+  <thead>
+    <tr>
+      <th>编号</th>
+      <th>订单</th>
+      <th>支付时间</th>
+      <th>支付用户</th>
+      <th>支付金额</th>
+      <th>订单标记</th>
+      <th>状态</th>
+    </tr>
+  </thead>
+  <tbody>
+  	{%for i in info%}
+    <tr>
+      <td>{{i.id}}</td>
+      <td>{{i.order}}</td>
+      <td>{{i.pay_time}}</td>
+      <td>{{i.user.phone}}</td>
+      <td>{{i.pay_price}}</td>
+      <td>{{i.note}}</td>
+      <td>{{i.state}}</td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+
+

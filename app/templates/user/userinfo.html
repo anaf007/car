@@ -7,69 +7,60 @@
 
 {% block body %}
 
-<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>用户信息</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
+
 
 <section class='ui-container'>
-<div class="ui-avatar-one" style="margin:0px auto;margin-top:20px;">
+<section class="ui-placehold-img">
+    <!-- <span style="background-image:url(http://placeholder.qiniudn.com/640x200)"></span> -->
+    <span style="background-image:url(/static/images/a1.jpg);"></span>
+</section>
+<!-- <div class="ui-avatar-one" style="margin:0px auto;margin-top:20px;">
 	<span style="background-image:url('{{current_user.gravatar(size=120)}}');"></span>
-</div>
+</div> -->
 <!-- <img src="{{current_user.gravatar(size=80)}}" > <br> -->
 
 <div class="ui-form-item ui-border-b" style="margin-top:10px;">
 <label>联系方式：</label>
 <input type="text" value="{{current_user.phone}}">
 </div>
-<div class="ui-form-item ui-border-b">
-<label>信用等级：</label>
-<input type="text" value="一星会员">
-</div>
+
 <div class="ui-form-item ui-border-b">
 <label>信息等级：</label>
+{%if current_user.user_infos.info_level==1%}
 <input type="text" value="未认证">
+{%endif%}
+{%if current_user.user_infos.info_level==2%}
+<input type="text" value="已认证">
+{%endif%}
+{%if current_user.user_infos.info_level==3%}
+<input type="text" value="诚信会员">
+{%endif%}
+</div>
+<div class="ui-form-item ui-border-b">
+<label>信用积分：</label>
+<input type="text" value="{{current_user.user_infos.source}}分">
 </div>
 <div class="ui-form-item ui-border-b">
 <label>推荐人数：</label>
-<input type="text" value="0人">
+<input type="text" value="{{current_user.user_infos.recommended}}人">
 </div>
-{%if current_user.role.name=='司机'%}
-<div class="ui-form-item ui-border-b">
-<label>预约次数：</label>
-<input type="text" value="{{getSend_Driver_post_Count(current_user.drivers)}}次">
-</div>
+
+
 <div class="ui-form-item ui-border-b">
 <label>下单次数：</label>
-<input type="text" value="{{getSend_Driver_post_Count(current_user.drivers)}}次">
+<input type="text" value="{{current_user.user_infos.order_times}}次">
 </div>
 
 <div class="ui-form-item ui-border-b">
 <label>接单次数：</label>
-<input type="text" value="0次">
+<input type="text" value="{{current_user.user_infos.order_number}}次">
 </div>
 
 <div class="ui-form-item ui-border-b">
 <label>违约次数：</label>
-<input type="text" value="0次">
-</div>
-{%endif%}
-{%if current_user.role.name=='货主'%}
-<div class="ui-form-item ui-border-b">
-<label>下单次数：</label>
-<input type="text" value="0次">
+<input type="text" value="{{current_user.user_infos.treaty_number}}次">
 </div>
 
-<div class="ui-form-item ui-border-b">
-<label>接单次数：</label>
-<input type="text" value="0次">
-</div>
-
-<div class="ui-form-item ui-border-b">
-<label>违约次数：</label>
-<input type="text" value="0次">
-</div>	
-{%endif%} 
 
 
 </section>

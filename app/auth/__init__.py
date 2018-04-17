@@ -9,7 +9,7 @@ from flask import Blueprint,current_app,session,make_response
 
 auth = Blueprint('auth',__name__)
 
-from . import views 
+from . import auth_views 
 
 
 import random,string,StringIO
@@ -73,3 +73,8 @@ def get_verify():
     def get():
     	return generate_verification_code()
     return dict(get_verify=get)
+
+
+
+
+    

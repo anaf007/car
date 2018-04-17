@@ -25,6 +25,7 @@ class Permission:
 	DRIVER = 0x08  #司机栏目
 	CONSIGNOR =0x10 #货主栏目
 	ADMINISTER = 0x80	#管理员
+	SUPERADMIN = 0x80	#超级管理员
 
 
 """角色表 一对多，一个角色对应多个用户
@@ -77,15 +78,6 @@ class Role(db.Model):
 		db.session.commit()
 
 
-#多对多关系
-#自引用关系
-class Follow(db.Model):
-	__tablename__ = 'follows'
-	follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),primary_key=True)
-	followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),primary_key=True)
-	timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-
 class User(UserMixin,db.Model):
 	__tablename__ = 'users'
 	id = db.Column(db.Integer,primary_key = True)
@@ -93,60 +85,60 @@ class User(UserMixin,db.Model):
 	username = db.Column(db.String(64),unique=True,index=True)
 	#密码
 	password_hash = db.Column(db.String(128))
-	#角色，多对一
-	role_id = db.Column(db.Integer,db.ForeignKey('roles.id'))
-	#名字
-	name = db.Column(db.String(64))
-	#地址
-	location = db.Column(db.String(64))
-	#自我简介
-	about_me = db.Column(db.Text())
+	#支付密码
+	pay_pwd_hash = db.Column(db.String(128),default='')
 	#创建时间
-	member_since = db.Column(db.DateTime(),default=datetime.utcnow)
+	member_since = db.Column(db.DateTime(),default=datetime.now)
 	#最后访问时间
-	last_seen = db.Column(db.DateTime(),default=datetime.utcnow)
-	#头像哈希
-	avatar_hash = db.Column(db.String(32))
+	last_seen = db.Column(db.DateTime(),default=datetime.now)
 	#电子邮箱，找回密码
 	mail = db.Column(db.String(100),unique=True) 
 	#手机号，也可以用于登陆
 	phone  = db.Column(db.String(100),index=True,unique=True)
-	#货主表 一对一   uselist=False
-	consignors  = db.relationship('Consignor', backref='users',uselist=False)
-	#创建者负责人  多对一  relationship  不会在表中显示行
-	drivers  = db.relationship('Driver', backref='users',lazy='dynamic')
-	#车队
-	fleet_id  = db.Column(db.Integer())
-	#账户保障金
-	price = db.Column(db.Numeric(precision=10,scale=2,\
+	#账户资金
+	price  = db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None),default=0)
+	#账户锁定资金
+	lock_price  = db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None),default=0)
 	#状态  默认1
 	status = db.Column(db.Integer(),default=1)
-	#外键文章
-	article_id = db.relationship('Article',backref='author',lazy='dynamic')
-	#多对多关系
-	followed = db.relationship('Follow',
-								foreign_keys=[Follow.follower_id],
-								backref=db.backref('follower', lazy='joined'),
-								lazy='dynamic',
-								cascade='all, delete-orphan')
-	followers = db.relationship('Follow',
-								foreign_keys=[Follow.followed_id],
-								backref=db.backref('followed', lazy='joined'),
-								lazy='dynamic',
-								cascade='all, delete-orphan')
-	#评论
-	comments = db.relationship('Comment', backref='author', lazy='dynamic')
+
+	#头像哈希
+	avatar_hash = db.Column(db.String(32))
+	#微信openid
+	wx_open_id = db.Column(db.String(100))
+	#角色，多对一
+	role_id = db.Column(db.Integer,db.ForeignKey('roles.id'))
+	
+	#货主表 一对一   uselist=False
+	consignors  = db.relationship('Consignor', backref='user',uselist=False)
+	#创建者负责人  多对一  relationship  不会在表中显示行
+	drivers  = db.relationship('Driver', backref='user',lazy='dynamic')
+	#车队
+	fleet_id  = db.Column(db.Integer())
+	
 	#货物发布者 这里不做货物发布了   货物发布应当链接到货主表
 	# goods_id = db.relationship('Goods',backref='user_goods',primaryjoin='Goods.user_id == User.id')
 	#货物司机接单者
-	car_goods_id = db.relationship('Goods',backref='users',lazy='dynamic')
+	car_goods_id = db.relationship('Goods',backref='user',lazy='dynamic')
 	#付款者
-	order_pay = db.relationship('Order_pay', backref='order_pay_user',lazy='dynamic',primaryjoin='Order_pay.pay_user_id == User.id')
+	order_pays = db.relationship('Order_pay', backref='user',lazy='dynamic')
 	#用户邮件
-	user_msgs = db.relationship('User_msg', backref='user_msg',primaryjoin='User_msg.users == User.id')
+	user_msgs = db.relationship('User_msg', backref='user',lazy='dynamic')
 	#一对一 用户信息表
-	user_info  = db.relationship('User_info', backref='user_infos',uselist=False)
+	user_infos  = db.relationship('User_info', backref='user',uselist=False)
+	#用户位置表
+	positions = db.relationship('Position', backref='user',lazy='dynamic')
+	#用户优惠券
+	couponsed = db.relationship('Coupons', backref='user')
+	#提现shenqing
+	tixianchengqings = db.relationship('Tixianchengqing', backref='user',lazy='dynamic')
+	#提现打款操作员
+	# tixiancaozuoyuan = db.relationship('Tixianchengqing', backref='caozuoyuan',lazy='dynamic')
+	#是否已经允许定位  0未允许   1已允许
+	is_location = db.Column(db.Integer,default=0)
+	
 
 	def __init__(self,**kwargs):
 		super(User,self).__init__(**kwargs)
@@ -154,46 +146,14 @@ class User(UserMixin,db.Model):
 		#self.follow(self)
 		#赋予角色信息
 		if self.role is None:
-			if self.username ==current_app.config['SUPERADMIN_NAME']:
+			if self.username == current_app.config['SUPERADMIN_NAME']:
 				self.role = Role.query.filter_by(permissions=0xff).first()
 			if self.role is None:
 				self.role = Role.query.filter_by(default=True).first()
 
-		#头像
-		if self.avatar_hash is None:
-			#使用flask-admin这里得到的self为空
-			if self.username:
-				self.avatar_hash = hashlib.md5(self.username.encode('utf-8')).hexdigest()
-			# db.session.add(self)
-			# db.session.commit()
 
-	# def __repr__(self):
-	# 	return self.username
-
-	@property
-	def password(self):
-		raise AttributeError('password is not a readable attribute')
-
-	@password.setter
-	def password(self,password):
-		self.password_hash = generate_password_hash(password)
-
-	def verify_password(self,password):
-		return check_password_hash(self.password_hash,password)
-
-	#验证角色
-	def can(self,permissions):
-		return self.role is not None and \
-			(self.role.permissions & permissions) == permissions
-
-	#验证角色
-	def is_administrator(self):
-		return self.can(Permission.ADMINISTER)
-
-	#刷新用户最后访问时间
-	def ping(self):
-		self.last_seen = datetime.utcnow()
-		db.session.add(self)
+	def __unicode__(self):
+		return self.phone
 
 	#头像
 	def gravatar(self,size=100,default='identicon',rating='g'):
@@ -205,38 +165,55 @@ class User(UserMixin,db.Model):
 		return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
 				url=url,hash=hash,size=size,default=default,rating=rating)
 
-	#生成虚拟数据
-	@staticmethod
-	def generate_fake(count=100):
-		from sqlalchemy.exc import IntegrityError
-		from random import seed
-		import forgery_py
-		seed()
-		for i in range(count):
-			 u = User(username=forgery_py.internet.user_name(True),
-			 		password = forgery_py.lorem_ipsum.word(),
-			 		# confirmed=True,
-			 		name = forgery_py.name.full_name(),
-			 		location = forgery_py.address.city(),
-			 		about_me = forgery_py.lorem_ipsum.sentence(),
-			 		member_since = forgery_py.date.date(True)
-			 		)
-			 db.session.add(u)
-			 try:
-			 	db.session.commit()
-			 except Exception, e:
-			 	db.session.rollback()
 
+
+	@property
+	def password(self):
+		raise AttributeError('password is not a readable attribute')
+	@property
+	def pay_pwd(self):
+		raise AttributeError('pay_pwd is not a readable attribute')
+
+	@password.setter
+	def password(self,password):
+		self.password_hash = generate_password_hash(password)
+
+	@pay_pwd.setter
+	def pay_pwd(self,pay_pwd):
+		self.pay_pwd_hash = generate_password_hash(pay_pwd)
+
+	def verify_password(self,password):
+		return check_password_hash(self.password_hash,password)
+	def verify_pay_pwd(self,pay_pwd):
+		return check_password_hash(self.pay_pwd_hash,pay_pwd)
+
+	#验证角色
+	def can(self,permissions):
+		return self.role is not None and \
+			(self.role.permissions & permissions) == permissions
+
+	#管理员
+	def is_administrator(self):
+		return self.can(Permission.ADMINISTER)
+	def is_superadmin(self):
+		return self.can(Permission.SUPERADMIN)
+
+	#刷新用户最后访问时间
+	def ping(self):
+		self.last_seen = datetime.now()
+		db.session.add(self)
+
+#用户信息表
 class User_info(db.Model):
 	__tablename__ = 'user_infos'
 	id = db.Column(db.Integer,primary_key=True)	
 	#姓名
-	name = db.Column(db.String(64))	
+	name = db.Column(db.String(64),default='')	
 	#真实姓名
-	lastname = db.Column(db.String(64))	
+	lastname = db.Column(db.String(64),default='')	
 	#信用等级
 	level = db.Column(db.Integer,default=1)
-	#信息登录 1未认证 2已认证 3系统设置诚信会员 -1黑名单
+	#信息登录 1未认证 2已认证 3系统设置诚信会员 -1黑名单 
 	info_level = db.Column(db.Integer,default=1)
 	#推荐人数 
 	recommended = db.Column(db.Integer,default=0)
@@ -246,7 +223,81 @@ class User_info(db.Model):
 	order_number = db.Column(db.Integer,default=0)
 	#违约次数
 	treaty_number = db.Column(db.Integer,default=0)
-	users = db.Column(db.Integer,db.ForeignKey('users.id'))
+	#用户积分
+	source = db.Column(db.Integer,default=0)
+	#申请认证时间
+	cif_time = db.Column(db.DateTime())
+	#确认时间
+	confirm_time = db.Column(db.DateTime())
+	#银行卡所属银行
+	suoshuyinhang = db.Column(db.String(64),default='')	
+	kaihuhang = db.Column(db.String(200),default='')	
+	kahao = db.Column(db.String(64),default='')	
+
+	user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+
+#用户位置表
+class Position(db.Model):
+	__tablename__ = 'positions'
+	id = db.Column(db.Integer,primary_key=True)	
+	latitude = db.Column(db.String(64))	
+	longitude = db.Column(db.String(64))	
+	precision = db.Column(db.String(64))
+	timestamp = db.Column(db.DateTime,index=True,default=datetime.now)
+	user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+
+
+#提现申请
+class Tixianchengqing(db.Model):
+	__tablename__ = 'tixianchengqings'
+	id = db.Column(db.Integer,primary_key=True)	
+	user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+	caozuoyuan_id = db.Column(db.String(200))
+	#备注
+	note = db.Column(db.String(200))
+	#金额
+	price = db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None),default=0)
+	#申请时间
+	create_time = db.Column(db.DateTime(),default=datetime.now)
+	#完成时间
+	finish_time = db.Column(db.DateTime())
+	#状态 0创建申请，1进行中 2完成
+	state = db.Column(db.Integer,default=0)
+
+
+#优惠券
+class Coupons(db.Model):
+	__tablename__ = 'couponsion'
+	id = db.Column(db.Integer,primary_key=True)	
+	#优惠金额
+	price = db.Column(db.Numeric(precision=10,scale=2,\
+		asdecimal=True, decimal_return_scale=None),default=0)
+	#条件 大于多少才能使用
+	maxprice = db.Column(db.Integer,default=100)
+	#状态  1可使用 2已使用 0不可用
+	state = db.Column(db.Integer,default=1)
+	#创建时间
+	create_time = db.Column(db.DateTime,default=datetime.now)
+	#过期时间
+	expiration_time = db.Column(db.DateTime)
+	user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+
+	# def __unicode__(self):
+	# 	return self.price
+		
+
+"""
+class User_level(db.Model):
+	__tablename__ = 'user_level'
+	id = db.Column(db.Integer,primary_key=True)	
+	#等级名称  一星会员 二星会员
+	name = db.Column(db.String(64))	 
+	#资费优惠 百分比
+	discounts = db.Column(db.String(10))
+	#快捷发布条数
+	count = db.Column(db.Integer)	 
+"""
 
 
 #验证角色
@@ -265,146 +316,6 @@ def load_user(user_id):
 	return User.query.get(int(user_id))
 
 
-#文章
-class Article(db.Model):
-	__tablename__ = 'articles'
-	id = db.Column(db.Integer,primary_key=True)
-	#标题
-	title = db.Column(db.String(64))
-	#是否显示
-	show = db.Column(db.Boolean,default=True)
-	#点击次数
-	click = db.Column(db.Integer,default=random.randint(100,200)) 
-	#缩略图
-	thumbnail = db.Column(db.Text)
-	#关键字
-	seokey = db.Column(db.String(128))
-	#描述
-	seoDescription = db.Column(db.String(200))
-	#创建时间
-	timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
-	#用户角色 多对一   此表为多
-	author_id = db.Column(db.Integer,db.ForeignKey('users.id'))
-	#评论 一对多 对应多条评论
-	comments = db.relationship('Comment', backref='articles', lazy='dynamic')
-	#栏目内容
-	body = db.Column(db.Text)
-	#所属栏目
-	category_id = db.Column(db.Integer,db.ForeignKey('categorys.id'))
-	# category_id = db.relationship('Category', backref=db.backref('category', lazy='dynamic'))
-
-	def __repr__(self):
-		return u"<文章:{}>".format(self.title)
-
-	#生成虚拟数据
-	@staticmethod
-	def generate_fake(count=100):
-		from random import seed,randint
-		import forgery_py
-		seed()
-		user_count = User.query.count()
-		for i in range(count):
-			u = User.query.offset(randint(0,user_count-1)).first()
-			p = Article(title=forgery_py.name.full_name(),
-					body = forgery_py.lorem_ipsum.sentences(randint(1,3)),
-					timestamp=forgery_py.date.date(True),
-					author = u
-					)
-			db.session.add(p)
-			db.session.commit()
-
-	"""平板上花了挺长的时间  很多错误，
-	都是打错或者没导入，都解决了
-	python manage.py shell
-	from app.models import User,Post
-	User.generate_fake(100)
-	Post.generate_fake(100)
-	"""
-
-
-#评论
-class Comment(db.Model):
-	__tablename__ = 'comments'
-	id = db.Column(db.Integer,primary_key=True)
-	body = db.Column(db.Text)
-	body_html = db.Column(db.Text)
-	timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
-	disabled = db.Column(db.Boolean)
-	author_id =db.Column(db.Integer,db.ForeignKey('users.id'))
-	article_id = db.Column(db.Integer,db.ForeignKey('articles.id'))
-
-	@staticmethod
-	def on_changed_body(target,value,oldvalue,initiator):
-		allowed_tags = ['a','abbr','acronym','b','code','em','i','strong']
-		target.body_html 
-
-
-
-category_attribute_reg = db.Table('category_attribute_register',
-							db.Column('category_id',db.Integer,db.ForeignKey('categorys.id')),
-							db.Column('category_attribute_id',db.Integer,db.ForeignKey('category_attribute.id'))
-							)
-
-
-#顶级栏目
-class CategoryTop(db.Model):
-	__tablename__ = 'category_top'
-	id = db.Column(db.Integer,primary_key=True)
-	title = db.Column(db.String(255))
-	show = db.Column(db.Boolean,default=True)
-	nlink = db.Column(db.Text)
-	sort = db.Column(db.Integer,default=10)
-	template  = db.Column(db.String(64))
-	seoKey = db.Column(db.String(200))
-	seoDescription = db.Column(db.String(200))
-	body = db.Column(db.Text)
-	category = db.relationship('Category',backref='category_pid',lazy='dynamic')
-	category_attribute_id = db.Column(db.Integer,db.ForeignKey('category_attribute.id'))
-	
-	
-
-	def __repr__(self):
-		return self.title
-	
-
-#本来是想用多对多自引用关系 但是出现的错误太多，解决起来花很多时间，
-#干脆用一对多关系解决父级栏目关系
-#栏目导航分类
-class Category(db.Model):
-	__tablename__ = 'categorys'
-	id = db.Column(db.Integer,primary_key=True)
-	title = db.Column(db.String(64))
-	show = db.Column(db.Boolean,default=True)
-	sort = db.Column(db.Integer,default=100)
-	pubd =  db.Column(db.DateTime(),default = datetime.utcnow)
-	nlink = db.Column(db.Text)
-	template  = db.Column(db.String(64))
-	body = db.Column(db.Text)
-	#外键属性表
-	category_attribute_id = db.Column(db.Integer,db.ForeignKey('category_attribute.id'))
-	#父级栏目
-
-	category_top_id = db.Column(db.Integer,db.ForeignKey('category_top.id'))
-	#一对多文章
-	article_id = db.relationship('Article',backref='category',lazy='dynamic')
-	# article_id = db.Column(db.Integer,db.ForeignKey('Article.id'))
-	seoKey = db.Column(db.String(200))
-	seoDescription = db.Column(db.String(200))
-	
-
-	def __repr__(self):
-		return self.title
-
-
-class Category_attribute(db.Model):
-	__tablename__ = 'category_attribute'
-	id = db.Column(db.Integer,primary_key=True)
-	name = db.Column(db.String(64))
-	category_id = db.relationship('Category',backref='category_attribute',lazy='dynamic')
-	category_top_id = db.relationship('CategoryTop',backref='category_top_attribute',lazy='dynamic')
-	def __repr__(self):
-		return self.name
-
 
 #用户消息表
 class User_msg(db.Model):
@@ -412,12 +323,12 @@ class User_msg(db.Model):
 	id = db.Column(db.Integer,primary_key=True)
 	title = db.Column(db.String(64))
 	body = db.Column(db.Text)
-	timestamp = db.Column(db.DateTime(),default=datetime.utcnow)
+	timestamp = db.Column(db.DateTime(),default=datetime.now)
 	#是否显示？
 	show = db.Column(db.Integer,default=0)
 	#状态0已发送未读 1已读 -1删除 2已确认,已确认跟已读区别就是已确认就是支付内容一定的删除了
 	state = db.Column(db.Integer())
-	users = db.Column(db.Integer, db.ForeignKey('users.id'))
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 """
@@ -477,20 +388,26 @@ class Driver(db.Model):
 	#违约次数
 	break_number = db.Column(db.Integer(),default=0) 
 	#申请时间
-	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	create_time = db.Column(db.DateTime,default=datetime.now) 
 	#开通时间
-	start_time = db.Column(db.DateTime,default=datetime.utcnow) 
-	#状态
+	start_time = db.Column(db.DateTime,default=datetime.now) 
+	#状态 0未申请 1已申请   2已开通
 	state = db.Column(db.Integer(),default=0)
 	#车辆描述
 	note = db.Column(db.Text)
 	#车辆证件照片   一
-	driver_images = db.relationship('Driver_images', backref='driverImages',lazy='dynamic')
+	driver_images = db.relationship('Driver_images', backref='driver',lazy='dynamic')
 	#直接关联车辆信息表driver_posts ,2017-07-21-司机自助下单  直接关联这个表不用发布信息所以不用关联下面这个了
-	order_pay = db.relationship('Order_pay', backref='order_pays',lazy='dynamic',primaryjoin='Order_pay.drivers_id == Driver.id')
-	post = db.relationship('Driver_post', backref='driverPosts',lazy='dynamic',primaryjoin='Driver_post.driver_id == Driver.id')
+	order_pays = db.relationship('Order_pay', backref='driver',lazy='dynamic')
+	driver_posts = db.relationship('Driver_post', backref='driver',lazy='dynamic')
 	#司机自助下单货物用户
-	driver_self_post = db.relationship('Driver_self_order', backref='driver_self_order_driver',lazy='dynamic',primaryjoin='Driver_self_order.driver == Driver.id')
+	driver_self_orders = db.relationship('Driver_self_order', backref='driver',lazy='dynamic')
+
+	# def __unicode__(self):
+	# 	return self.number
+
+	def __unicode__(self):
+		return self.number
 
 
 
@@ -515,33 +432,49 @@ class Consignor(db.Model):
 	# 创建者主人# 多对一    会在表中创建user_id
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	#公司名称
-	name = db.Column(db.String(64))
+	name = db.Column(db.String(64),default='')
+	#负责人名字
+	fuzheren = db.Column(db.String(64),default='')
+	#负责人身份证号
+	shenfenzheng = db.Column(db.String(64),default='')
 	#公司大小规模 人数  20人  50人100人200人 500人1000人 2000人10000人
-	company_size = db.Column(db.String(50)) 
+	company_size = db.Column(db.String(50),default='') 
 	#公司行业，水产，销售 木材。。等等
-	company_industry = db.Column(db.String(50)) 
+	company_industry = db.Column(db.String(50),default='') 
 	#证件表  ，公司营业执照等证件。
 	# company_cer = db.Column(db.Integer()) 
 	#公司地址
-	address  = db.Column(db.String(255)) 
+	address  = db.Column(db.String(255),default='') 
 	#违约次数
 	break_number = db.Column(db.Integer(),default=0) 
 	#申请时间
-	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	create_time = db.Column(db.DateTime,default=datetime.now) 
 	#开通时间
-	start_time = db.Column(db.DateTime,default=datetime.utcnow) 
-	#状态 0未开通 1正常
+	start_time = db.Column(db.DateTime,default=datetime.now) 
+	#状态 0未开通 1申请中 2已通过
 	state = db.Column(db.Integer(),default=0)
 	#公司简介
-	note = db.Column(db.Text)
+	note = db.Column(db.Text,default='')
 	#接单车辆？ 接的是  车辆信息表
 	# driver_post = db.relationship('Driver_post', backref='driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Consignor.id')
 	#货物表
-	goods_id = db.relationship('Goods', backref='consignorsGoods',lazy='dynamic',primaryjoin='Goods.consignors_id == Consignor.id')
-	#货主自助下单   一对一uselist='False'？
-	goods_self_order = db.relationship('Goods_self_order', backref='consignors_selft_order',lazy='dynamic')
+	goodsed = db.relationship('Goods', backref='consignor',lazy='dynamic')
+	#货主自助下单   
+	goods_self_orders = db.relationship('Goods_self_order', backref='consignor',lazy='dynamic')
+	consignor_imagesed = db.relationship('Consignor_images', backref='consignor',lazy='dynamic')
 
+	def __unicode__(self):
+		return self.name
+	
 
+#货主照片
+class Consignor_images(db.Model):
+	__tablename__ = 'consignor_images'
+	id = db.Column(db.Integer(),primary_key=True)
+	name = db.Column(db.String(64)) #
+	url = db.Column(db.String(100))
+	#多
+	consignor_id = db.Column(db.Integer, db.ForeignKey('consignors.id'))
 
 #货主发布的货物信息表
 class Goods(db.Model):
@@ -581,7 +514,7 @@ class Goods(db.Model):
 	start_car_time =  db.Column(db.DateTime) 
 	start_zone = db.Column(db.String(10))
 	#发布时间
-	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	create_time = db.Column(db.DateTime,default=datetime.now) 
 	#发布者 不是user表 应该是货主公司表 
 	consignors_id = db.Column(db.Integer, db.ForeignKey('consignors.id'))
 	# user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -593,55 +526,61 @@ class Goods(db.Model):
 		asdecimal=True, decimal_return_scale=None))
 	#接单者
 	car_user_id =  db.Column(db.Integer, db.ForeignKey('users.id'))
-	#对应车辆信息表
-	driver_post_id = db.relationship('Driver_post', backref='goods_driver_posts',lazy='dynamic',primaryjoin='Driver_post.consignor_user_id == Goods.id')
+	# #对应车辆信息表
+	driver_posts = db.relationship('Driver_post', backref='goodsed',lazy='dynamic')
 	# derver_posts_id =  db.Column(db.Integer, db.ForeignKey('driver_post.id'))
 	#接单时间
 	receive_time = db.Column(db.DateTime) 
-	#状态 -2失效订单超时未支付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3司机已经运送抵达ok  4系统确认已经抵达ok 完成   其他状态等待 ?4初期未付款状态?
+	#状态 -2失效订单超时未支付  -1管理员关闭 0发布 
+	#1司机已经接单未付款 ，2司机已付款到系统  
+	#3司机已经运送抵达ok  4系统或货主确认已经抵达ok 完成  
+	#5货主确认了司机的接单信息   。其他状态等待 ?
 	state = db.Column(db.Integer(),default=0)
-	order_pay = db.relationship('Order_pay', backref='goods_order_pay',lazy='dynamic',primaryjoin='Order_pay.goods_id == Goods.id')
+	order_pays = db.relationship('Order_pay', backref='goodsed',lazy='dynamic')
 	#预约数量
 	make_count = db.Column(db.Integer,default=0)
 	#紧急状态 置顶1
 	show_statie = db.Column(db.Integer,default=0)
 	#自助下单
-	driver_self_post_id = db.relationship('Driver_self_order', backref='driver_self_orders',lazy='dynamic',primaryjoin='Driver_self_order.goods == Goods.id')
+	driver_self_posts = db.relationship('Driver_self_order', backref='goodsed',lazy='dynamic')
+	#是否在线支付运费  默认1在线支付
+	online_pirce = db.Column(db.Integer,default=1)
+	#货主是否已经支付运费。  默认未支付
+	price_is_pay = db.Column(db.Integer,default=0)
+
+	def __unicode__(self):
+		return u'ID:'+str(self.id)
 
 
-#货源留言表,目前还没有关系
-class Goods_comment(db.Model):
-	__tablename__ = 'goods_comments'
-	id = db.Column(db.Integer(),primary_key=True)
-	send_goods_id  = db.Column(db.Integer())
 
-
-#支付订单,预约表
+#支付订单表，一次交易有两条，一条货主支付运费，线下交易金额为0，一条司机支付定金
 class Order_pay(db.Model):
 	__tablename__ = 'order_pays'
 	id = db.Column(db.Integer,primary_key=True)
 	#订单
-	order  = db.Column(db.String(20),unique=True)
+	order  = db.Column(db.String(30),unique=True)
 	#货物
 	goods_id =  db.Column(db.Integer, db.ForeignKey('goods.id'))
 	#车辆
 	drivers_id =  db.Column(db.Integer, db.ForeignKey('drivers.id'))
-	#车辆信息
+	#车运信息
 	driver_post_id =  db.Column(db.Integer, db.ForeignKey('driver_posts.id'))
 	#创建时间
-	create_time = db.Column(db.DateTime,default=datetime.utcnow)
+	create_time = db.Column(db.DateTime,default=datetime.now)
 	#支付时间
 	pay_time = db.Column(db.DateTime)
 	#-1失效 0创建 1审核通过未支付 2已支付 
 	state = db.Column(db.Integer,default=0)
-	#支付者，不能直接关联货主或者车辆信息表  因为一个车可能是多个用户使用
+	#支付者，一个是货主  一个是  司机  
 	pay_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	#支付金额
 	pay_price = db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
+	#订单标记  货主支付运费  司机支付 定金
+	note = db.Column(db.String(50))
 
 
-#车源信息
+#车运信息
 class Driver_post(db.Model):
 	__tablename__ = 'driver_posts'
 	id = db.Column(db.Integer,primary_key=True)
@@ -669,12 +608,12 @@ class Driver_post(db.Model):
 	#发车时段  全天 上午下午晚上
 	zone = db.Column(db.String(100))
 
-	start_address = db.Column(db.String(100))
+	start_address = db.Column(db.String(200))
 	#目的省
-	end_address = db.Column(db.String(100))
+	end_address = db.Column(db.String(200))
 
 	#发布时间
-	create_time = db.Column(db.DateTime,default=datetime.utcnow) 
+	create_time = db.Column(db.DateTime,default=datetime.now) 
 	#发布者
 	driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
 	#开始报价运费
@@ -683,50 +622,19 @@ class Driver_post(db.Model):
 	#实际运费   接单结算运费 系统抽取比例  系统调节
 	end_price =  db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
-	#接单者，关联到货物信息表
-	consignor_user_id =  db.Column(db.Integer, db.ForeignKey('goods.id'))
+	# #接单者，关联到货物信息表
+	consignor_id =  db.Column(db.Integer, db.ForeignKey('goods.id'))
 	#接单时间
 	receive_time = db.Column(db.DateTime) 
 	#状态 -2失效订单被抢付  -1管理员关闭 0发布 1司机已经接单未付款 ，2司机已付款到系统  3已经运送抵达ok  4司机自身去接单，所以该条信息自动冲掉 ！5！其他状态等待
 	state = db.Column(db.Integer(),default=0)
-	#外键
-	order_pay = db.relationship('Order_pay', backref='driver_posts_order_pays',uselist='False')
+	#外键订单列表
+	order_pays = db.relationship('Order_pay', backref='driver_post')
 
-	goods_self_order = db.relationship('Goods_self_order', backref='driver_post_self_order',uselist='False')
+	goods_self_orders = db.relationship('Goods_self_order', backref='driver_post',lazy='dynamic')
 	#预约次数
 	make_count = db.Column(db.Integer,default=0)
 
-
-
-class Order_Task(db.Model):
-	__tablename__ = 'order_tasks'
-	id = db.Column(db.Integer,primary_key=True)
-	#订单号
-	order_str = db.Column(db.String(20))
-	#创建时间
-	create_time = db.Column(db.DateTime,default=datetime.utcnow)
-	#运行时间
-	run_time = db.Column(db.DateTime,default=datetime.utcnow)
-
-
-class Redis_Task(db.Model):
-	__tablename__ = 'redis_tasks'
-	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(80))
-	redis_key = db.Column(db.String(128), unique=True)
-	start_time = db.Column(db.DateTime)
-	create_date = db.Column(db.DateTime, default=datetime.utcnow)
-
-	def __init__(self, name, redis_key, start_time):
-		self.name = name
-		self.redis_key = redis_key
-		start_time = ':'.join(start_time.split(':')[:2])
-		self.start_time = datetime2.datetime.strptime(start_time, "%Y-%m-%d %H:%M")
-		# self.seconds as key expire seconds
-		self.seconds = int((self.start_time - datetime.utcnow()).total_seconds())
-
-	def __repr__(self):
-		return '<Task name:%r, key:%r>' % (self.name, self.redis_key)
 
 
 #车辆信息  车长  体积 方   重量 吨  不做外键。
@@ -746,24 +654,27 @@ class Car_Type(db.Model):
 
 #司机自助下单 货物预约表
 class Driver_self_order(db.Model):
-	__tablename__ = 'Driver_self_orders'
+	__tablename__ = 'driver_self_orders'
 	id = db.Column(db.Integer,primary_key=True)
-	driver = db.Column(db.Integer, db.ForeignKey('drivers.id'))
-	goods = db.Column(db.Integer, db.ForeignKey('goods.id'))
-	create_time = db.Column(db.DateTime,default=datetime.utcnow)
-	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
+	driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))
+	goods_id = db.Column(db.Integer, db.ForeignKey('goods.id'))
+	create_time = db.Column(db.DateTime,default=datetime.now)
+	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的 ,2司机不接单 3货主同意该预约
 	state = db.Column(db.Integer(),default=0)
 	#预约价格
 	price =  db.Column(db.Numeric(precision=10,scale=2,\
 		asdecimal=True, decimal_return_scale=None))
+
+	# def __unicode__(self):
+	# 	return self.driver_id
 
 #货主自助下单 车辆预约表
 class Goods_self_order(db.Model):
 	__tablename__ = 'goods_self_orders'
 	id = db.Column(db.Integer,primary_key=True)
-	driver_post = db.Column(db.Integer, db.ForeignKey('driver_posts.id'))
-	consignors = db.Column(db.Integer, db.ForeignKey('consignors.id'))
-	create_time = db.Column(db.DateTime,default=datetime.utcnow)
+	driver_post_id = db.Column(db.Integer, db.ForeignKey('driver_posts.id'))
+	consignors_id = db.Column(db.Integer, db.ForeignKey('consignors.id'))
+	create_time = db.Column(db.DateTime,default=datetime.now)
 	#状态默认0 1审核通过  一般一条货物信息只有一个是审核通过的
 	state = db.Column(db.Integer(),default=0)
 	#预约价格
@@ -771,4 +682,27 @@ class Goods_self_order(db.Model):
 		asdecimal=True, decimal_return_scale=None))
 
 
+#定时任务表
+class Scheduler_task(db.Model):
+	__tablename__ = 'scheduler_tasks'
+	id = db.Column(db.Integer,primary_key=True)
+	#任务名称
+	func_id = db.Column(db.String(200))
+	#创建时间  执行时间
+	create_time = db.Column(db.DateTime)
+	#函数名称
+	func = db.Column(db.String(100))
+	#参数  货源的id
+	args = db.Column(db.String(200))
 
+
+#还有推荐
+class Haoyoutuijian(db.Model):
+	__tablename__ = 'haoyoutuijians'
+	id = db.Column(db.Integer,primary_key=True)
+	tuijianren = db.Column(db.Integer)
+	beituijianren = db.Column(db.Integer)
+	create_time = db.Column(db.DateTime,default=datetime.now)
+
+
+	

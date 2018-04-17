@@ -1,16 +1,11 @@
 {% extends "base.html" %}
-{% block title %}发布车辆信息{% endblock %}
+{% block title %}发布车运信息{% endblock %}
 {% block head %}
          {{ super() }}
 {% endblock %}
 
 
 {% block body %}
-
-<header style='float:left;' class="ui-header ui-header-positive ui-border-b" >
-    <i class="ui-icon-return" onclick="history.back()"></i><h1>发布车源信息</h1>
-    <!-- <button class="ui-btn">回首页</button> -->
-</header>
 
 
 
@@ -197,9 +192,9 @@ function daybank(){
                 <div class="ui-btn-wrap">
                 <input type="submit" value="发布信息" class="ui-btn-lg ui-btn-danger"> 
                 </div>
-                 <div class="ui-btn-wrap">
+                 <!-- <div class="ui-btn-wrap">
 	            	<button class="ui-btn-lg ui-btn-primary active">快捷填写</button>
-	            </div>
+	            </div> -->
                  {%else%}
 <input type="submit" value="发布返程车信息并注册司机" class="ui-btn-lg ui-btn-danger"> 
                 {%endif%}
@@ -356,7 +351,9 @@ button{border-color: #ccc;}
 	/*.ui-border-b{float: left;}*/
 	.ui-select-group{width: 100%;}
 .ui-btn-danger:before{border:0px;}
+.ui-footer{display: none;}
 </style>
+
 {% endblock %}
 
 
