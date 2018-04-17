@@ -61,7 +61,7 @@ class DevelopmentConfig(Config):
 	SUPERADMIN_NAME = os.environ.get('SUPERADMIN_NAME') or 'admin'
 	#配置数据库路径从系统变量读取没有就根据字符串中的读取 mysql为例子
 	SQLALCHEMY_DATABASE_URI = os.environ.get('dev_database_url') or \
-		'mysql://root:cnpl3815241@127.0.0.1:3306/car'
+		'mysql://root:@127.0.0.1:3306/car'
 
 #测试配置
 class TestingConfig(Config):
